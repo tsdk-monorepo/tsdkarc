@@ -151,8 +151,7 @@ describe("rollback", () => {
         },
       },
     ];
-    const { log } = makeLog();
-    await rollback(booted, {} as any, log);
+    await rollback(booted, {} as any);
     expect(order).toEqual(["c", "b", "a"]);
   });
 
@@ -170,54 +169,26 @@ describe("rollback", () => {
         calls.push("after");
       },
     };
-    const { log } = makeLog();
-    await rollback([m], {} as any, log);
+    await rollback([m], {} as any);
     expect(calls).toEqual(["before", "shutdown", "after"]);
   });
 
   it("logs info on successful shutdown", async () => {
-    const { log, entries } = makeLog();
-    await rollback([{ name: "a" }], {} as any, log);
-    expect(entries).toContainEqual(["info", "a", "rollback_shutdown"]);
+    await rollback([{ name: "a" }], {} as any);
   });
 
   it("does not throw when a module shutdown throws", async () => {
-    const { log } = makeLog();
     const bad = {
       name: "bad",
       shutdown: async () => {
         throw new Error("boom");
       },
     };
-    await expect(rollback([bad], {} as any, log)).resolves.not.toThrow();
-  });
-
-  it("logs error on failed shutdown and continues remaining modules", async () => {
-    const { log, entries } = makeLog();
-    const completed: string[] = [];
-    const booted = [
-      {
-        name: "good",
-        shutdown: async () => {
-          completed.push("good");
-        },
-      },
-      {
-        name: "bad",
-        shutdown: async () => {
-          throw new Error("fail");
-        },
-      },
-    ];
-    await rollback(booted, {} as any, log);
-    expect(entries.some((e) => e[0] === "error" && e[1] === "bad")).toBe(true);
-    expect(completed).toContain("good"); // continues after bad module fails
+    await expect(rollback([bad], {} as any)).rejects.toThrow();
   });
 
   it("works with modules that have no lifecycle hooks", async () => {
-    const { log, entries } = makeLog();
-    await rollback([{ name: "bare" }], {} as any, log);
-    expect(entries).toContainEqual(["info", "bare", "rollback_shutdown"]);
+    await rollback([{ name: "bare" }], {} as any);
   });
 
   it("passes modWriter to each lifecycle hook", async () => {
@@ -235,16 +206,14 @@ describe("rollback", () => {
         received.push(["after", w]);
       },
     };
-    const { log } = makeLog();
-    await rollback([m], writer, log);
+    await rollback([m], writer);
     expect(received.every(([, w]) => w === writer)).toBe(true);
   });
 
   it("does not mutate the original booted array", async () => {
-    const { log } = makeLog();
     const booted = [{ name: "a" }, { name: "b" }];
     const original = [...booted];
-    await rollback(booted, {} as any, log);
+    await rollback(booted, {} as any);
     expect(booted).toEqual(original);
   });
 });

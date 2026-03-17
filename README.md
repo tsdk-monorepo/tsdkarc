@@ -127,7 +127,6 @@ const serverModule = defineModule<ServerSlice>()({
 });
 
 const app = await start([serverModule]);
-// app.ctx = ConfigSlice & DbSlice & ServerSlice
 await app.stop();
 ```
 
@@ -142,10 +141,10 @@ Use the second argument to `start()` for process-level concerns that need access
 ```ts
 const app = await start([serverModule], {
   afterBoot(ctx) {
-    process.on("uncaughtException", (err) => ctx.logger.error(err));
+    process.on("uncaughtException", (err) => console.error(err));
   },
   beforeShutdown(ctx) {
-    ctx.logger.info("shutting down");
+    console.error.info("shutting down");
   },
 });
 ```
@@ -188,14 +187,18 @@ const app = await start([serverModule]);
 beforeBoot → boot → afterBoot → [running] → beforeShutdown → shutdown → afterShutdown
 ```
 
-| Hook             | Purpose                                    |
-| ---------------- | ------------------------------------------ |
-| `beforeBoot`     | Pre-setup, before `ctx.set()` calls        |
-| `boot`           | Register values on `ctx` via `ctx.set()`   |
-| `afterBoot`      | All modules booted, cross-module ctx ready |
-| `beforeShutdown` | Prepare for teardown                       |
-| `shutdown`       | Release resources                          |
-| `afterShutdown`  | Final cleanup                              |
+| Hook                 | Purpose                                                                        |
+| -------------------- | ------------------------------------------------------------------------------ |
+| `beforeBoot`         | Pre-setup, Called once before the first module begins booting.                 |
+| `boot`               | Register values on `ctx` via `ctx.set()`                                       |
+| `afterBoot`          | Called once after the last module has finished booting.                        |
+| `beforeShutdown`     | Called once before the first module begins shutting down.                      |
+| `shutdown`           | Release resources                                                              |
+| `afterShutdown`      | Called once after the last module has finished shutting down.                  |
+| `beforeEachBoot`     | Called before each individual module boots, in boot order.                     |
+| `afterEachBoot`      | Called after each individual module finishes booting, in boot order.           |
+| `beforeEachShutdown` | Called before each individual module shuts down, in shutdown order.            |
+| `afterEachShutdown`  | Called after each individual module finishes shutting down, in shutdown order. |
 
 ---
 
@@ -207,7 +210,7 @@ beforeBoot → boot → afterBoot → [running] → beforeShutdown → shutdown 
 | ---------------- | -------------------------- | ----------------------------- |
 | `name`           | `string`                   | Unique module identifier      |
 | `description`    | `string`                   | Optional description          |
-| `modules`        | `Module[]`                 | Declared dependencies         |
+| `modules`        | `Module<Slice>[]`          | Declared dependencies         |
 | `beforeBoot`     | `(ctx) => void \| Promise` | Runs before boot              |
 | `boot`           | `(ctx) => void \| Promise` | Register values on ctx        |
 | `afterBoot`      | `(ctx) => void \| Promise` | Runs after all modules booted |
@@ -220,7 +223,7 @@ beforeBoot → boot → afterBoot → [running] → beforeShutdown → shutdown 
 | Field     | Description                            |
 | --------- | -------------------------------------- |
 | `roots`   | Top-level modules (deps auto-resolved) |
-| `options` | Global lifecycle hooks + custom logger |
+| `options` | Global lifecycle hooks                 |
 | `ctx`     | Merged, fully-typed context            |
 | `stop`    | Triggers full shutdown sequence        |
 

@@ -78,12 +78,50 @@ type AnyModule = Module<object, object>;
  *   afterBoot      — after the last module has booted
  *   beforeShutdown — before the first module shuts down
  *   afterShutdown  — after the last module has shut down
+ *
+ * Per-module variants (beforeEach*, afterEach*) fire once per module,
+ * in boot/shutdown order, with the current module passed as the second argument.
  */
 export interface LifecycleHooks<S extends object = Record<never, never>> {
+  /** Called once before the first module begins booting. */
   beforeBoot?(ctx: ContextWriter<S>): Promise<void> | void;
+
+  /** Called once after the last module has finished booting. */
   afterBoot?(ctx: ContextWriter<S>): Promise<void> | void;
+
+  /** Called once before the first module begins shutting down. */
   beforeShutdown?(ctx: ContextWriter<S>): Promise<void> | void;
+
+  /** Called once after the last module has finished shutting down. */
   afterShutdown?(ctx: ContextWriter<S>): Promise<void> | void;
+
+  /** Called before each individual module boots, in boot order. */
+  beforeEachBoot?(
+    ctx: ContextWriter<S>,
+    /** The module about to boot. */
+    module: Module<any>
+  ): Promise<void> | void;
+
+  /** Called after each individual module finishes booting, in boot order. */
+  afterEachBoot?(
+    ctx: ContextWriter<S>,
+    /** The module that just finished booting. */
+    module: Module<any>
+  ): Promise<void> | void;
+
+  /** Called before each individual module shuts down, in shutdown order. */
+  beforeEachShutdown?(
+    ctx: ContextWriter<S>,
+    /** The module about to shut down. */
+    module: Module<any>
+  ): Promise<void> | void;
+
+  /** Called after each individual module finishes shutting down, in shutdown order. */
+  afterEachShutdown?(
+    ctx: ContextWriter<S>,
+    /** The module that just finished shutting down. */
+    module: Module<any>
+  ): Promise<void> | void;
 }
 
 // ---------------------------------------------------------------------------
@@ -161,17 +199,6 @@ export function defineModule<OwnSlice extends object = Record<never, never>>() {
 }
 
 // ---------------------------------------------------------------------------
-// Logger
-// ---------------------------------------------------------------------------
-
-export type Logger = (
-  level: "info" | "error",
-  module: string,
-  event: string,
-  data?: unknown
-) => void;
-
-// ---------------------------------------------------------------------------
 // StartOptions
 // ---------------------------------------------------------------------------
 
@@ -181,9 +208,8 @@ export type Logger = (
  *
  * S is inferred from the roots tuple — no explicit type param needed.
  */
-export type StartOptions<S extends object = Record<never, never>> = {
-  log?: Logger;
-} & LifecycleHooks<S>;
+export type StartOptions<S extends object = Record<never, never>> =
+  LifecycleHooks<S>;
 
 // ---------------------------------------------------------------------------
 // start
@@ -215,11 +241,15 @@ export default async function start<const Roots extends readonly AnyModule[]>(
   options: StartOptions<MergeSlices<Roots>> = {}
 ): Promise<{ stop(): Promise<void>; ctx: MergeSlices<Roots> }> {
   const {
-    log = defaultLogger,
     beforeBoot,
     afterBoot,
     beforeShutdown,
     afterShutdown,
+
+    beforeEachBoot,
+    afterEachBoot,
+    beforeEachShutdown,
+    afterEachShutdown,
   } = options;
 
   const ctx: Record<string, unknown> = {};
@@ -240,12 +270,15 @@ export default async function start<const Roots extends readonly AnyModule[]>(
 
     for (const mod of [...booted].reverse()) {
       try {
+        await beforeEachShutdown?.(writer, mod);
         await mod.beforeShutdown?.(modWriter);
         await mod.shutdown?.(modWriter);
+        await afterEachShutdown?.(writer, mod);
         await mod.afterShutdown?.(modWriter);
-        log("info", mod.name, "shutdown");
       } catch (err) {
-        log("error", mod.name, "shutdown_failed", errorMessage(err));
+        throw new Error(
+          `Module "${mod.name}" stop failed: ${errorMessage(err)}`
+        );
       }
     }
 
@@ -256,16 +289,15 @@ export default async function start<const Roots extends readonly AnyModule[]>(
 
   for (const mod of sorted) {
     try {
-      log("info", mod.name, "booting", { description: mod.description });
+      await beforeEachBoot?.(writer, mod);
       await mod.beforeBoot?.(modWriter);
       await mod.boot?.(modWriter);
+      await afterEachBoot?.(writer, mod);
       await mod.afterBoot?.(modWriter);
       booted.push(mod);
-      log("info", mod.name, "booted");
     } catch (err) {
-      log("error", mod.name, "boot_failed", errorMessage(err));
       stopped = true;
-      await rollback(booted, modWriter, log);
+      await rollback(booted, modWriter);
       throw new Error(`Module "${mod.name}" boot failed: ${errorMessage(err)}`);
     }
   }
@@ -339,17 +371,17 @@ export function topoSort(registry: Map<string, AnyModule>): AnyModule[] {
  */
 export async function rollback(
   booted: AnyModule[],
-  modWriter: ContextWriter<object, object>,
-  log: Logger
+  modWriter: ContextWriter<object, object>
 ) {
   for (const mod of [...booted].reverse()) {
     try {
       await mod.beforeShutdown?.(modWriter);
       await mod.shutdown?.(modWriter);
       await mod.afterShutdown?.(modWriter);
-      log("info", mod.name, "rollback_shutdown");
     } catch (err) {
-      log("error", mod.name, "rollback_shutdown_failed", errorMessage(err));
+      throw new Error(
+        `Module "${mod.name}" rollback_shutdown_failed: ${errorMessage(err)}`
+      );
     }
   }
 }
@@ -367,17 +399,6 @@ function makeWriter(
       ctx[key] = value;
     },
   }) as unknown as ContextWriter<Record<string, unknown>>;
-}
-
-function defaultLogger(
-  level: "info" | "error",
-  module: string,
-  event: string,
-  data?: unknown
-) {
-  console.log(
-    JSON.stringify({ ts: new Date().toISOString(), level, module, event, data })
-  );
 }
 
 function errorMessage(err: unknown) {
