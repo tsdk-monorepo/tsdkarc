@@ -1,17 +1,17 @@
-# <a href="https://arc.tsdk.dev" align="center"><img src="./assets/logo.jpg" align="center" width="30px" height="30px" style="border-radius: 4px;margin-right:4px;" alt="tsdkarc: the Elegant, fully type-safe module composition library" /></a> tsdkarc
+# <a href="https://arc.tsdk.dev" align="center"><img src="./assets/logo.jpg" align="center" width="30px" height="30px" style="border-radius: 4px;margin-right:4px;" alt="TsdkArc: the Elegant, fully type-safe module composition library" /></a> TsdkArc
 
 <a href="https://arc.tsdk.dev">
-<img src="./assets/banner.jpg" width="100%" style="border-radius: 24px" alt="tsdkarc: the Elegant, fully type-safe module composition library" /></a>
+<img src="./assets/banner.jpg" width="100%" style="border-radius: 24px" alt="TsdkArc: the Elegant, fully type-safe module composition library" /></a>
 
 <div align="center">The Elegant, Fully Type-safe Module Composition Library.
 </div>
 
 ---
 
-## Why `tsdkarc`
+## Why `TsdkArc`
 
 Application codebases grow, the code become coupled and messy — hard to reuse, hard to share.
-`tsdkarc` lets you compose modules like building blocks, nest them, and share them type safely across projects.
+`TsdkArc` lets you compose modules like building blocks, nest them, and share them type safely across projects.
 
 In **tsdkrc**, Each module declares what it needs and what it provides. Then call `start([modules])` will resolves the full dependency graph, boots modules in order, and returns a typed context.
 

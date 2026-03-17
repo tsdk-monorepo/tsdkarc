@@ -38,8 +38,8 @@ jobs:
       - name: Build main project
         run: bun i && bun run build
 
-      - name: Build demos
-        working-directory: ./demos
+      - name: Build website
+        working-directory: ./website
         run: bun i && bun run build
 
       - name: Setup Pages
@@ -48,7 +48,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./demos/dist
+          path: ./website/out
 
       - name: Deploy to GitHub Pages
         id: deployment
