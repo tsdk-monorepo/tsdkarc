@@ -3,17 +3,11 @@
 <a href="https://arc.tsdk.dev">
 <img src="./assets/banner.jpg" width="100%" style="border-radius: 24px" alt="tsdkarc: theElegant, fully type-safe module composition library" /></a>
 
----
-
-<div align="center">
-The elegant, fully type-safe module composition library.
+<div align="center" style="display:flex;justify-content:center;align-items:center;">
+<img src="./assets/logo.jpg" width="16" height="16" style="border-radius: 4px;margin-right:4px;" alt="tsdkarc: theElegant, fully type-safe module composition library" /><span>The Elegant, Fully Type-safe Module Composition Library.</span>
 </div>
 
 ---
-
-```bash
-npm install tsdkarc
-```
 
 ## Why
 
@@ -23,6 +17,10 @@ Application codebases grow, the code become coupled and messy — hard to reuse,
 In **tsdkrc**, Each module declares what it needs and what it provides. Then call `start([modules])` will resolves the full dependency graph, boots modules in order, and returns a typed context.
 
 ## Quick Start
+
+```bash
+npm install tsdkarc
+```
 
 ```ts
 import start, { defineModule } from "tsdkarc";
