@@ -1,8 +1,15 @@
 # tsdkarc
 
-<img src="./assets/banner.jpg" width="100%" style="border-radius: 24px" alt="tsdkarc: theElegant, fully type-safe module composition library" />
+<a href="https://arc.tsdk.dev">
+<img src="./assets/banner.jpg" width="100%" style="border-radius: 24px" alt="tsdkarc: theElegant, fully type-safe module composition library" /></a>
 
+---
+
+<div align="center">
 The elegant, fully type-safe module composition library.
+</div>
+
+---
 
 ```bash
 npm install tsdkarc
