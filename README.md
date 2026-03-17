@@ -139,7 +139,13 @@ const app = await start([serverModule], {
     process.on("uncaughtException", (err) => console.error(err));
   },
   beforeShutdown(ctx) {
-    console.error.info("shutting down");
+    console.info("shutting down");
+  },
+  afterEachBoot(ctx) {
+    console.info("booting", mod.name);
+  },
+  beforeEachShutdown(ctx, mod) {
+    console.info("shutting down", mod.name);
   },
 });
 ```
