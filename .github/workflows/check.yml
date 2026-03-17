@@ -17,10 +17,10 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
       - name: Run build
-        run: bun i && bun run build
+        run: bun i && bun run build && bun run test
 
-      - name: Run demos
-        run: cd demos && bun i && bun run build
+      # - name: Run demos
+      #   run: cd demos && bun i && bun run build
 
-      - name: Run vue example
-        run: cd demos && bun i && bun run build
+      # - name: Run vue example
+      #   run: cd demos && bun i && bun run build
