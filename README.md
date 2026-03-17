@@ -19,49 +19,6 @@ In **tsdkrc**, Each module declares what it needs and what it provides. Then cal
 
 ---
 
-## Core Concepts
-
-| Term        | Description                                                                                     |
-| ----------- | ----------------------------------------------------------------------------------------------- |
-| **Slice**   | The shape a module adds to the shared context (`{ key: Type }`)                                 |
-| **Module**  | Declares dependencies (`modules`), registers values (`ctx.set`), and optionally tears them down |
-| **Context** | The merged union of all slices — fully typed at each module's boundary                          |
-
----
-
-## API
-
-```ts
-defineModule<OwnSlice>()({
-  name: string,
-  modules: Module[],
-  boot?(ctx): void | Promise<void>,
-  beforeBoot?(ctx): void | Promise<void>,
-  afterBoot?(ctx): void | Promise<void>,
-  shutdown?(ctx): void | Promise<void>,
-  beforeShutdown?(ctx): void | Promise<void>,
-  afterShutdown?(ctx): void | Promise<void>,
-})
-
-start(modules: Module[], hooks?: {
-  beforeBoot?(ctx): void | Promise<void>,
-  afterBoot?(ctx): void | Promise<void>,
-  beforeShutdown?(ctx): void | Promise<void>,
-  afterShutdown?(ctx): void | Promise<void>,
-}): Promise<{ ctx, stop() }>
-```
-
-| Hook             | When it runs                                         |
-| ---------------- | ---------------------------------------------------- |
-| `beforeBoot`     | before all module's `boot`                           |
-| `boot`           | register values via `ctx.set(key, value)`            |
-| `afterBoot`      | after all modules have booted (e.g. start listening) |
-| `shutdown`       | begin teardown — runs in reverse boot order          |
-| `beforeShutdown` | before all module's `shutdown`                       |
-| `afterShutdown`  | after all module's `shutdown` completes              |
-
----
-
 ## Quick Start
 
 ```ts
@@ -91,6 +48,49 @@ const configModule = defineModule<ConfigSlice>()({
   await app.stop();
 })();
 ```
+
+---
+
+## Core Concepts
+
+| Term        | Description                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------------------- |
+| **Slice**   | The shape a module adds to the shared context (`{ key: Type }`)                                 |
+| **Module**  | Declares dependencies (`modules`), registers values (`ctx.set`), and optionally tears them down |
+| **Context** | The merged union of all slices — fully typed at each module's boundary                          |
+
+---
+
+## API Outline
+
+```ts
+defineModule<OwnSlice>()({
+  name: string,
+  modules: Module[],
+  boot?(ctx): void | Promise<void>,
+  beforeBoot?(ctx): void | Promise<void>,
+  afterBoot?(ctx): void | Promise<void>,
+  shutdown?(ctx): void | Promise<void>,
+  beforeShutdown?(ctx): void | Promise<void>,
+  afterShutdown?(ctx): void | Promise<void>,
+})
+
+start(modules: Module[], hooks?: {
+  beforeBoot?(ctx): void | Promise<void>,
+  afterBoot?(ctx): void | Promise<void>,
+  beforeShutdown?(ctx): void | Promise<void>,
+  afterShutdown?(ctx): void | Promise<void>,
+}): Promise<{ ctx, stop() }>
+```
+
+| Hook             | When it runs                                         |
+| ---------------- | ---------------------------------------------------- |
+| `beforeBoot`     | before all module's `boot`                           |
+| `boot`           | register values via `ctx.set(key, value)`            |
+| `afterBoot`      | after all modules have booted (e.g. start listening) |
+| `shutdown`       | begin teardown — runs in reverse boot order          |
+| `beforeShutdown` | before all module's `shutdown`                       |
+| `afterShutdown`  | after all module's `shutdown` completes              |
 
 ---
 
