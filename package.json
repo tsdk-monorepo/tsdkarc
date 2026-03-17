@@ -1,7 +1,7 @@
 {
   "name": "tsdkarc",
   "version": "1.0.1",
-  "description": "Elegant and Fully type-safe composable module library",
+  "description": "Elegant and Fully type-safe module composable library",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
   "homepage": "https://arc.tsdk.dev",
@@ -24,7 +24,7 @@
   "keywords": [
     "typesafe",
     "tsdk",
-    "composable module",
+    "module composable",
     "dependency injection"
   ],
   "devDependencies": {

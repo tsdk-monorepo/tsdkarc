@@ -204,7 +204,7 @@ export default function HomeView({
         {/* Left: Content */}
         <div className="w-full lg:w-1/2 space-y-10 px-6 md:px-12">
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter leading-tight">
-            Type-safe composable module.
+            Type-safe module composable.
           </h1>
           <p className="text-lg md:text-xl text-gray-500 max-w-md leading-relaxed">
             Compose modules like building blocks, nest them, and share them
