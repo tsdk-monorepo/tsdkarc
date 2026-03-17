@@ -122,6 +122,12 @@ export interface LifecycleHooks<S extends object = Record<never, never>> {
     /** The module that just finished shutting down. */
     module: Module<any>
   ): Promise<void> | void;
+  onError?(
+    error: Error,
+    ctx: ContextWriter<S>,
+    /** The module that just finished shutting down. */
+    module: Module<any>
+  ): Promise<void> | void;
 }
 
 // ---------------------------------------------------------------------------
@@ -250,6 +256,8 @@ export default async function start<const Roots extends readonly AnyModule[]>(
     afterEachBoot,
     beforeEachShutdown,
     afterEachShutdown,
+
+    onError,
   } = options;
 
   const ctx: Record<string, unknown> = {};
@@ -276,9 +284,14 @@ export default async function start<const Roots extends readonly AnyModule[]>(
         await afterEachShutdown?.(writer, mod);
         await mod.afterShutdown?.(modWriter);
       } catch (err) {
-        throw new Error(
+        const error = new Error(
           `Module "${mod.name}" stop failed: ${errorMessage(err)}`
         );
+        if (onError) {
+          await onError?.(error, writer, mod);
+        } else {
+          throw error;
+        }
       }
     }
 
@@ -298,7 +311,14 @@ export default async function start<const Roots extends readonly AnyModule[]>(
     } catch (err) {
       stopped = true;
       await rollback(booted, modWriter);
-      throw new Error(`Module "${mod.name}" boot failed: ${errorMessage(err)}`);
+      const error = new Error(
+        `Module "${mod.name}" boot failed: ${errorMessage(err)}`
+      );
+      if (onError) {
+        await onError?.(error, writer, mod);
+      } else {
+        throw error;
+      }
     }
   }
 

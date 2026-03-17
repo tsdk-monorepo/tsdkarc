@@ -581,8 +581,12 @@ describe("error handling", () => {
         throw new Error("shutdown exploded");
       },
     });
-    const { stop } = await start([A], {});
-    await stop();
+    const { stop } = await start([A], {
+      onError(err) {
+        console.error(err);
+      },
+    });
+    await stop().catch((e) => e);
     expect(order).toContain("shutdown:B");
   });
 });
