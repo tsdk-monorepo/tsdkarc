@@ -1,4 +1,4 @@
-# tsdkarc <img src="./assets/logo.jpg" width="20px" height="20px" style="border-radius: 4px;margin-left:4px;" alt="tsdkarc: the Elegant, fully type-safe module composition library" />
+# <img src="./assets/logo.jpg" width="24px" height="24px" style="border-radius: 4px;margin-right:4px;" alt="tsdkarc: the Elegant, fully type-safe module composition library" /> tsdkarc
 
 <a href="https://arc.tsdk.dev">
 <img src="./assets/banner.jpg" width="100%" style="border-radius: 24px" alt="tsdkarc: the Elegant, fully type-safe module composition library" /></a>
