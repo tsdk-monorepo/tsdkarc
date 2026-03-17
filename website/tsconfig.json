@@ -31,5 +31,5 @@
     "**/*.mts",
     "@types/node"
   ],
-  "exclude": ["node_modules", "public/**"]
+  "exclude": ["node_modules", "public/**", "out"]
 }

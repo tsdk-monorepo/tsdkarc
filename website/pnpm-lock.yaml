@@ -12,8 +12,8 @@ importers:
         specifier: ^1.6.15
         version: 1.6.15
       littkk:
-        specifier: ^2.2.0
-        version: 2.2.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        specifier: ^2.3.0
+        version: 2.3.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       lucide-react:
         specifier: ^0.577.0
         version: 0.577.0(react@19.2.3)
@@ -1725,8 +1725,8 @@ packages:
     resolution: {integrity: sha512-l51N2r93WmGUye3WuFoN5k10zyvrVs0qfKBhyC5ogUQ6Ew6JUSswh78mbSO+IU3nTWsyOArqPCcShdQSadghBQ==}
     engines: {node: '>= 12.0.0'}
 
-  littkk@2.2.0:
-    resolution: {integrity: sha512-/rNKLNALvXQIMVWwoatopB5PoJOLQKXOqHXyEHWJMAJwaCr9biDd5P0THudjfZfYh7cHUx/dV+mg62gRK83lJA==}
+  littkk@2.3.0:
+    resolution: {integrity: sha512-l6g/iP4ua6fTX5Xe1hPiy+QMrxeNW+4qOZo+VcqNTCZcA+6KfRScPxDFyvGaDgPuxmAzsnXjfKsdD6H3qsPXBg==}
     peerDependencies:
       react: '>=19'
       react-dom: '*'
@@ -4071,7 +4071,7 @@ snapshots:
       lightningcss-win32-arm64-msvc: 1.31.1
       lightningcss-win32-x64-msvc: 1.31.1
 
-  littkk@2.2.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  littkk@2.3.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       react: 19.2.3
     optionalDependencies:

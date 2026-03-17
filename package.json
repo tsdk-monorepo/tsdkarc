@@ -1,10 +1,10 @@
 {
   "name": "tsdkarc",
-  "version": "1.0.0",
-  "description": "Elegant and Fully type-safe module composition library",
+  "version": "1.0.1",
+  "description": "Elegant and Fully type-safe composable module library",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
-  "homepage": "https://www.npmjs.com/package/tsdkarc",
+  "homepage": "https://arc.tsdk.dev",
   "main": "lib/index.js",
   "module": "esm/index.js",
   "types": "./lib/index.d.ts",
@@ -24,8 +24,8 @@
   "keywords": [
     "typesafe",
     "tsdk",
-    "dependency injection",
-    "di"
+    "composable module",
+    "dependency injection"
   ],
   "devDependencies": {
     "typescript": "^5.9.3",

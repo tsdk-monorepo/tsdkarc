@@ -1,9 +1,9 @@
-# <a href="https://arc.tsdk.dev" align="center"><img src="./assets/logo.jpg" align="center" width="30px" height="30px" style="border-radius: 4px;margin-right:4px;" alt="TsdkArc: the Elegant, fully type-safe module composition library" /></a> TsdkArc
+# <a href="https://arc.tsdk.dev" align="center"><img src="./assets/logo.jpg" align="center" width="30px" height="30px" style="border-radius: 4px;margin-right:4px;" alt="TsdkArc: the Elegant, fully type-safe composable module library" /></a> TsdkArc
 
 <a href="https://arc.tsdk.dev">
-<img src="./assets/banner.jpg" width="100%" style="border-radius: 24px" alt="TsdkArc: the Elegant, fully type-safe module composition library" /></a>
+<img src="./assets/banner.jpg" width="100%" style="border-radius: 24px" alt="TsdkArc: the Elegant, fully type-safe composable module library" /></a>
 
-<div align="center">The Elegant, Fully Type-safe Module Composition Library.
+<div align="center">The Elegant, Fully Type-safe Composable Module Library.
 </div>
 
 ---

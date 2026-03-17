@@ -105,8 +105,8 @@ export default function DocsView({
         </div>
       </aside>
 
-      <article className="flex-1 space-y-24 pb-24 md:pt-0 px-6 md:px-12">
-        <section id="why" className="space-y-6">
+      <article className="flex-1 space-y-24 pb-24 md:pt-0 md:px-12">
+        <section id="why" className="space-y-6 px-6 md:px-0">
           <h2 className="text-3xl font-bold tracking-tight mb-4">Why</h2>
           <p className="text-gray-600 leading-relaxed text-lg">
             Application codebases grow, the code become coupled and messy — hard
@@ -127,8 +127,8 @@ export default function DocsView({
         </section>
 
         <section id="quickstart" className="space-y-6">
-          <h2 className="text-3xl font-bold tracking-tight mb-6">Quickstart</h2>
-          <div className="bg-[#282A36] border border-gray-200 p-6 md:p-8 rounded-2xl overflow-x-auto mt-6">
+          <h2 className="text-3xl font-bold tracking-tight mb-6 px-6 md:px-0">Quickstart</h2>
+          <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto mt-6">
             <Shiki
               className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
               path={`/snippets/quickstart.ts`}
@@ -139,10 +139,10 @@ export default function DocsView({
         </section>
 
         <section id="concepts" className="space-y-6">
-          <h2 className="text-3xl font-bold tracking-tight mb-6">
+          <h2 className="text-3xl font-bold tracking-tight mb-6 px-6 md:px-0">
             Core Concepts
           </h2>
-          <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+          <div className="overflow-hidden md:rounded-xl border border-gray-200 shadow-sm">
             <table className="w-full text-left bg-white">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -191,13 +191,13 @@ export default function DocsView({
         </section>
 
         <section id="api" className="space-y-6">
-          <h2 className="text-3xl font-bold tracking-tight mb-6">
+          <h2 className="text-3xl font-bold tracking-tight mb-6 px-6 md:px-0">
             API Reference
           </h2>
 
           <div className="space-y-4">
-            <h3 className="text-xl font-bold">defineModule</h3>
-            <div className="bg-[#282A36] border border-gray-200 p-6 md:p-8 rounded-2xl overflow-x-auto">
+            <h3 className="text-xl font-bold px-6 md:px-0">defineModule</h3>
+            <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto">
               <Shiki
                 className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
                 path={`/snippets/api.ts`}
@@ -208,8 +208,8 @@ export default function DocsView({
           </div>
 
           <div className="space-y-4 mt-12">
-            <h3 className="text-xl font-bold">start</h3>
-            <div className="bg-[#282A36] border border-gray-200 p-6 md:p-8 rounded-2xl overflow-x-auto">
+            <h3 className="text-xl font-bold px-6 md:px-0">start</h3>
+            <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto">
               <Shiki
                 className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
                 path={`/snippets/api-start.ts`}
@@ -221,10 +221,10 @@ export default function DocsView({
         </section>
 
         <section id="dependency" className="space-y-6">
-          <h2 className="text-3xl font-bold tracking-tight mb-4">
+          <h2 className="text-3xl font-bold tracking-tight mb-4 px-6 md:px-0">
             Dependency Chain
           </h2>
-          <p className="text-gray-600 leading-relaxed text-lg">
+          <p className="text-gray-600 leading-relaxed text-lg px-6 md:px-0">
             Downstream modules declare upstream modules and get their context
             fully typed.{" "}
             <code className="bg-gray-100 px-1 rounded text-sm font-mono text-black">
@@ -233,7 +233,7 @@ export default function DocsView({
             walks the dependency graph and deduplicates — each module boots
             exactly once.
           </p>
-          <div className="bg-[#282A36] border border-gray-200 p-6 md:p-8 rounded-2xl overflow-x-auto mt-6">
+          <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto mt-6">
             <Shiki
               className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
               path={`/snippets/dependency-chain.ts`}
@@ -244,16 +244,16 @@ export default function DocsView({
         </section>
 
         <section id="patterns" className="space-y-6">
-          <h2 className="text-3xl font-bold tracking-tight mb-4">Patterns</h2>
+          <h2 className="text-3xl font-bold tracking-tight mb-4 px-6 md:px-0">Patterns</h2>
           <div className="space-y-4">
-            <h3 className="font-bold text-xl">
+            <h3 className="font-bold text-xl px-6 md:px-0">
               Register anything, not just data
             </h3>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 text-lg px-6 md:px-0">
               Functions, class instances, and middleware are all valid context
               values.
             </p>
-            <div className="bg-[#282A36] border border-gray-200 p-6 md:p-8 rounded-2xl overflow-x-auto mt-4">
+            <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto mt-4">
               <Shiki
                 className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
                 path={`/snippets/patterns.ts`}
@@ -265,10 +265,10 @@ export default function DocsView({
         </section>
 
         <section id="lifecycle" className="space-y-6">
-          <h2 className="text-3xl font-bold tracking-tight mb-4">Lifecycle</h2>
+          <h2 className="text-3xl font-bold tracking-tight mb-4 px-6 md:px-0">Lifecycle</h2>
 
           {/* Pipeline diagram */}
-          <div className="bg-gray-50 border border-gray-200 p-6 md:p-8 rounded-2xl font-mono text-sm overflow-x-auto whitespace-nowrap text-gray-500 font-bold mb-8 shadow-sm">
+          <div className="bg-gray-50 md:border border-gray-200 p-6 md:p-8 md:rounded-2xl font-mono text-sm overflow-x-auto whitespace-nowrap text-gray-500 font-bold mb-8 shadow-sm">
             beforeBoot <span className="text-gray-300 font-normal px-1">→</span>{" "}
             boot <span className="text-gray-300 font-normal px-1">→</span>{" "}
             afterBoot <span className="text-gray-300 font-normal px-1">→</span>{" "}
@@ -282,17 +282,17 @@ export default function DocsView({
             afterShutdown
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+          <div className="overflow-x-auto md:rounded-xl border border-gray-200 shadow-sm">
             <table className="w-full text-left bg-white">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-4 font-semibold text-gray-500 uppercase tracking-widest text-xs w-1/3">
+                  <th className="px-6 py-4 font-semibold text-gray-500 uppercase tracking-widest text-xs w-1/3 md:w-auto">
                     Hook
                   </th>
-                  <th className="px-6 py-4 font-semibold text-gray-500 uppercase tracking-widest text-xs w-24">
+                  <th className="px-6 py-4 font-semibold text-gray-500 uppercase tracking-widest text-xs w-24 md:w-auto">
                     Fires
                   </th>
-                  <th className="px-6 py-4 font-semibold text-gray-500 uppercase tracking-widest text-xs">
+                  <th className="px-6 py-4 font-semibold text-gray-500 uppercase tracking-widest text-xs min-w-[200px]">
                     Purpose
                   </th>
                 </tr>

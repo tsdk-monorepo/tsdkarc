@@ -200,11 +200,11 @@ export default function HomeView({
   return (
     <div className="animate-in fade-in duration-500">
       {/* Hero Section */}
-      <section className="px-6 py-16 md:px-12 md:py-32 max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
+      <section className="py-16 md:py-32 max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
         {/* Left: Content */}
-        <div className="w-full lg:w-1/2 space-y-10">
+        <div className="w-full lg:w-1/2 space-y-10 px-6 md:px-12">
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter leading-tight">
-            Type-safe module composition.
+            Type-safe composable module.
           </h1>
           <p className="text-lg md:text-xl text-gray-500 max-w-md leading-relaxed">
             Compose modules like building blocks, nest them, and share them
@@ -228,7 +228,7 @@ export default function HomeView({
         </div>
 
         {/* Right: M3U8 Video Presentation */}
-        <div className="w-full lg:w-1/2 relative bg-gray-50 rounded-2xl overflow-hidden group">
+        <div className="w-full lg:w-1/2 relative bg-gray-50 md:rounded-2xl overflow-hidden group">
           {/* 透明遮罩层：用于拦截点击事件控制播放/暂停 */}
           <div
             className="absolute inset-0 z-10 cursor-pointer"
@@ -269,11 +269,11 @@ export default function HomeView({
       </section>
 
       {/* Minimal Quick Start with Copy Button */}
-      <section className="px-6 md:px-12 max-w-7xl mx-auto mb-32 relative group">
-        <h2 className="text-sm font-bold tracking-widest uppercase text-gray-400 mb-6">
+      <section className="md:px-12 max-w-7xl mx-auto mb-32 relative group">
+        <h2 className="px-6 md:px-0 text-sm font-bold tracking-widest uppercase text-gray-400 mb-6">
           Quick Start
         </h2>
-        <div className="bg-[#282A36] rounded-2xl p-6 md:p-8 overflow-x-auto relative">
+        <div className="bg-[#282A36] md:rounded-2xl p-6 md:p-8 overflow-x-auto relative">
           {/* Enhanced Copy Button */}
           <button
             onClick={handleCopyCode}
@@ -298,16 +298,16 @@ export default function HomeView({
       </section>
 
       {/* Features - Typography & Spacing Bento with Restored Shimmer */}
-      <section className="px-6 py-16 md:px-12 max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold tracking-tight mb-12">
+      <section className="py-16 md:px-16 max-w-7xl mx-auto">
+        <h2 className="px-6 md:px-0 text-3xl font-bold tracking-tight mb-12">
           Why TsdkArc?
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Feature 1: Type Safety (With Elegant Flowing Light) */}
           <div
             ref={featureRef}
-            className="md:col-span-2 p-[2px] rounded-2xl bg-gradient-to-r from-gray-900 via-white to-gray-900 animate-border-flow group transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] cursor-crosshair hover:shadow-2xl hover:shadow-gray-300/30">
-            <div className="bg-black text-white p-8 md:p-12 rounded-[14px] h-full flex flex-col justify-between relative overflow-hidden">
+            className="md:col-span-2 p-[2px] md:rounded-2xl bg-gradient-to-r from-gray-900 via-white to-gray-900 animate-border-flow group transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] cursor-crosshair hover:shadow-2xl hover:shadow-gray-300/30">
+            <div className="bg-black text-white p-8 md:p-12 md:rounded-[14px] h-full flex flex-col justify-between relative overflow-hidden">
               {/* Internal Shimmer Sweep (Scroll & Periodic) */}
               {isFeatureVisible && (
                 <div className="absolute top-0 bottom-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none animate-periodic-shimmer"></div>
@@ -328,7 +328,7 @@ export default function HomeView({
           </div>
 
           {/* Feature 2 */}
-          <div className="bg-gray-50 border border-gray-100 p-8 md:p-10 rounded-2xl flex flex-col justify-between group transition-transform duration-300 hover:scale-[1.02] active:scale-[0.96] cursor-crosshair hover:border-gray-300">
+          <div className="bg-gray-50 border border-gray-100 p-8 md:p-10 md:rounded-2xl flex flex-col justify-between group transition-transform duration-300 hover:scale-[1.02] active:scale-[0.96] cursor-crosshair hover:border-gray-300">
             <NetworkIcon className="w-10 h-10 mb-8 text-gray-400 group-hover:text-black transition-colors" />
             <div>
               <h3 className="text-xl font-bold mb-3 tracking-tight">
@@ -345,7 +345,7 @@ export default function HomeView({
           </div>
 
           {/* Feature 3 */}
-          <div className="bg-gray-50 border border-gray-100 p-8 md:p-10 rounded-2xl flex flex-col justify-between group transition-transform duration-300 hover:scale-[1.02] active:scale-[0.96] cursor-crosshair hover:border-gray-300">
+          <div className="bg-gray-50 border border-gray-100 p-8 md:p-10 md:rounded-2xl flex flex-col justify-between group transition-transform duration-300 hover:scale-[1.02] active:scale-[0.96] cursor-crosshair hover:border-gray-300">
             <PuzzleIcon className="w-10 h-10 mb-8 text-gray-400 group-hover:text-black transition-colors" />
             <div>
               <h3 className="text-xl font-bold mb-3 tracking-tight">
@@ -358,7 +358,7 @@ export default function HomeView({
           </div>
 
           {/* Feature 4 */}
-          <div className="md:col-span-2 border-2 border-black p-8 md:p-12 rounded-2xl flex flex-col justify-between group transition-transform duration-300 hover:scale-[1.01] active:scale-[0.98] cursor-crosshair">
+          <div className="md:col-span-2 border-2 border-black p-8 md:p-12 md:rounded-2xl flex flex-col justify-between group transition-transform duration-300 hover:scale-[1.01] active:scale-[0.98] cursor-crosshair">
             <CycleIcon className="w-10 h-10 mb-8 text-gray-400 group-hover:text-black transition-colors" />
             <div>
               <h3 className="text-2xl md:text-3xl font-bold mb-4 tracking-tight">
@@ -381,13 +381,13 @@ export default function HomeView({
       </section>
 
       {/* Minimalist Lists (Use Cases & What it is NOT) */}
-      <section className="px-6 py-16 md:px-12 max-w-7xl mx-auto flex flex-col md:flex-row gap-20">
+      <section className="py-16 md:px-12 max-w-7xl mx-auto flex flex-col md:flex-row gap-20">
         {/* Ideal Use Cases */}
         <div className="flex-1">
-          <h2 className="text-2xl font-bold tracking-tight mb-8">
+          <h2 className="px-6 md:px-0 text-2xl font-bold tracking-tight mb-8">
             Ideal Use Cases
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-2 px-3 md:px-0">
             {useCases.map((uc, i) => (
               <div
                 key={i}
@@ -408,10 +408,10 @@ export default function HomeView({
 
         {/* What it is NOT */}
         <div className="flex-1">
-          <h2 className="text-2xl font-bold tracking-tight mb-8 text-gray-400">
+          <h2 className="px-6 md:px-0 text-2xl font-bold tracking-tight mb-8 text-gray-400">
             What it is NOT
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-2 px-3 md:px-0">
             {notCases.map((nc, i) => (
               <div
                 key={i}
