@@ -1,0 +1,37 @@
+{
+  "name": "tsdkarc",
+  "version": "1.0.0",
+  "description": "Elegant and Fully type-safe module composition library",
+  "repository": "tsdk-monorepo/tsdkarc",
+  "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
+  "homepage": "https://www.npmjs.com/package/tsdkarc",
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "types": "./lib/index.d.ts",
+  "scripts": {
+    "build": "concurrently \"npm run build:cjs\"  \"npm run build:esm\"",
+    "build:cjs": "rm -rf lib && tsc --project tsconfig.json && rm -rf lib/tests",
+    "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests",
+    "checktype": "tsc --noEmit",
+    "test": "vitest --run --testTimeout=120000 --hookTimeout=60000"
+  },
+  "files": [
+    "lib/*",
+    "esm/*",
+    "assets",
+    "README.md"
+  ],
+  "keywords": [
+    "typesafe",
+    "tsdk",
+    "dependency injection",
+    "di"
+  ],
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@tsconfig/recommended": "^1.0.10",
+    "vitest": "^3.2.4",
+    "concurrently": "^9.2.1"
+  },
+  "license": "MIT"
+}
