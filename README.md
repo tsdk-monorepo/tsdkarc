@@ -62,8 +62,6 @@ const configModule = defineModule<ConfigSlice>()({
 | **Module**  | Declares dependencies (`modules`), registers values (`ctx.set`), and optionally tears them down |
 | **Context** | The merged union of all slices — fully typed at each module's boundary                          |
 
----
-
 ## API Outline
 
 ```ts
@@ -85,15 +83,6 @@ start(modules: Module[], hooks?: {
   afterShutdown?(ctx): void | Promise<void>,
 }): Promise<{ ctx, stop() }>
 ```
-
-| Hook             | When it runs                                         |
-| ---------------- | ---------------------------------------------------- |
-| `beforeBoot`     | before all module's `boot`                           |
-| `boot`           | register values via `ctx.set(key, value)`            |
-| `afterBoot`      | after all modules have booted (e.g. start listening) |
-| `shutdown`       | begin teardown — runs in reverse boot order          |
-| `beforeShutdown` | before all module's `shutdown`                       |
-| `afterShutdown`  | after all module's `shutdown` completes              |
 
 ---
 
