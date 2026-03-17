@@ -8,7 +8,7 @@
 
 ---
 
-## Why `tsdkrc`
+## Why `tsdkarc`
 
 Application codebases grow, the code become coupled and messy — hard to reuse, hard to share.
 `tsdkarc` lets you compose modules like building blocks, nest them, and share them type safely across projects.
