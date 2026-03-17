@@ -4,12 +4,12 @@
 <img src="./assets/banner.jpg" width="100%" style="border-radius: 24px" alt="tsdkarc: theElegant, fully type-safe module composition library" /></a>
 
 <div align="center" style="display:flex;justify-content:center;align-items:center;">
-<img src="./assets/logo.jpg" width="16" height="16" style="border-radius: 4px;margin-right:4px;" alt="tsdkarc: theElegant, fully type-safe module composition library" /><span>The Elegant, Fully Type-safe Module Composition Library.</span>
+<img src="./assets/logo.jpg" width="20px" height="20px" style="border-radius: 4px;margin-right:4px;" alt="tsdkarc: theElegant, fully type-safe module composition library" />   <span>The Elegant, Fully Type-safe Module Composition Library.</span>
 </div>
 
 ---
 
-## Why
+## Why `tsdkrc`
 
 Application codebases grow, the code become coupled and messy — hard to reuse, hard to share.
 `tsdkarc` lets you compose modules like building blocks, nest them, and share them type safely across projects.
