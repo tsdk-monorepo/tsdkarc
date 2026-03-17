@@ -18,15 +18,13 @@ npm install tsdkarc
 ## Why
 
 Application codebases grow, the code become coupled and messy — hard to reuse, hard to share.
-`tsdkarc` lets you compose modules like building blocks, nest them, and share them across projects.
+`tsdkarc` lets you compose modules like building blocks, nest them, and share them type safely across projects.
 
 In **tsdkrc**, Each module declares what it needs and what it provides. Then call `start([modules])` will resolves the full dependency graph, boots modules in order, and returns a typed context.
 
 ## Quick Start
 
 ```ts
-import start, { defineModule } from "tsdkarc";
-
 import start, { defineModule } from "tsdkarc";
 
 interface ConfigSlice {
