@@ -26,10 +26,10 @@ export default function HomeView({
 }: {
   snippets: { quickstart: string };
 }) {
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [copied, setCopied] = useState(false);
   const [isCodeCopied, setIsCodeCopied] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isFeatureVisible, setIsFeatureVisible] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const featureRef = useRef(null);
@@ -63,7 +63,11 @@ export default function HomeView({
 
     // Use an example m3u8 stream
 
-    if (video && video.canPlayType && video.canPlayType("application/vnd.apple.mpegurl")) {
+    if (
+      video &&
+      video.canPlayType &&
+      video.canPlayType("application/vnd.apple.mpegurl")
+    ) {
       // Native support (Safari / Mobile)
       video.src = videoSrc;
     } else {
@@ -107,6 +111,14 @@ export default function HomeView({
   const togglePlay = () => {
     const nextPlaying = !isPlaying;
     setIsPlaying(nextPlaying);
+    if (isMuted) {
+      const nextMuted = false;
+      setIsMuted(nextMuted);
+      if (videoRef.current) {
+        videoRef.current.muted = nextMuted;
+      }
+    }
+
     if (videoRef.current) {
       if (nextPlaying) {
         videoRef.current!.play().catch((e) => console.error("Play failed:", e));
