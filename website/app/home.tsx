@@ -18,6 +18,7 @@ import {
   XIcon,
   ArrowUpRightIcon,
 } from "./icons";
+const videoSrc = "/output.m3u8";
 
 // --- Home View Component ---
 export default function HomeView({
@@ -25,10 +26,10 @@ export default function HomeView({
 }: {
   snippets: { quickstart: string };
 }) {
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isCodeCopied, setIsCodeCopied] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [isFeatureVisible, setIsFeatureVisible] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const featureRef = useRef(null);
@@ -61,9 +62,8 @@ export default function HomeView({
     if (!video) return;
 
     // Use an example m3u8 stream
-    const videoSrc = "/output.m3u8";
 
-    if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    if (video && video.canPlayType && video.canPlayType("application/vnd.apple.mpegurl")) {
       // Native support (Safari / Mobile)
       video.src = videoSrc;
     } else {
@@ -238,7 +238,7 @@ export default function HomeView({
           <video
             ref={videoRef}
             className="w-full h-full aspect-video object-cover opacity-95 transition-opacity duration-700 pointer-events-none"
-            autoPlay
+            autoPlay={isPlaying}
             loop
             muted={isMuted}
             playsInline={true}

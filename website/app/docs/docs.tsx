@@ -109,7 +109,7 @@ export default function DocsView({
         <section id="why" className="space-y-6 px-6 md:px-0">
           <h2 className="text-3xl font-bold tracking-tight mb-4">Why</h2>
           <p className="text-gray-600 leading-relaxed text-lg">
-            Application codebases grow, the code become coupled and messy — hard
+            Your application codebases grow, the code become coupled and messy — hard
             to reuse, hard to share.
             <strong className="text-black font-semibold mx-1">TsdkArc</strong>
             lets you compose modules like building blocks, nest them, and share
