@@ -1,5 +1,9 @@
 # TsdkArc Changelog
 
+## v1.1.2
+
+- Fix `mod.beforeShutdown` and `mod.afterShutdown` running logic
+
 ## v1.1.1
 
 - Fix type issue with conflict context types

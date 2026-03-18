@@ -274,7 +274,7 @@ describe("per-module lifecycle hooks", () => {
     expect(calls).toEqual(["boot:B", "A:before", "boot:A", "A:after"]);
   });
 
-  it("beforeShutdown/afterShutdown fire around this module only", async () => {
+  it("beforeShutdown/afterShutdown fire around all modules", async () => {
     const calls: string[] = [];
     const B = defineModule()({
       name: "B",
@@ -297,7 +297,8 @@ describe("per-module lifecycle hooks", () => {
     });
     const { stop } = await start([A], {});
     await stop();
-    expect(calls).toEqual(["A:before", "shutdown:A", "A:after", "shutdown:B"]);
+    console.log("calls", calls);
+    expect(calls).toEqual(["A:before", "shutdown:A", "shutdown:B", "A:after"]);
   });
 
   it("per-module hook can read and write ctx — same as boot", async () => {

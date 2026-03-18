@@ -236,18 +236,6 @@ type NoOverlap<DepCtx, OwnSlice> = {
     : OwnSlice[K];
 };
 
-/**
- * Combines exact-key check and overlap check in one mapped type.
- * Removes the R & Exact<...> intersection layer from error output.
- */
-type ValidReturn<OwnSlice, DepCtx, R> = {
-  [K in keyof R]: K extends keyof OwnSlice
-    ? K extends keyof DepCtx
-      ? TypeError<`Key "${K & string}" is already owned by a dependency module`>
-      : OwnSlice[K & keyof OwnSlice]
-    : TypeError<`Key "${K & string}" is not declared in OwnSlice`>;
-};
-
 // ---------------------------------------------------------------------------
 // StartOptions
 // ---------------------------------------------------------------------------
@@ -319,17 +307,46 @@ export default async function start<const Roots extends readonly AnyModule[]>(
     stopped = true;
 
     await beforeShutdown?.(writer);
+    const reverseBoot = [...booted].reverse();
 
-    for (const mod of [...booted].reverse()) {
+    for (const mod of reverseBoot) {
+      try {
+        await mod.beforeShutdown?.(modWriter);
+      } catch (err) {
+        const error = new Error(
+          `Module "${mod.name}" beforeShutdown failed: ${errorMessage(err)}`
+        );
+        if (onError) {
+          await onError?.(error, writer, mod);
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    for (const mod of reverseBoot) {
       try {
         await beforeEachShutdown?.(writer, mod);
-        await mod.beforeShutdown?.(modWriter);
         await mod.shutdown?.(modWriter);
         await afterEachShutdown?.(writer, mod);
-        await mod.afterShutdown?.(modWriter);
       } catch (err) {
         const error = new Error(
           `Module "${mod.name}" stop failed: ${errorMessage(err)}`
+        );
+        if (onError) {
+          await onError?.(error, writer, mod);
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    for (const mod of reverseBoot) {
+      try {
+        await mod.afterShutdown?.(modWriter);
+      } catch (err) {
+        const error = new Error(
+          `Module "${mod.name}" afterShutdown failed: ${errorMessage(err)}`
         );
         if (onError) {
           await onError?.(error, writer, mod);
@@ -460,11 +477,13 @@ function makeWriter(
   ctx: Record<string, unknown>
 ): ContextWriter<Record<string, unknown>> {
   return Object.assign(ctx, {
-    set(key: string | Record<string, unknown>, value: unknown) {
-      if (typeof key === "object") {
-        return Object.assign(ctx, key);
+    set(keyOrCtx: string | Record<string, unknown>, value: unknown) {
+      if (typeof keyOrCtx === "object") {
+        return Object.assign(ctx, { ...keyOrCtx, set: ctx.set });
       }
-      ctx[key] = value;
+      if (keyOrCtx !== "set") {
+        ctx[keyOrCtx] = value;
+      }
       return ctx;
     },
   }) as unknown as ContextWriter<Record<string, unknown>>;

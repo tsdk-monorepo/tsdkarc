@@ -1,6 +1,6 @@
 {
   "name": "tsdkarc",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "TsdkArc is an elegant and fully type-safe module composable library",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
