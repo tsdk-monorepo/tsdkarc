@@ -217,7 +217,7 @@ beforeBoot → boot → afterBoot → [running] → beforeShutdown → shutdown 
 | Hook                 | Purpose                                                                        |
 | -------------------- | ------------------------------------------------------------------------------ |
 | `beforeBoot`         | Pre-setup, Called once before the first module begins booting.                 |
-| `boot`               | Register values on `ctx` via `ctx.set()`                                       |
+| `boot`               | Register values on `ctx` via return ctx or call `ctx.set()`                                       |
 | `afterBoot`          | Called once after the last module has finished booting.                        |
 | `beforeShutdown`     | Called once before the first module begins shutting down.                      |
 | `shutdown`           | Release resources                                                              |
