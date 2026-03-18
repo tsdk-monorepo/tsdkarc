@@ -93,7 +93,7 @@ export default function DocsView({
                 key={sec.id}
                 id={`nav-btn-${sec.id}`}
                 onClick={() => scrollTo(sec.id)}
-                className={`whitespace-nowrap md:whitespace-normal text-left pl-4 py-2 text-sm transition-all active:scale-95 rounded-lg ${
+                className={`whitespace-nowrap md:whitespace-normal text-left px-4 md:pr-0 py-2 text-sm transition-all active:scale-95 rounded-lg ${
                   isActive
                     ? "text-black font-bold bg-gray-100"
                     : "font-medium text-gray-500 hover:text-black hover:bg-gray-50"
