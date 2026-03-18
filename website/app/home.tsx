@@ -182,33 +182,6 @@ export default function HomeView({
     },
   ];
 
-  const relatedProjects = [
-    {
-      name: "xior",
-      emoji: "🔌",
-      desc: "A tiny fetch wrapper with plugins and axios-like API.",
-      url: "https://github.com/suhaotian/xior",
-    },
-    {
-      name: "tsdk",
-      emoji: "🛠️",
-      desc: "Type-safe API development CLI tool for TypeScript.",
-      url: "https://github.com/tsdk-monorepo/tsdk",
-    },
-    {
-      name: "broad-infinite-list",
-      emoji: "⚡",
-      desc: "High performance infinite scrolling list.",
-      url: "https://github.com/suhaotian/broad-infinite-list",
-    },
-    {
-      name: "littkk",
-      emoji: "🧞‍♂️",
-      desc: "Shows and hides UI elements on scroll.",
-      url: "https://github.com/suhaotian/littkk",
-    },
-  ];
-
   return (
     <div className="animate-in fade-in duration-500">
       {/* Hero Section */}
@@ -227,7 +200,7 @@ export default function HomeView({
             <button
               onClick={handleCopy}
               className="group flex items-center justify-center gap-3 bg-black text-white px-8 py-4 rounded-lg font-medium hover:bg-gray-800 active:scale-95 transition-all w-full sm:w-auto">
-              <TerminalIcon className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
+              <TerminalIcon className="size-5 text-gray-400 group-hover:text-white transition-colors" />
               {copied ? "Copied to clipboard" : "npm install tsdkarc"}
             </button>
 
@@ -272,9 +245,9 @@ export default function HomeView({
             className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-md text-black p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white active:scale-90 z-30"
             aria-label={isMuted ? "Unmute" : "Mute"}>
             {isMuted ? (
-              <VolumeOffIcon className="w-5 h-5" />
+              <VolumeOffIcon className="size-5" />
             ) : (
-              <VolumeUpIcon className="w-5 h-5" />
+              <VolumeUpIcon className="size-5" />
             )}
           </button>
         </div>
@@ -442,34 +415,6 @@ export default function HomeView({
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Other Projects */}
-      <section className="px-6 py-16 md:px-12 max-w-7xl mx-auto">
-        <h2 className="text-2xl font-bold tracking-tight mb-8">
-          Other Awesome Projects
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {relatedProjects.map((project) => (
-            <a
-              key={project.name}
-              href={project.url}
-              target="_blank"
-              rel="noreferrer"
-              className="block p-6 bg-gray-50 border border-gray-100 rounded-2xl hover:bg-gray-100 hover:border-gray-200 transition-colors group active:scale-[0.98]">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="font-bold text-lg flex items-center gap-2">
-                  <span className="text-xl leading-none">{project.emoji}</span>{" "}
-                  {project.name}
-                </h3>
-                <ArrowUpRightIcon className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors shrink-0" />
-              </div>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                {project.desc}
-              </p>
-            </a>
-          ))}
         </div>
       </section>
     </div>

@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 
 import "./globals.css";
-import { DocumentIcon, GithubIcon } from "./icons";
+import { ArrowUpRightIcon, DocumentIcon, GithubIcon } from "./icons";
 import NavLink from "./active-link";
 
 const geistSans = Geist({
@@ -87,6 +87,33 @@ export const metadata: Metadata = {
   },
 };
 
+const myAwesomeProjects = [
+  {
+    name: "xior",
+    emoji: "🔌",
+    desc: "A tiny fetch wrapper with plugins and axios-like API.",
+    url: "https://github.com/suhaotian/xior",
+  },
+  {
+    name: "tsdk",
+    emoji: "🛠️",
+    desc: "Type-safe API development CLI tool for TypeScript.",
+    url: "https://github.com/tsdk-monorepo/tsdk",
+  },
+  {
+    name: "broad-infinite-list",
+    emoji: "⚡",
+    desc: "High performance infinite scrolling list.",
+    url: "https://github.com/suhaotian/broad-infinite-list",
+  },
+  {
+    name: "littkk",
+    emoji: "🧞‍♂️",
+    desc: "Shows and hides UI elements on scroll.",
+    url: "https://github.com/suhaotian/littkk",
+  },
+];
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -121,7 +148,7 @@ export default function RootLayout({
                   href="/docs"
                   activeClassName="text-black!"
                   className={`flex items-center gap-2 text-sm font-medium transition-all active:scale-95 text-gray-500 hover:text-black`}>
-                  <DocumentIcon className="w-5 h-5" />
+                  <DocumentIcon className="size-5" />
                   <span className="hidden sm:inline">Documentation</span>
                   <span className="sm:hidden">Docs</span>
                 </NavLink>
@@ -130,7 +157,7 @@ export default function RootLayout({
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black transition-all active:scale-95">
-                  <GithubIcon className="w-5 h-5" />
+                  <GithubIcon className="size-5" />
                   <span className="hidden sm:inline">GitHub</span>
                   <span className="sm:hidden">Code</span>
                 </a>
@@ -138,6 +165,36 @@ export default function RootLayout({
             </header>
 
             <main className="flex-1">{children}</main>
+
+            {/* Other Awesome Projects */}
+            <section className="px-6 py-16 md:px-12 max-w-7xl mx-auto">
+              <h2 className="text-2xl font-bold tracking-tight mb-8">
+                Other Awesome Projects
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {myAwesomeProjects.map((project) => (
+                  <a
+                    key={project.name}
+                    href={project.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block p-6 bg-gray-50 border border-gray-100 rounded-2xl hover:bg-gray-100 hover:border-gray-200 transition-colors group active:scale-[0.98]">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="font-bold text-lg flex items-center gap-2">
+                        <span className="text-xl leading-none">
+                          {project.emoji}
+                        </span>{" "}
+                        {project.name}
+                      </h3>
+                      <ArrowUpRightIcon className="size-5 text-gray-400 group-hover:text-black transition-colors shrink-0" />
+                    </div>
+                    <p className="text-gray-500 text-sm leading-relaxed">
+                      {project.desc}
+                    </p>
+                  </a>
+                ))}
+              </div>
+            </section>
 
             {/* Footer */}
             <footer className="px-6 py-12 md:px-12 flex flex-col sm:flex-row justify-between items-center gap-6 mt-24">

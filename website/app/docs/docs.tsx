@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Shiki from "../shiki";
 import { littkk } from "littkk";
+import { ArrowUpRightIcon } from "../icons";
 
 // --- Docs View Component ---
 export default function DocsView({
@@ -23,6 +24,7 @@ export default function DocsView({
     { id: "why", title: "Why TsdkArc" },
     { id: "quickstart", title: "Quickstart" },
     { id: "concepts", title: "Core Concepts" },
+    { id: "playground", title: "Online Playground" },
     { id: "api", title: "API Reference" },
     { id: "dependency", title: "Dependency Chain" },
     { id: "patterns", title: "Patterns" },
@@ -109,8 +111,8 @@ export default function DocsView({
         <section id="why" className="space-y-6 px-6 md:px-0">
           <h2 className="text-3xl font-bold tracking-tight mb-4">Why</h2>
           <p className="text-gray-600 leading-relaxed text-lg">
-            Your application codebases grow, the code become coupled and messy — hard
-            to reuse, hard to share.
+            Your application codebases grow, the code become coupled and messy —
+            hard to reuse, hard to share.
             <strong className="text-black font-semibold mx-1">TsdkArc</strong>
             lets you compose modules like building blocks, nest them, and share
             them across projects.
@@ -127,7 +129,9 @@ export default function DocsView({
         </section>
 
         <section id="quickstart" className="space-y-6">
-          <h2 className="text-3xl font-bold tracking-tight mb-6 px-6 md:px-0">Quickstart</h2>
+          <h2 className="text-3xl font-bold tracking-tight mb-6 px-6 md:px-0">
+            Quickstart
+          </h2>
           <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto mt-6">
             <Shiki
               className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
@@ -190,6 +194,22 @@ export default function DocsView({
           </div>
         </section>
 
+        <section id="playground" className="space-y-6">
+          <h2 className="text-3xl font-bold tracking-tight mb-6 px-6 md:px-0">
+            Online Playground
+          </h2>
+
+          <p>
+            <a
+              className="text-sky-600 flex items-center"
+              target="_blank"
+              href="https://stackblitz.com/edit/vitejs-vite-kdennssf?file=src%2FB.module.ts,src%2FA.module.ts,src%2Ftsdkarc-demo.ts,src%2FC.module.ts,src%2Fcircular-dependencies.module.ts&terminal=dev">
+              Visit online playground{" "}
+              <ArrowUpRightIcon className="ml-1 size-5 text-gray-400 group-hover:text-black transition-colors shrink-0" />
+            </a>
+          </p>
+        </section>
+
         <section id="api" className="space-y-6">
           <h2 className="text-3xl font-bold tracking-tight mb-6 px-6 md:px-0">
             API Reference
@@ -244,7 +264,9 @@ export default function DocsView({
         </section>
 
         <section id="patterns" className="space-y-6">
-          <h2 className="text-3xl font-bold tracking-tight mb-4 px-6 md:px-0">Patterns</h2>
+          <h2 className="text-3xl font-bold tracking-tight mb-4 px-6 md:px-0">
+            Patterns
+          </h2>
           <div className="space-y-4">
             <h3 className="font-bold text-xl px-6 md:px-0">
               Register anything, not just data
@@ -265,7 +287,9 @@ export default function DocsView({
         </section>
 
         <section id="lifecycle" className="space-y-6">
-          <h2 className="text-3xl font-bold tracking-tight mb-4 px-6 md:px-0">Lifecycle</h2>
+          <h2 className="text-3xl font-bold tracking-tight mb-4 px-6 md:px-0">
+            Lifecycle
+          </h2>
 
           {/* Pipeline diagram */}
           <div className="bg-gray-50 md:border border-gray-200 p-6 md:p-8 md:rounded-2xl font-mono text-sm overflow-x-auto whitespace-nowrap text-gray-500 font-bold mb-8 shadow-sm">
