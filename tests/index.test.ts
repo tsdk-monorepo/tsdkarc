@@ -15,6 +15,7 @@
 
 import { describe, it, expect, vi, expectTypeOf } from "vitest";
 import start, { defineModule } from "../src";
+import { CModule } from "./C.module";
 
 // ---------------------------------------------------------------------------
 // Shared slice types and module factories
@@ -633,6 +634,47 @@ describe("error handling", () => {
     expect(ctx.b).toBeDefined();
     expect(ctx.c).toBe(3);
     expect(ctx.d).toBeTruthy();
+  });
+
+  it(`circular denpendencies should work`, async () => {
+    const result: string[] = [];
+    const log = (value: string) => {
+      result.push(value);
+      console.log(value);
+    };
+    const { stop, ctx } = await start([CModule], {
+      beforeEachBoot(ctx, mod) {
+        log(`beforeEachBoot ${mod.name}`);
+      },
+      afterEachBoot(ctx, mod) {
+        log(`afterEachBoot ${mod.name}`);
+      },
+      beforeEachShutdown(ctx, mod) {
+        log(`beforeEachShutdown ${mod.name}`);
+      },
+      afterEachShutdown(ctx, mod) {
+        log(`afterEachShutdown ${mod.name}`);
+      },
+    });
+    await stop();
+    const moduleCount = 3;
+    const eventCount = 4;
+    const output = [
+      "beforeEachBoot A",
+      "afterEachBoot A",
+      "beforeEachBoot B",
+      "afterEachBoot B",
+      "beforeEachBoot C",
+      "afterEachBoot C",
+      "beforeEachShutdown C",
+      "afterEachShutdown C",
+      "beforeEachShutdown B",
+      "afterEachShutdown B",
+      "beforeEachShutdown A",
+      "afterEachShutdown A",
+    ];
+    expect(result.length).toBe(moduleCount * eventCount);
+    expect(result.join(",")).toBe(output.join(","));
   });
 });
 

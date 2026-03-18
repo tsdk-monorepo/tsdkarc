@@ -145,7 +145,7 @@ export interface Module<S extends object, Sl extends object = S> {
   name: string;
   description?: string;
   modules?: AnyModule[];
-  boot?(ctx: ContextWriter<S, Sl>): Promise<void> | void;
+  boot?(ctx: ContextWriter<S, Sl>): Promise<void> | void | Sl | Promise<Sl>;
   shutdown?(ctx: ContextWriter<S, Sl>): Promise<void> | void;
   /** Called immediately before this module's own boot(). */
   beforeBoot?(ctx: ContextWriter<S, Sl>): Promise<void> | void;
@@ -178,13 +178,23 @@ export interface Module<S extends object, Sl extends object = S> {
  * @param def  module definition
  */
 export function defineModule<OwnSlice extends object = Record<never, never>>() {
-  return function <const Deps extends readonly AnyModule[] = []>(def: {
+  return function <
+    const Deps extends readonly AnyModule[] = [],
+    R extends OwnSlice = OwnSlice
+  >(def: {
     name: string;
     description?: string;
     modules?: Deps;
     boot?(
-      ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
-    ): Promise<void> | void | OwnSlice | Promise<OwnSlice>;
+      ctx: ContextWriter<
+        FullContext<Deps, OwnSlice>,
+        NoOverlap<MergeSlices<Deps>, OwnSlice>
+      >
+    ):
+      | Promise<void>
+      | void
+      | (R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>)
+      | Promise<R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>>;
     shutdown?(
       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
     ): Promise<void> | void;
@@ -204,6 +214,39 @@ export function defineModule<OwnSlice extends object = Record<never, never>>() {
     return def as unknown as Module<FullContext<Deps, OwnSlice>, OwnSlice>;
   };
 }
+
+/**
+ * Errors if U has any key not in T by mapping extra keys to never.
+ */
+type Exact<T, U> = { [K in keyof U]: K extends keyof T ? T[K] : never };
+
+/**
+ * Produces a readable type error message instead of `never`.
+ * Msg appears directly in the IDE error output.
+ */
+type TypeError<Msg extends string> = { readonly __error__: Msg };
+
+/**
+ * Errors if OwnSlice declares a key that already exists in DepCtx.
+ * Overlapping keys show a readable message instead of `never`.
+ */
+type NoOverlap<DepCtx, OwnSlice> = {
+  [K in keyof OwnSlice]: K extends keyof DepCtx
+    ? TypeError<`Key "${K & string}" is already owned by a dependency module`>
+    : OwnSlice[K];
+};
+
+/**
+ * Combines exact-key check and overlap check in one mapped type.
+ * Removes the R & Exact<...> intersection layer from error output.
+ */
+type ValidReturn<OwnSlice, DepCtx, R> = {
+  [K in keyof R]: K extends keyof OwnSlice
+    ? K extends keyof DepCtx
+      ? TypeError<`Key "${K & string}" is already owned by a dependency module`>
+      : OwnSlice[K & keyof OwnSlice]
+    : TypeError<`Key "${K & string}" is not declared in OwnSlice`>;
+};
 
 // ---------------------------------------------------------------------------
 // StartOptions
