@@ -193,7 +193,7 @@ export default function HomeView({
           </h1>
           <p className="text-lg md:text-xl text-gray-500 max-w-md leading-relaxed">
             Compose modules like building blocks, nest them, and share them
-            across projects. Clean, simple, scalable.
+            across projects. Clean, simple, type safe and scalable.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
