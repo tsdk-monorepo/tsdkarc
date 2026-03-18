@@ -41,7 +41,15 @@ const configModule = defineModule<ConfigSlice>()({
 
 // Run
 (async () => {
-  const app = await start([configModule]);
+  const app = await start([serverModule], {
+    afterBoot() {
+      console.log("The app is running");
+    },
+    onError(error, ctx, mod) {
+      console.log(`${mod.name} error`, error.message);
+      // throw error;
+    },
+  });
   console.log(app.ctx.config.port); // 3000
   await app.stop();
 })();

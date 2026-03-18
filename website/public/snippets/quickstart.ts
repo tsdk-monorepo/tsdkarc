@@ -25,5 +25,13 @@ const serverModule = defineModule<ServerSlice>()({
 });
 
 // Launch 🚀
-const app = await start([serverModule]);
+const app = await start([serverModule], {
+  afterBoot() {
+    console.log("The app is running");
+  },
+  onError(error, ctx, mod) {
+    console.log(`${mod.name} error`, error.message);
+    // throw error;
+  },
+});
 app.ctx.server.listen(); // Running on 3000
