@@ -35,6 +35,7 @@ export type ContextWriter<
   Sl extends object = S
 > = Readonly<S> & {
   set<K extends Exclude<keyof Sl, "set">>(key: K, value: Sl[K]): void;
+  set(ctx: Sl): void;
 };
 // ---------------------------------------------------------------------------
 // Type helpers
@@ -183,7 +184,7 @@ export function defineModule<OwnSlice extends object = Record<never, never>>() {
     modules?: Deps;
     boot?(
       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
-    ): Promise<void> | void;
+    ): Promise<void> | void | OwnSlice | Promise<OwnSlice>;
     shutdown?(
       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
     ): Promise<void> | void;
@@ -304,7 +305,8 @@ export default async function start<const Roots extends readonly AnyModule[]>(
     try {
       await beforeEachBoot?.(writer, mod);
       await mod.beforeBoot?.(modWriter);
-      await mod.boot?.(modWriter);
+      const modCtx = await mod.boot?.(modWriter);
+      if (modCtx) modWriter.set(modCtx);
       await afterEachBoot?.(writer, mod);
       await mod.afterBoot?.(modWriter);
       booted.push(mod);
@@ -415,8 +417,12 @@ function makeWriter(
   ctx: Record<string, unknown>
 ): ContextWriter<Record<string, unknown>> {
   return Object.assign(ctx, {
-    set(key: string, value: unknown) {
+    set(key: string | Record<string, unknown>, value: unknown) {
+      if (typeof key === "object") {
+        return Object.assign(ctx, key);
+      }
       ctx[key] = value;
+      return ctx;
     },
   }) as unknown as ContextWriter<Record<string, unknown>>;
 }

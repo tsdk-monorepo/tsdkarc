@@ -32,10 +32,19 @@ const configModule = defineModule<ConfigSlice>()({
   name: "config",
   modules: [],
   boot(ctx) {
-    ctx.set("config", {
-      env: process.env.NODE_ENV ?? "development",
-      port: Number(process.env.PORT) || 3000,
-    });
+    return {
+      config: {
+        env: process.env.NODE_ENV ?? "development",
+        port: Number(process.env.PORT) || 3000,
+      },
+    };
+    // Or:
+    /* 
+      ctx.set("config", {
+        env: process.env.NODE_ENV ?? "development",
+        port: Number(process.env.PORT) || 3000,
+      });
+    */
   },
 });
 
@@ -71,7 +80,7 @@ const configModule = defineModule<ConfigSlice>()({
 defineModule<OwnSlice>()({
   name: string,
   modules: Module[],
-  boot?(ctx): void | Promise<void>,
+  boot?(ctx): OwnSlice | Promise<OwnSlice> | void | Promise<void>,
   beforeBoot?(ctx): void | Promise<void>,
   afterBoot?(ctx): void | Promise<void>,
   shutdown?(ctx): void | Promise<void>,

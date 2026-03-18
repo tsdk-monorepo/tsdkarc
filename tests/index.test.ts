@@ -589,6 +589,51 @@ describe("error handling", () => {
     await stop().catch((e) => e);
     expect(order).toContain("shutdown:B");
   });
+
+  it("`boot` return `OwnSlice` should works", async () => {
+    const order: string[] = [];
+    type OwnSlice = { a: number; b: () => string };
+    const B = defineModule<OwnSlice>()({
+      name: "B",
+      boot: () => {
+        return {
+          a: 1,
+          b: () => {
+            return "hi";
+          },
+        };
+      },
+      shutdown: async () => {
+        order.push("shutdown:B");
+      },
+    });
+
+    type AOwnSlice = { c: number; d: boolean };
+    const A = defineModule<AOwnSlice>()({
+      name: "A",
+      modules: [B] as const,
+      boot: () => {
+        return {
+          c: 3,
+          d: true,
+        };
+      },
+      shutdown: async () => {
+        throw new Error("shutdown exploded");
+      },
+    });
+    const { stop, ctx } = await start([A], {
+      onError(err) {
+        console.error(err);
+      },
+    });
+    await stop().catch((e) => e);
+    expect(order).toContain("shutdown:B");
+    expect(ctx.a).toBe(1);
+    expect(ctx.b).toBeDefined();
+    expect(ctx.c).toBe(3);
+    expect(ctx.d).toBeTruthy();
+  });
 });
 
 // ---------------------------------------------------------------------------

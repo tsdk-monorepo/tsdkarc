@@ -16,11 +16,21 @@ const serverModule = defineModule<ServerSlice>()({
   name: "server",
   modules: [configModule], // 👈 Declares dependency
   boot(ctx) {
-    ctx.set("server", {
-      listen: () => {
-        console.log(`Running on ${ctx.config.port}`); // 👈 Fully typed
+    return {
+      server: {
+        listen: () => {
+          console.log(`Running on ${ctx.config.port}`); // 👈 Fully typed
+        },
       },
-    });
+    };
+    // Or:
+    /*
+      ctx.set("server", {
+        listen: () => {
+          console.log(`Running on ${ctx.config.port}`); // 👈 Fully typed
+        },
+      });
+    */
   },
 });
 
