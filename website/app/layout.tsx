@@ -104,6 +104,7 @@ export default function RootLayout({
               data-scroll-top>
               <NavLink
                 href="/"
+                clickScrollToTop
                 className="font-bold text-2xl tracking-tighter cursor-pointer flex items-center space-x-1">
                 <img
                   src="/logo.jpg"

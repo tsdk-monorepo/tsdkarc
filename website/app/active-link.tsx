@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link, { LinkProps } from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
@@ -9,13 +9,17 @@ type NavLinkProps = {
   children: ReactNode;
   className?: string;
   activeClassName?: string;
-};
+  clickScrollToTop?: boolean;
+} & LinkProps;
 
 export default function NavLink({
   href,
   children,
   className = "",
   activeClassName = "active",
+  clickScrollToTop = false,
+  onClick,
+  ...props
 }: NavLinkProps) {
   const pathname = usePathname();
 
@@ -26,7 +30,14 @@ export default function NavLink({
     .join(" ");
 
   return (
-    <Link href={href} className={combinedClass}>
+    <Link
+      href={href}
+      className={combinedClass}
+      onClick={(e) => {
+        onClick?.(e);
+        if (clickScrollToTop) window.scrollTo(0, 0);
+      }}
+      {...props}>
       {children}
     </Link>
   );
