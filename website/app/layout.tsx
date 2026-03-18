@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | TsdkArc", // Useful for sub-pages like "Docs | tsdk"
   },
   description:
-    "The ultimate type-safe fullstack development framework. Build robust APIs, Web Workers, and auto-generated frontend hooks with zero boilerplate.",
+    "Compose modules like building blocks, nest them, and share them across projects. Clean, simple, type safe and scalable.",
 
   // SEO Keywords
   keywords: [
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     title:
       "TsdkArc | The Elegant and Fully Type-safe Module Composable Library.",
     description:
-      "Compose modules like building blocks, nest them, and share them across projects. Clean, simple, scalable.",
+      "Compose modules like building blocks, nest them, and share them across projects. Clean, simple, type safe and scalable.",
     siteName: "TsdkArc",
     images: [
       {
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     title:
       "TsdkArc | The Elegant and Fully Type-safe Module Composable Library.",
     description:
-      "Compose modules like building blocks, nest them, and share them across projects. Clean, simple, scalable.",
+      "Compose modules like building blocks, nest them, and share them across projects. Clean, simple, type safe and scalable.",
     images: ["/og.jpg"],
     creator: "@tsdk.dev",
   },
