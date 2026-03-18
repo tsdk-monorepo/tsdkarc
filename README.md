@@ -66,7 +66,7 @@ const configModule = defineModule<ConfigSlice>()({
 })();
 ```
 
-- Online Playground: [Do some practice here](https://stackblitz.com/edit/vitejs-vite-kdennssf?file=src%2FB.module.ts,src%2FA.module.ts,src%2Ftsdkarc-demo.ts,src%2FC.module.ts,src%2Fcircular-dependencies.module.ts&terminal=dev)
+- Online Playground: [Do some practice here](https://stackblitz.com/edit/vitejs-vite-kdennssf?file=src%2Ftsdkarc-demo.ts&terminal=dev)
 - Website & Documentation: https://arc.tsdk.dev/
 
 ---

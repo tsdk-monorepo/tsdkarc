@@ -203,7 +203,7 @@ export default function DocsView({
             <a
               className="text-sky-600 inline-flex items-center whitespace-nowrap"
               target="_blank"
-              href="https://stackblitz.com/edit/vitejs-vite-kdennssf?file=src%2FB.module.ts,src%2FA.module.ts,src%2Ftsdkarc-demo.ts,src%2FC.module.ts,src%2Fcircular-dependencies.module.ts&terminal=dev">
+              href="https://stackblitz.com/edit/vitejs-vite-kdennssf?file=src%2Ftsdkarc-demo.ts&terminal=dev">
               Visit online playground{" "}
               <span className="text-xs text-black px-1 md:hidden">
                 (Better view on Desktop)

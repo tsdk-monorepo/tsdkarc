@@ -33,6 +33,7 @@ export default function NavLink({
     <Link
       href={href}
       className={combinedClass}
+      prefetch={false}
       onClick={(e) => {
         onClick?.(e);
         if (clickScrollToTop) window.scrollTo(0, 0);
