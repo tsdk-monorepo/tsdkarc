@@ -20,6 +20,10 @@ export default function Shiki({
   const [html, setHtml] = useState(() =>
     defaultValue || ""
   );
+  codeToHtml(defaultValue, {
+        lang,
+        theme,
+      })
   useEffect(() => {
     (async () => {
       const code = defaultValue

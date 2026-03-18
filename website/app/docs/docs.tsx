@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable react/no-unescaped-entities */
 import React, { useState, useEffect, useRef } from "react";
-import Shiki from "../shiki";
+import ShikiCode from "../code";
 import { littkk } from "littkk";
 import { ArrowUpRightIcon } from "../icons";
 
@@ -15,6 +15,12 @@ export default function DocsView({
     patterns: string;
     apiModule: string;
     apiStart: string;
+
+    quickstartHtml: string;
+    dependencyChainHtml: string;
+    patternsHtml: string;
+    apiModuleHtml: string;
+    apiStartHtml: string;
   };
 }) {
   const [activeSection, setActiveSection] = useState("why");
@@ -132,12 +138,12 @@ export default function DocsView({
           <h2 className="text-3xl font-bold tracking-tight mb-6 px-6 md:px-0">
             Quickstart
           </h2>
+
+          <p>Define modules, resue the modules, and run application.</p>
           <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto mt-6">
-            <Shiki
+            <ShikiCode
               className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
-              path={`/snippets/quickstart.ts`}
-              defaultValue={snippets.quickstart}
-              lang="typescript"
+              codeHtml={snippets.quickstartHtml}
             />
           </div>
         </section>
@@ -221,11 +227,9 @@ export default function DocsView({
           <div className="space-y-4">
             <h3 className="text-xl font-bold px-6 md:px-0">defineModule</h3>
             <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto">
-              <Shiki
+              <ShikiCode
                 className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
-                path={`/snippets/api.ts`}
-                defaultValue={snippets.apiModule}
-                lang="typescript"
+                codeHtml={snippets.apiModuleHtml}
               />
             </div>
           </div>
@@ -233,11 +237,9 @@ export default function DocsView({
           <div className="space-y-4 mt-12">
             <h3 className="text-xl font-bold px-6 md:px-0">start</h3>
             <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto">
-              <Shiki
+              <ShikiCode
                 className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
-                path={`/snippets/api-start.ts`}
-                defaultValue={snippets.apiStart}
-                lang="typescript"
+                codeHtml={snippets.apiStartHtml}
               />
             </div>
           </div>
@@ -257,11 +259,9 @@ export default function DocsView({
             exactly once.
           </p>
           <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto mt-6">
-            <Shiki
+            <ShikiCode
               className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
-              path={`/snippets/dependency-chain.ts`}
-              defaultValue={snippets.dependencyChain}
-              lang="typescript"
+              codeHtml={snippets.dependencyChainHtml}
             />
           </div>
         </section>
@@ -279,11 +279,9 @@ export default function DocsView({
               values.
             </p>
             <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto mt-4">
-              <Shiki
+              <ShikiCode
                 className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
-                path={`/snippets/patterns.ts`}
-                defaultValue={snippets.patterns}
-                lang="typescript"
+                codeHtml={snippets.patternsHtml}
               />
             </div>
           </div>
@@ -374,6 +372,17 @@ export default function DocsView({
                     colSpan={3}
                     className="px-6 py-2 text-xs font-semibold text-gray-400 uppercase tracking-widest">
                     Per-module — fires once per module, in boot / shutdown order
+                  </td>
+                </tr>
+
+                <tr className="hover:bg-gray-50/50 transition-colors">
+                  <td className="px-6 py-4 font-bold text-black text-base">
+                    onError
+                  </td>
+                  <td className="px-6 py-4 text-gray-400 text-xs">Once</td>
+                  <td className="px-6 py-4 text-gray-600">
+                    When resolve modules and hooks error will call `onError`,
+                    default will throw
                   </td>
                 </tr>
 

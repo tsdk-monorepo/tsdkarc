@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable react/no-unescaped-entities */
 import React, { useState, useEffect, useRef } from "react";
-import Shiki from "./shiki";
+import ShikiCode from "./code";
 import { littkk } from "littkk";
 import Link from "next/link";
 import {
@@ -16,7 +16,6 @@ import {
   PuzzleIcon,
   CycleIcon,
   XIcon,
-  ArrowUpRightIcon,
 } from "./icons";
 const videoSrc = "/output.m3u8";
 
@@ -24,7 +23,7 @@ const videoSrc = "/output.m3u8";
 export default function HomeView({
   snippets,
 }: {
-  snippets: { quickstart: string };
+  snippets: { quickstart: string; quickstartHTML: string };
 }) {
   const [isMuted, setIsMuted] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -272,12 +271,9 @@ export default function HomeView({
             {isCodeCopied ? "Copied!" : "Copy"}
           </button>
 
-          <Shiki
+          <ShikiCode
             className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
-            path={`/snippets/quickstart.ts`}
-            setCode={setCode}
-            defaultValue={snippets.quickstart}
-            lang="typescript"
+            codeHtml={snippets.quickstartHTML}
           />
         </div>
       </section>

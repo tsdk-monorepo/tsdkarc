@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import DocsView from "./docs";
 import { Metadata } from "next";
+import { codeToHtml } from "shiki";
 
 export const metadata: Metadata = {
   title: "Documentation",
@@ -15,6 +16,23 @@ export default async function Docs() {
       fs.readFile("public/snippets/api.ts", "utf-8"),
       fs.readFile("public/snippets/api-start.ts", "utf-8"),
     ]);
+
+  const [
+    quickstartHtml,
+    dependencyChainHtml,
+    patternsHtml,
+    apiModuleHtml,
+    apiStartHtml,
+  ] = await Promise.all(
+    [quickstart, dependencyChain, patterns, apiModule, apiStart].map(
+      (itemCode) => {
+        return codeToHtml(itemCode, {
+          theme: "dracula",
+          lang: "ts",
+        });
+      }
+    )
+  );
   return (
     <DocsView
       snippets={{
@@ -23,6 +41,12 @@ export default async function Docs() {
         patterns,
         apiModule,
         apiStart,
+
+        quickstartHtml,
+        dependencyChainHtml,
+        patternsHtml,
+        apiModuleHtml,
+        apiStartHtml,
       }}
     />
   );

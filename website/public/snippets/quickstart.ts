@@ -6,7 +6,11 @@ interface ConfigSlice {
 const configModule = defineModule<ConfigSlice>()({
   name: "config",
   modules: [],
-  boot: (ctx) => ctx.set("config", { port: 3000 }),
+  boot: () => ({
+    config: {
+      port: 3000,
+    },
+  }),
 });
 
 interface ServerSlice {
