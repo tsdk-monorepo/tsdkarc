@@ -139,7 +139,7 @@ export default function DocsView({
             Quickstart
           </h2>
 
-          <p>Define modules, resue the modules, and run application.</p>
+          <p>Define modules, reuse the modules, and run application.</p>
           <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto mt-6">
             <ShikiCode
               className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
