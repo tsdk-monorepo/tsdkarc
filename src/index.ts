@@ -183,6 +183,10 @@ export type InferContextBy<M> = ContextBy<M>;
 /** Get context writter type by typeof module*/
 export type ContextWriterBy<M> = ContextWriter<M extends Module<any, infer Ctx> ? Ctx : never>;
 
+
+/** Get context writter's `set` type by typeof module*/
+export type ContextSet<M> = ContextWriter<M extends Module<any, infer Ctx> ? Ctx : never>['set'];
+
 // ---------------------------------------------------------------------------
 // defineModule
 // ---------------------------------------------------------------------------
