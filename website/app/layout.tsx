@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
   title: {
     default:
-      "TsdkArc | The Clean, Simple and Fully Type-safe Module Composable Library",
+      "TsdkArc | The Clean and Fully Type-safe Module Composable Library",
     template: "%s | TsdkArc", // Useful for sub-pages like "Docs | tsdk"
   },
   description:
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://arc.tsdk.dev",
     title:
-      "TsdkArc | The Clean, Simple and Fully Type-safe Module Composable Library",
+      "TsdkArc | The Clean and Fully Type-safe Module Composable Library",
     description:
       "Compose modules like building blocks, nest them, and share them across projects. Clean, simple, type safe and scalable.",
     siteName: "TsdkArc",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
         url: "/og.jpg", // Must be exactly 1200x630 pixels for best results
         width: 1200,
         height: 630,
-        alt: "TsdkArc | The Clean, Simple and Fully Type-safe Module Composable Library",
+        alt: "TsdkArc | The Clean and Fully Type-safe Module Composable Library",
       },
     ],
   },
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image", // This gives you the big, beautiful image preview
     title:
-      "TsdkArc | The Clean, Simple and Fully Type-safe Module Composable Library",
+      "TsdkArc | The Clean and Fully Type-safe Module Composable Library",
     description:
       "Compose modules like building blocks, nest them, and share them across projects. Clean, simple, type safe and scalable.",
     images: ["/og.jpg"],
