@@ -37,6 +37,7 @@ export type ContextWriter<
   set<K extends Exclude<keyof Sl, "set">>(key: K, value: Sl[K]): void;
   set(ctx: Sl): void;
 };
+
 // ---------------------------------------------------------------------------
 // Type helpers
 // ---------------------------------------------------------------------------
@@ -174,9 +175,13 @@ export const moduleA = defineModule<AContext>()({
 // Get context type by module
 type AContext2 = InferContextBy<typeof moduleA> // same as above `AContext`
  */
-export type InferContextBy<M> = M extends Module<infer Full, any>
+export type ContextBy<M> = M extends Module<infer Full, any>
   ? { [K in keyof Full]: Full[K] }
   : never;
+export type InferContextBy<M> = ContextBy<M>;
+
+/** Get context writter type by typeof module*/
+export type ContextWriterBy<M> = ContextWriter<M extends Module<any, infer Ctx> ? Ctx : never>;
 
 // ---------------------------------------------------------------------------
 // defineModule

@@ -24,7 +24,7 @@ npm install tsdkarc
 ```
 
 ```ts
-import start, { defineModule, type InferContextBy } from "tsdkarc";
+import start, { defineModule, type InferContextBy, type ContextWriterBy } from "tsdkarc";
 
 interface ConfigSlice {
   config: { port: number; env: string };
@@ -52,6 +52,8 @@ const configModule = defineModule<ConfigSlice>()({
 
 // get type from module
 type ConfigModuleCtx = InferContextBy<typeof configModule>; // same as `ConfigSlice`
+
+type ConfigModuleSet = ContextWriterBy<typeof configModule>;
 
 // Run
 (async () => {

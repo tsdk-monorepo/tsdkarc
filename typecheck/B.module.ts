@@ -1,4 +1,4 @@
-import { defineModule } from "../src";
+import { defineModule, InferContextBy, ContextWriterBy } from "../src";
 import { A } from "./A.module";
 
 type BOwnSlice = { 
@@ -14,3 +14,9 @@ export const B = defineModule<BOwnSlice>()({
     console.log(`shutdown ${ctx.valueB}`);
   },
 });
+
+type BContext = InferContextBy<typeof B>;
+
+type BContextWritter = ContextWriterBy<typeof B>;
+
+type a = BContextWritter['set'];

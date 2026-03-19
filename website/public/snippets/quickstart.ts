@@ -1,4 +1,8 @@
-import start, { defineModule, type InferContextBy } from "tsdkarc";
+import start, {
+  defineModule,
+  type InferContextBy,
+  type ContextWriterBy,
+} from "tsdkarc";
 
 interface ConfigSlice {
   config: { port: number };
@@ -15,6 +19,12 @@ const configModule = defineModule<ConfigSlice>()({
 
 // Get context type directly from the module
 export type ConfigModuleCtx = InferContextBy<typeof configModule>; // same as `ConfigSlice`
+
+// Get set context type
+type ConfigModuleSet = ContextWriterBy<typeof configModule>["set"];
+function test(set: ConfigModuleSet) {
+  set("config", { port: 200 });
+}
 
 interface ServerSlice {
   server: { listen: () => void };

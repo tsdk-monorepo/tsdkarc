@@ -1,4 +1,4 @@
-import { defineModule, InferContextBy, Module } from "../src";
+import { defineModule, ContextBy, Module } from "../src";
 
 type AContext = {
   /** A's value */
@@ -14,7 +14,7 @@ export const A = defineModule<AContext>()({
   },
 });
 
-type AContext2 = InferContextBy<typeof A>;
+type AContext2 = ContextBy<typeof A>;
 
 const check: AContext2 = {
   value: "a",
