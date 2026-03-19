@@ -1,4 +1,4 @@
-import { defineModule, Module } from 'tsdkarc';
+import { defineModule, Module, type InferContextBy } from 'tsdkarc';
 
 defineModule<OwnSlice>()({
   name: string;
@@ -11,3 +11,6 @@ defineModule<OwnSlice>()({
   beforeShutdown?(ctx): void | Promise<void>;
   afterShutdown?(ctx): void | Promise<void>;
 })
+
+
+type ModuleContext = InferContextBy<Module>
