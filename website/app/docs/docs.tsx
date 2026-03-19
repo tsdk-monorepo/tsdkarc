@@ -138,8 +138,9 @@ export default function DocsView({
           <h2 className="text-3xl font-bold tracking-tight mb-6 px-6 md:px-0">
             Quickstart
           </h2>
-
-          <p>Define modules, reuse the modules, and run application.</p>
+          <p className="px-6 md:px-0 mb-6">
+            Define modules, reuse the modules, and run application.
+          </p>
           <div className="bg-[#282A36] md:border border-gray-200 p-6 md:p-8 md:rounded-2xl overflow-x-auto mt-6">
             <ShikiCode
               className="text-sm font-mono text-gray-800 leading-relaxed pt-4 md:pt-0"
@@ -366,15 +367,6 @@ export default function DocsView({
                   </td>
                 </tr>
 
-                {/* Divider row */}
-                <tr className="bg-gray-50">
-                  <td
-                    colSpan={3}
-                    className="px-6 py-2 text-xs font-semibold text-gray-400 uppercase tracking-widest">
-                    Per-module — fires once per module, in boot / shutdown order
-                  </td>
-                </tr>
-
                 <tr className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4 font-bold text-black text-base">
                     onError
@@ -383,6 +375,15 @@ export default function DocsView({
                   <td className="px-6 py-4 text-gray-600">
                     When resolve modules and hooks error will call `onError`,
                     default will throw
+                  </td>
+                </tr>
+
+                {/* Divider row */}
+                <tr className="bg-gray-50">
+                  <td
+                    colSpan={3}
+                    className="px-6 py-2 text-xs font-semibold text-gray-400 uppercase tracking-widest">
+                    Per-module — fires once per module, in boot / shutdown order
                   </td>
                 </tr>
 
