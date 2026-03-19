@@ -91,7 +91,7 @@ const myAwesomeProjects = [
   {
     name: "xior",
     emoji: "🔌",
-    desc: "A tiny fetch wrapper with plugins and axios-like API.",
+    desc: "A tiny fetch wrapper with plugins support and axios-like API!",
     url: "https://github.com/suhaotian/xior",
   },
   {
@@ -103,13 +103,13 @@ const myAwesomeProjects = [
   {
     name: "broad-infinite-list",
     emoji: "⚡",
-    desc: "High performance infinite scrolling list.",
+    desc: "A high-performance, bidirectional infinite scroll list component for large list rendering, support React/Vue/Expo.",
     url: "https://github.com/suhaotian/broad-infinite-list",
   },
   {
     name: "littkk",
     emoji: "🧞‍♂️",
-    desc: "Shows and hides UI elements on scroll.",
+    desc: "Shows and hides UI elements based on scroll direction.",
     url: "https://github.com/suhaotian/littkk",
   },
 ];
