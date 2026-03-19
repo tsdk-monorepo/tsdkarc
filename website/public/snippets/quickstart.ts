@@ -17,12 +17,12 @@ const configModule = defineModule<ConfigSlice>()({
   }),
 });
 
-// Get context type directly from the module
+// Get the module's context type(include the dependencies modules)
 export type ConfigModuleCtx = InferContextBy<typeof configModule>; // same as `ConfigSlice`
 
-// Get set context type
+// Get the `set` type of the module
 type ConfigModuleSet = ContextWriterBy<typeof configModule>["set"];
-function test(set: ConfigModuleSet) {
+function test(set: ConfigModuleSet) { // type safe here
   set("config", { port: 200 });
 }
 

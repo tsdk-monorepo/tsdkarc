@@ -50,10 +50,11 @@ const configModule = defineModule<ConfigSlice>()({
   },
 });
 
-// get type from module
+// Get the module's context type(include the dependencies modules)
 type ConfigModuleCtx = InferContextBy<typeof configModule>; // same as `ConfigSlice`
 
-type ConfigModuleSet = ContextWriterBy<typeof configModule>;
+// Get the `set` type of the module
+type ConfigModuleSet = ContextWriterBy<typeof configModule>['set'];
 
 // Run
 (async () => {
