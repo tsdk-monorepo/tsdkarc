@@ -1,11 +1,11 @@
-import { defineModule } from "../src";
+import { defineModule, InferContextBy, Module } from "../src";
 
-type AOwnSlice = {
+type AContext = {
   /** A's value */
   value: string;
 };
 
-export const A = defineModule<AOwnSlice>()({
+export const A = defineModule<AContext>()({
   name: "A",
   modules: [] as const,
   boot: () => ({ value: "module:A" }),
@@ -13,3 +13,9 @@ export const A = defineModule<AOwnSlice>()({
     console.log(`shutdown ${ctx.value}`);
   },
 });
+
+type AContext2 = InferContextBy<typeof A>;
+
+const check: AContext2 = {
+  value: "a",
+};

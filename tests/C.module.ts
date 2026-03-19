@@ -1,5 +1,5 @@
-import { defineModule } from "../src";
-import { A } from './A.module';
+import { defineModule, InferContextBy } from "../src";
+import { A } from "./A.module";
 import { B } from "./B.module";
 
 type COwnSlice = {
@@ -27,3 +27,12 @@ export const CModule = defineModule<COwnSlice>()({
     console.log(`shutdown ${ctx.value}`);
   },
 });
+
+type CContext2 = InferContextBy<typeof CModule>;
+
+const check: CContext2 = {
+  valueC: "c",
+  a: 0,
+  // @ts-expect-error
+  no: 1,
+};

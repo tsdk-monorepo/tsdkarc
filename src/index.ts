@@ -157,6 +157,27 @@ export interface Module<S extends object, Sl extends object = S> {
   afterShutdown?(ctx: ContextWriter<S, Sl>): Promise<void> | void;
 }
 
+/** 
+
+type AContext = {
+  value: string;
+};
+
+export const moduleA = defineModule<AContext>()({
+  name: "A",
+  modules: [] as const,
+  boot: () => ({ value: "module:A" }),
+  async shutdown(ctx) {
+    console.log(`shutdown ${ctx.value}`);
+  },
+});
+// Get context type by module
+type AContext2 = InferContextBy<typeof moduleA> // same as above `AContext`
+ */
+export type InferContextBy<M> = M extends Module<any, infer Ctx>
+  ? Ctx
+  : never;
+
 // ---------------------------------------------------------------------------
 // defineModule
 // ---------------------------------------------------------------------------
