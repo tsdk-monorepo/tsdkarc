@@ -1,5 +1,9 @@
 # TsdkArc Changelog
 
+## v1.1.3
+
+- Feat: add helper type `InferContextBy` directly infer type from the module
+
 ## v1.1.2
 
 - Fix `mod.beforeShutdown` and `mod.afterShutdown` running logic
