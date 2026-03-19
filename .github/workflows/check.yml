@@ -17,7 +17,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
       - name: Run build
-        run: bun i && bun run build && bun run test
+        run: bun i && bun run checktype && rm -rf typecheck && bun run build && bun run test
 
       # - name: Run demos
       #   run: cd demos && bun i && bun run build

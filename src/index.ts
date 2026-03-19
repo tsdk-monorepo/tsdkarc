@@ -174,8 +174,8 @@ export const moduleA = defineModule<AContext>()({
 // Get context type by module
 type AContext2 = InferContextBy<typeof moduleA> // same as above `AContext`
  */
-export type InferContextBy<M> = M extends Module<any, infer Ctx>
-  ? Ctx
+export type InferContextBy<M> = M extends Module<infer Full, any>
+  ? { [K in keyof Full]: Full[K] }
   : never;
 
 // ---------------------------------------------------------------------------

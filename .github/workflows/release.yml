@@ -34,7 +34,7 @@ jobs:
         run: bun install
 
       - name: Run Build
-        run: bun run build
+        run:  bun run checktype && rm -rf typecheck && bun run build
 
       - name: Determine release tag
         id: release-tag

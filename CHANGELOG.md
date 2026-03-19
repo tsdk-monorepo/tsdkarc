@@ -1,5 +1,9 @@
 # TsdkArc Changelog
 
+## v1.1.4
+
+- Feat: improve the helper type `InferContextBy` directly infer type from **nested** modules
+
 ## v1.1.3
 
 - Feat: add helper type `InferContextBy` directly infer type from the module
