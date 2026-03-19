@@ -1,4 +1,4 @@
-import start, { defineModule, InferContextBy } from "tsdkarc";
+import start, { defineModule, type InferContextBy } from "tsdkarc";
 
 interface ConfigSlice {
   config: { port: number };
