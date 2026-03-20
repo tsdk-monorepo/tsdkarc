@@ -223,6 +223,7 @@ export default function HomeView({
             ref={videoRef}
             className="w-full h-full aspect-video object-cover opacity-95 transition-opacity duration-700 pointer-events-none"
             autoPlay={isPlaying}
+            poster="/video.jpg"
             loop
             muted={isMuted}
             playsInline={true}
