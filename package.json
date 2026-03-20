@@ -1,6 +1,6 @@
 {
   "name": "tsdkarc",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "TsdkArc is an elegant and fully type-safe module composable library",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
@@ -13,7 +13,7 @@
     "build:cjs": "rm -rf lib && tsc --project tsconfig.cjs.json && rm -rf lib/tests",
     "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests",
     "checktype": "tsc --noEmit",
-    "test": "vitest --run --testTimeout=120000 --hookTimeout=60000"
+    "test": "npm run checktype && vitest --run --testTimeout=120000 --hookTimeout=60000"
   },
   "files": [
     "lib/*",

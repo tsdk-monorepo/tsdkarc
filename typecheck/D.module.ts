@@ -1,4 +1,4 @@
-import { defineModule, ContextOf, ContextWriterOf } from "../src";
+import start, { defineModule, ContextOf, ContextWriterOf } from "../src";
 import { A } from "./A.module";
 import { B } from "./B.module";
 
@@ -26,3 +26,9 @@ const check: CContext2 = {
   // @ts-expect-error
   noExist: 1,
 };
+
+start([CModule]).then((app) => {
+  app.ctx.echo();
+  // @ts-expect-error
+  console.log(app.ctx.b === 1);
+});

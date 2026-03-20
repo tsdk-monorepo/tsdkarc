@@ -13,6 +13,7 @@ export const CModule = defineModule<COwnSlice>()({
   modules: [B, A] as const,
   // @ts-expect-error `value2` not exist in `COwnSlice`
   boot: (ctx) => {
+    ctx.set("a", 2);
     ctx.set("valueC", "2");
 
     // @ts-expect-error `value2` not exist in `COwnSlice`

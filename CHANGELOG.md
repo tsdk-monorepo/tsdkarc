@@ -1,5 +1,9 @@
 # TsdkArc Changelog
 
+## v1.2.3
+
+- Fix `ctx`'s `set` should only keep in `boot` hook
+
 ## v1.2.2
 
 - Fix `ctx`'s type are any on hooks

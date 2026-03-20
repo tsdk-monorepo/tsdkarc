@@ -11,6 +11,10 @@ export const A = defineModule()({
     },
   }),
   async shutdown(ctx) {
+    ctx.echo();
+    ctx.value;
+    // @ts-expect-error
+    ctx.set;
     console.log(`shutdown ${ctx.value}`);
   },
 });

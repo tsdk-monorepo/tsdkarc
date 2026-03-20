@@ -143,15 +143,15 @@ export interface Module<S extends object, Sl extends object = S> {
   description?: string;
   modules?: AnyModule[];
   boot?(ctx: ContextWriter<S, Sl>): Promise<void> | void | Sl | Promise<Sl>;
-  shutdown?(ctx: ContextWriter<S, Sl>): Promise<void> | void;
+  shutdown?(ctx: Omit<ContextWriter<S, Sl>, "set">): Promise<void> | void;
   /** Called immediately before this module's own boot(). */
-  beforeBoot?(ctx: ContextWriter<S, Sl>): Promise<void> | void;
+  beforeBoot?(ctx: Omit<ContextWriter<S, Sl>, "set">): Promise<void> | void;
   /** Called immediately after this module's own boot(). */
-  afterBoot?(ctx: ContextWriter<S, Sl>): Promise<void> | void;
+  afterBoot?(ctx: Omit<ContextWriter<S, Sl>, "set">): Promise<void> | void;
   /** Called immediately before this module's own shutdown(). */
-  beforeShutdown?(ctx: ContextWriter<S, Sl>): Promise<void> | void;
+  beforeShutdown?(ctx: Omit<ContextWriter<S, Sl>, "set">): Promise<void> | void;
   /** Called immediately after this module's own shutdown(). */
-  afterShutdown?(ctx: ContextWriter<S, Sl>): Promise<void> | void;
+  afterShutdown?(ctx: Omit<ContextWriter<S, Sl>, "set">): Promise<void> | void;
 }
 
 /**
@@ -219,19 +219,19 @@ type ModuleDef<
     | (R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>)
     | Promise<R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>>;
   shutdown?(
-    ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, 'set'>
   ): Promise<void> | void;
   beforeBoot?(
-    ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, 'set'>
   ): Promise<void> | void;
   afterBoot?(
-    ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, 'set'>
   ): Promise<void> | void;
   beforeShutdown?(
-    ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, 'set'>
   ): Promise<void> | void;
   afterShutdown?(
-    ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, 'set'>
   ): Promise<void> | void;
 };
 
@@ -263,23 +263,23 @@ type ModuleDefInfer<
   ): void | Promise<void> | Slice | Promise<Slice>;
   /** ctx = full context including own slice — runs after boot. */
   shutdown?(
-    ctx: ContextWriter<FullContext<Deps, Slice>, Slice>
+    ctx: Omit<ContextWriter<FullContext<Deps, Slice>, Slice>, 'set'>
   ): Promise<void> | void;
   /** ctx = dep context only — runs before boot. */
   beforeBoot?(
-    ctx: ContextWriter<MergeSlices<Deps>, MergeSlices<Deps>>
+    ctx: Omit<ContextWriter<MergeSlices<Deps>, MergeSlices<Deps>>, 'set'>
   ): Promise<void> | void;
   /** ctx = full context including own slice — runs after boot. */
   afterBoot?(
-    ctx: ContextWriter<FullContext<Deps, Slice>, Slice>
+    ctx: Omit<ContextWriter<FullContext<Deps, Slice>, Slice>, 'set'>
   ): Promise<void> | void;
   /** ctx = full context including own slice — runs after boot. */
   beforeShutdown?(
-    ctx: ContextWriter<FullContext<Deps, Slice>, Slice>
+    ctx: Omit<ContextWriter<FullContext<Deps, Slice>, Slice>, 'set'>
   ): Promise<void> | void;
   /** ctx = full context including own slice — runs after boot. */
   afterShutdown?(
-    ctx: ContextWriter<FullContext<Deps, Slice>, Slice>
+    ctx: Omit<ContextWriter<FullContext<Deps, Slice>, Slice>, 'set'>
   ): Promise<void> | void;
 };
 
