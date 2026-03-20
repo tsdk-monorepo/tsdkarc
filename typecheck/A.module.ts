@@ -1,11 +1,8 @@
-import { defineModule, ContextBy, Module } from "../src";
+import { defineModule, ContextOf, Module } from "../src";
 
-type AContext = {
-  /** A's value */
-  value: string;
-};
 
-export const A = defineModule<AContext>()({
+
+export const A = defineModule()({
   name: "A",
   modules: [] as const,
   boot: () => ({ value: "module:A" }),
@@ -14,7 +11,7 @@ export const A = defineModule<AContext>()({
   },
 });
 
-type AContext2 = ContextBy<typeof A>;
+type AContext2 = ContextOf<typeof A>;
 
 const check: AContext2 = {
   value: "a",

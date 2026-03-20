@@ -2,25 +2,14 @@ import { defineModule, ContextOf } from "../src";
 import { A } from "./A.module";
 import { B } from "./B.module";
 
-type COwnSlice = {
-  /** C's value */
-  valueC: string;
-  a?: number;
-};
-
-export const CModule = defineModule<COwnSlice>()({
+export const CModule = defineModule()({
   name: "C",
   modules: [B, A] as const,
-  // @ts-expect-error `value2` not exist in `COwnSlice`
-  boot: (ctx) => {
-    ctx.set("valueC", "2");
-
-    // @ts-expect-error `value2` not exist in `COwnSlice`
-    ctx.set("value2", "2");
-
+  boot() {
     return {
       valueC: "module:C",
       value2: "module:C",
+      a: 0,
     };
   },
   async shutdown(ctx) {
@@ -31,6 +20,7 @@ export const CModule = defineModule<COwnSlice>()({
 type CContext2 = ContextOf<typeof CModule>;
 
 const check: CContext2 = {
+  value2: "c",
   valueC: "c",
   a: 0,
   value: "1",

@@ -173,19 +173,17 @@ export const moduleA = defineModule<AContext>()({
   },
 });
 // Get context type by module
-type AContext2 = InferContextBy<typeof moduleA> // same as above `AContext`
+type AContext2 = ContextOf<typeof moduleA> // same as above `AContext`
  */
-export type ContextBy<M> = M extends Module<infer Full, any>
+export type ContextOf<M> = M extends Module<infer Full, any>
   ? { [K in keyof Full]: Full[K] }
   : never;
-export type InferContextBy<M> = ContextBy<M>;
 
 /** Get context writter type by typeof module*/
-export type ContextWriterBy<M> = ContextWriter<M extends Module<any, infer Ctx> ? Ctx : never>;
-
+export type ContextWriterOf<M> = ContextWriter<M extends Module<any, infer Ctx> ? Ctx : never>;
 
 /** Get context writter's `set` type by typeof module*/
-export type ContextSet<M> = ContextWriter<M extends Module<any, infer Ctx> ? Ctx : never>['set'];
+export type ContextSetOf<M> = ContextWriter<M extends Module<any, infer Ctx> ? Ctx : never>['set'];
 
 // ---------------------------------------------------------------------------
 // defineModule
@@ -207,42 +205,174 @@ export type ContextSet<M> = ContextWriter<M extends Module<any, infer Ctx> ? Ctx
  *
  * @param def  module definition
  */
-export function defineModule<OwnSlice extends object = Record<never, never>>() {
-  return function <
-    const Deps extends readonly AnyModule[] = [],
-    R extends OwnSlice = OwnSlice
-  >(def: {
-    name: string;
-    description?: string;
-    modules?: Deps;
-    boot?(
-      ctx: ContextWriter<
-        FullContext<Deps, OwnSlice>,
-        NoOverlap<MergeSlices<Deps>, OwnSlice>
-      >
-    ):
-      | Promise<void>
-      | void
-      | (R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>)
-      | Promise<R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>>;
-    shutdown?(
-      ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
-    ): Promise<void> | void;
-    beforeBoot?(
-      ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
-    ): Promise<void> | void;
-    afterBoot?(
-      ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
-    ): Promise<void> | void;
-    beforeShutdown?(
-      ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
-    ): Promise<void> | void;
-    afterShutdown?(
-      ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
-    ): Promise<void> | void;
-  }): Module<FullContext<Deps, OwnSlice>, OwnSlice> {
-    return def as unknown as Module<FullContext<Deps, OwnSlice>, OwnSlice>;
-  };
+// export function defineModule<OwnSlice extends object = Record<never, never>>() {
+//   return function <
+//     const Deps extends readonly AnyModule[] = [],
+//     R extends OwnSlice = OwnSlice
+//   >(def: {
+//     name: string;
+//     description?: string;
+//     modules?: Deps;
+//     boot?(
+//       ctx: ContextWriter<
+//         FullContext<Deps, OwnSlice>,
+//         NoOverlap<MergeSlices<Deps>, OwnSlice>
+//       >
+//     ):
+//       | Promise<void>
+//       | void
+//       | (R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>)
+//       | Promise<R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>>;
+//     shutdown?(
+//       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+//     ): Promise<void> | void;
+//     beforeBoot?(
+//       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+//     ): Promise<void> | void;
+//     afterBoot?(
+//       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+//     ): Promise<void> | void;
+//     beforeShutdown?(
+//       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+//     ): Promise<void> | void;
+//     afterShutdown?(
+//       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+//     ): Promise<void> | void;
+//   }): Module<FullContext<Deps, OwnSlice>, OwnSlice> {
+//     return def as unknown as Module<FullContext<Deps, OwnSlice>, OwnSlice>;
+//   };
+// }
+
+/**
+ * Extracts the non-void return type of a boot function.
+ * Returns Record<never, never> when boot is absent or returns void.
+ */
+type BootReturn<T> = T extends (...args: any[]) => Promise<infer R>
+  ? Exclude<R, void> extends never
+    ? Record<never, never>
+    : Exclude<R, void>
+  : T extends (...args: any[]) => infer R
+  ? Exclude<R, void> extends never
+    ? Record<never, never>
+    : Exclude<R, void>
+  : Record<never, never>;
+
+/**
+ * Infers OwnSlice from a def object's boot return type.
+ * Falls back to Record<never, never> if no boot or boot returns void.
+ */
+type InferredOwnSlice<Def> = Def extends { boot: infer B }
+  ? BootReturn<B>
+  : Record<never, never>;
+
+/**
+ * Infers the Deps tuple from a def object's modules field.
+ * Falls back to [] if modules is absent.
+ */
+type InferredDeps<Def> = Def extends { modules: infer M }
+  ? M extends readonly AnyModule[]
+    ? M
+    : []
+  : [];
+
+/**
+ * Module def shape when OwnSlice is explicitly provided.
+ */
+type ModuleDef<
+  Deps extends readonly AnyModule[],
+  OwnSlice extends object,
+  R extends object
+> = {
+  name: string;
+  description?: string;
+  modules?: Deps;
+  boot?(
+    ctx: ContextWriter<
+      FullContext<Deps, OwnSlice>,
+      NoOverlap<MergeSlices<Deps>, OwnSlice>
+    >
+  ):
+    | void
+    | Promise<void>
+    | (R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>)
+    | Promise<R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>>;
+  shutdown?(ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>): Promise<void> | void;
+  beforeBoot?(ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>): Promise<void> | void;
+  afterBoot?(ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>): Promise<void> | void;
+  beforeShutdown?(ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>): Promise<void> | void;
+  afterShutdown?(ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>): Promise<void> | void;
+};
+
+/**
+ * Loose module def shape used when OwnSlice is inferred.
+ *
+ * modules is typed as readonly AnyModule[] so TypeScript preserves the literal
+ * tuple — Deps is extracted post-hoc via InferredDeps<Def>, not constrained here.
+ *
+ * boot returns `any` intentionally — Exact<object, R> would collapse every
+ * property to never if we used `object`. Enforcement is on the output Module<>.
+ */
+type ModuleDefLoose = {
+  name: string;
+  description?: string;
+  modules?: readonly AnyModule[];
+  boot?(ctx: ContextWriter<any, any>): any;
+  shutdown?(ctx: ContextWriter<any, any>): Promise<void> | void;
+  beforeBoot?(ctx: ContextWriter<any, any>): Promise<void> | void;
+  afterBoot?(ctx: ContextWriter<any, any>): Promise<void> | void;
+  beforeShutdown?(ctx: ContextWriter<any, any>): Promise<void> | void;
+  afterShutdown?(ctx: ContextWriter<any, any>): Promise<void> | void;
+};
+
+/**
+ * Sentinel type used to detect whether OwnSlice was explicitly supplied.
+ * When defineModule() is called with no type argument, OwnSlice defaults to
+ * this value, triggering the infer-from-boot path.
+ */
+declare const INFER: unique symbol;
+type Infer = typeof INFER;
+
+/**
+ * Selects the inner function signature based on whether OwnSlice was supplied.
+ *
+ * OwnSlice = Infer (no type arg given):
+ *   Captures the whole def as const Def, extracts both Deps and OwnSlice
+ *   from the def object post-hoc via InferredDeps<Def> and InferredOwnSlice<Def>.
+ *
+ * OwnSlice = explicit type:
+ *   Enforces boot return against the supplied OwnSlice via Exact/NoOverlap.
+ */
+type DefineModuleInner<OwnSlice> = OwnSlice extends Infer
+  ? <const Def extends ModuleDefLoose>(
+      def: Def
+    ) => Module<
+      FullContext<InferredDeps<Def>, Exclude<InferredOwnSlice<Def>, void>>,
+      Exclude<InferredOwnSlice<Def>, void>
+    >
+  : OwnSlice extends object
+  ? <const Deps extends readonly AnyModule[], R extends NoOverlap<MergeSlices<Deps>, OwnSlice>>(
+      def: ModuleDef<Deps, OwnSlice, R>
+    ) => Module<FullContext<Deps, OwnSlice>, OwnSlice>
+  : never;
+
+/**
+ * Defines a module with optional dependency wiring and lifecycle hooks.
+ *
+ * Explicit OwnSlice — boot return is enforced against the supplied type:
+ *   defineModule<{ count: number }>()({ name: "counter", boot: () => ({ count: 0 }) })
+ *
+ * Inferred OwnSlice — OwnSlice is derived from boot's non-void return type,
+ * and FullContext includes all dep module contexts via InferredDeps:
+ *   defineModule()({ name: "C", modules: [A, B] as const, boot: () => ({ c: 1 }) })
+ *   // Module<ContextOf<A> & ContextOf<B> & { c: number }, { c: number }>
+ *
+ * Void / absent boot — OwnSlice becomes Record<never, never>:
+ *   defineModule()({ name: "logger", boot: () => { console.log("up") } })
+ */
+export function defineModule<OwnSlice = Infer>(): DefineModuleInner<OwnSlice> {
+  return function (def: ModuleDefLoose): Module<any, any> {
+    return def as unknown as Module<any, any>;
+  } as DefineModuleInner<OwnSlice>;
 }
 
 /**

@@ -1,13 +1,15 @@
 import start, {
   defineModule,
-  type InferContextBy,
-  type ContextWriterBy,
+  type ContextOf,
+  type ContextWriterOf,
+  type ContextSetOf
 } from "tsdkarc";
 
-interface ConfigSlice {
-  config: { port: number };
-}
-const configModule = defineModule<ConfigSlice>()({
+// interface ConfigSlice {
+//   config: { port: number };
+// }
+// const configModule = defineModule<ConfigSlice>()({
+const configModule = defineModule()({
   name: "config",
   modules: [],
   boot: () => ({
@@ -18,11 +20,13 @@ const configModule = defineModule<ConfigSlice>()({
 });
 
 // Get the module's context type(include the dependencies modules)
-export type ConfigModuleCtx = InferContextBy<typeof configModule>; // same as `ConfigSlice`
+export type ConfigModuleCtx = ContextOf<typeof configModule>; // same as `ConfigSlice`
 
 // Get the `set` type of the module
-type ConfigModuleSet = ContextWriterBy<typeof configModule>["set"];
-function test(set: ConfigModuleSet) { // type safe here
+type ConfigModuleSet = ContextWriterOf<typeof configModule>["set"];
+// or
+type ConfigModuleSet2 = ContextSetOf<typeof configModule>
+function test(set: ConfigModuleSet) { // type safe here 
   set("config", { port: 200 });
 }
 

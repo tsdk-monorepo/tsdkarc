@@ -1,4 +1,4 @@
-import { defineModule, InferContextBy } from "../src";
+import { defineModule, ContextOf } from "../src";
 import { A } from "./A.module";
 import { B } from "./B.module";
 
@@ -28,7 +28,7 @@ export const CModule = defineModule<COwnSlice>()({
   },
 });
 
-type CContext2 = InferContextBy<typeof CModule>;
+type CContext2 = ContextOf<typeof CModule>;
 
 const check: CContext2 = {
   valueC: "c",

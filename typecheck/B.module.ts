@@ -1,14 +1,15 @@
 import {
   defineModule,
-  InferContextBy,
-  ContextWriterBy,
-  ContextSet,
+  ContextOf,
+  ContextWriterOf,
+  ContextSetOf,
 } from "../src";
 import { A } from "./A.module";
 
 type BOwnSlice = {
   /** B's value */
   valueB: string;
+  b?: boolean;
 };
 
 export const B = defineModule<BOwnSlice>()({
@@ -20,9 +21,9 @@ export const B = defineModule<BOwnSlice>()({
   },
 });
 
-type BContext = InferContextBy<typeof B>;
+type BContext = ContextOf<typeof B>;
 
-type BContextWritter = ContextWriterBy<typeof B>;
+type BContextWritter = ContextWriterOf<typeof B>;
 type Set1 = BContextWritter["set"];
 
-type Set2 = ContextSet<typeof B>;
+type Set2 = ContextSetOf<typeof B>;

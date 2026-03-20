@@ -1,5 +1,12 @@
 # TsdkArc Changelog
 
+## v1.2.0
+
+- Feat: New unified type helpers: `ContextOf<Module>` / `ContextWritterOf<Module>` / `SetOf<Module>`
+- Feat: More smart `boot` return Ctx type infers! 🍻
+- Breaking Change: `InferContextBy<Module>` -> `ContextOf<Module>`
+- Breaking Change: `ContextWriterBy<Module>` -> `ContextWritterOf<Module>`
+
 ## v1.1.5
 
 - Feat: add helper type `ContextWriterBy` to get `set` of `typeof module`

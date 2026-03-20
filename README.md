@@ -24,13 +24,14 @@ npm install tsdkarc
 ```
 
 ```ts
-import start, { defineModule, type InferContextBy, type ContextWriterBy } from "tsdkarc";
+import start, { defineModule, type ContextOf, type ContextWriterOf, type SetOf } from "tsdkarc";
 
-interface ConfigSlice {
-  config: { port: number; env: string };
-}
+// interface ConfigSlice {
+//   config: { port: number; env: string };
+// }
 
-const configModule = defineModule<ConfigSlice>()({
+// const configModule = defineModule<ConfigSlice>()({
+const configModule = defineModule()({
   name: "config",
   modules: [],
   boot(ctx) {
@@ -51,10 +52,11 @@ const configModule = defineModule<ConfigSlice>()({
 });
 
 // Get the module's context type(include the dependencies modules)
-type ConfigModuleCtx = InferContextBy<typeof configModule>; // same as `ConfigSlice`
+type ConfigModuleCtx = ContextOf<typeof configModule>; // same as `ConfigSlice`
 
 // Get the `set` type of the module
-type ConfigModuleSet = ContextWriterBy<typeof configModule>['set'];
+type ConfigModuleSet = ContextWriterOf<typeof configModule>['set'];
+type ConfigModuleSet = SetOf<typeof configModule>
 
 // Run
 (async () => {
