@@ -5,7 +5,8 @@
     "lib": ["ES2015", "DOM"],
     "esModuleInterop": true,
     "declaration": true,
-    "outDir": "./lib"
+    "outDir": "./lib",
+    "noImplicitAny": true
   },
   "include": ["./src", "./typecheck"],
   "exclude": ["node_modules"]

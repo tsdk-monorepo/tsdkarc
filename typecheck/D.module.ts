@@ -1,18 +1,18 @@
-import { defineModule, ContextOf } from "../src";
+import { defineModule, ContextOf, ContextWriterOf } from "../src";
 import { A } from "./A.module";
 import { B } from "./B.module";
 
 export const CModule = defineModule()({
   name: "C",
   modules: [B, A] as const,
-  boot() {
+  boot(ctx) {
     return {
       valueC: "module:C",
-      value2: "module:C",
-      a: 0,
     };
   },
   async shutdown(ctx) {
+    const a = ctx.value;
+    const b = a + 3;
     console.log(`shutdown ${ctx.value}`);
   },
 });
@@ -20,11 +20,9 @@ export const CModule = defineModule()({
 type CContext2 = ContextOf<typeof CModule>;
 
 const check: CContext2 = {
-  value2: "c",
-  valueC: "c",
-  a: 0,
   value: "1",
   valueB: "2",
+  valueC: "c",
   // @ts-expect-error
   noExist: 1,
 };

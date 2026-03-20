@@ -3,7 +3,7 @@
  *
  * Minimal module lifecycle manager.
  *
- * Exports: Module, defineModule, ContextWriter, Logger, LifecycleHooks, StartOptions, start.
+ * Exports: Module, defineModule, ContextWriter, LifecycleHooks, StartOptions, start.
  *
  * Type helpers (internal):
  *   UnionToIntersection<U>  — U1 | U2 | U3  →  U1 & U2 & U3
@@ -100,34 +100,30 @@ export interface LifecycleHooks<S extends object = Record<never, never>> {
   /** Called before each individual module boots, in boot order. */
   beforeEachBoot?(
     ctx: ContextWriter<S>,
-    /** The module about to boot. */
     module: Module<any>
   ): Promise<void> | void;
 
   /** Called after each individual module finishes booting, in boot order. */
   afterEachBoot?(
     ctx: ContextWriter<S>,
-    /** The module that just finished booting. */
     module: Module<any>
   ): Promise<void> | void;
 
   /** Called before each individual module shuts down, in shutdown order. */
   beforeEachShutdown?(
     ctx: ContextWriter<S>,
-    /** The module about to shut down. */
     module: Module<any>
   ): Promise<void> | void;
 
   /** Called after each individual module finishes shutting down, in shutdown order. */
   afterEachShutdown?(
     ctx: ContextWriter<S>,
-    /** The module that just finished shutting down. */
     module: Module<any>
   ): Promise<void> | void;
+
   onError?(
     error: Error,
     ctx: ContextWriter<S>,
-    /** The module that just finished shutting down. */
     module: Module<any>
   ): Promise<void> | void;
 }
@@ -158,122 +154,48 @@ export interface Module<S extends object, Sl extends object = S> {
   afterShutdown?(ctx: ContextWriter<S, Sl>): Promise<void> | void;
 }
 
-/** 
-
-type AContext = {
-  value: string;
-};
-
-export const moduleA = defineModule<AContext>()({
-  name: "A",
-  modules: [] as const,
-  boot: () => ({ value: "module:A" }),
-  async shutdown(ctx) {
-    console.log(`shutdown ${ctx.value}`);
-  },
-});
-// Get context type by module
-type AContext2 = ContextOf<typeof moduleA> // same as above `AContext`
+/**
+ * Extracts the full context type from a module.
+ *
+ * @example
+ * type AContext = ContextOf<typeof moduleA> // { value: string }
  */
 export type ContextOf<M> = M extends Module<infer Full, any>
   ? { [K in keyof Full]: Full[K] }
   : never;
 
-/** Get context writter type by typeof module*/
-export type ContextWriterOf<M> = ContextWriter<M extends Module<any, infer Ctx> ? Ctx : never>;
+/** Get ContextWriter type by typeof module. */
+export type ContextWriterOf<M> = ContextWriter<
+  M extends Module<any, infer Ctx> ? Ctx : never
+>;
 
-/** Get context writter's `set` type by typeof module*/
-export type SetOf<M> = ContextWriterOf<M>['set'];
+/** Get the `set` function type from a module's ContextWriter. */
+export type SetOf<M> = ContextWriterOf<M>["set"];
 
 // ---------------------------------------------------------------------------
 // defineModule
 // ---------------------------------------------------------------------------
 
 /**
- * Define a module with full context inferred from its dependency tuple.
- *
- * OwnSlice first — pass only what this module contributes:
- *   defineModule<AuthSlice>()({ modules: [db, redis] as const, ... })
- *
- * Deps is inferred from modules — no need to pass it explicitly.
- * Omit OwnSlice entirely if this module contributes nothing to context:
- *   defineModule()({ modules: [db] as const, ... })
- *
- * Inside boot/shutdown:
- *   ctx.db           — read dep directly (Readonly<S>)
- *   ctx.set('auth')  — write own slice only
- *
- * @param def  module definition
+ * Errors if U has any key not in T by mapping extra keys to never.
  */
-// export function defineModule<OwnSlice extends object = Record<never, never>>() {
-//   return function <
-//     const Deps extends readonly AnyModule[] = [],
-//     R extends OwnSlice = OwnSlice
-//   >(def: {
-//     name: string;
-//     description?: string;
-//     modules?: Deps;
-//     boot?(
-//       ctx: ContextWriter<
-//         FullContext<Deps, OwnSlice>,
-//         NoOverlap<MergeSlices<Deps>, OwnSlice>
-//       >
-//     ):
-//       | Promise<void>
-//       | void
-//       | (R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>)
-//       | Promise<R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>>;
-//     shutdown?(
-//       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
-//     ): Promise<void> | void;
-//     beforeBoot?(
-//       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
-//     ): Promise<void> | void;
-//     afterBoot?(
-//       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
-//     ): Promise<void> | void;
-//     beforeShutdown?(
-//       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
-//     ): Promise<void> | void;
-//     afterShutdown?(
-//       ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
-//     ): Promise<void> | void;
-//   }): Module<FullContext<Deps, OwnSlice>, OwnSlice> {
-//     return def as unknown as Module<FullContext<Deps, OwnSlice>, OwnSlice>;
-//   };
-// }
+type Exact<T, U> = { [K in keyof U]: K extends keyof T ? T[K] : never };
 
 /**
- * Extracts the non-void return type of a boot function.
- * Returns Record<never, never> when boot is absent or returns void.
+ * Produces a readable type error message instead of `never`.
+ * Msg appears directly in the IDE error output.
  */
-type BootReturn<T> = T extends (...args: any[]) => Promise<infer R>
-  ? Exclude<R, void> extends never
-    ? Record<never, never>
-    : Exclude<R, void>
-  : T extends (...args: any[]) => infer R
-  ? Exclude<R, void> extends never
-    ? Record<never, never>
-    : Exclude<R, void>
-  : Record<never, never>;
+type TypeError<Msg extends string> = { readonly __error__: Msg };
 
 /**
- * Infers OwnSlice from a def object's boot return type.
- * Falls back to Record<never, never> if no boot or boot returns void.
+ * Errors if OwnSlice declares a key that already exists in DepCtx.
+ * Overlapping keys show a readable message instead of `never`.
  */
-type InferredOwnSlice<Def> = Def extends { boot: infer B }
-  ? BootReturn<B>
-  : Record<never, never>;
-
-/**
- * Infers the Deps tuple from a def object's modules field.
- * Falls back to [] if modules is absent.
- */
-type InferredDeps<Def> = Def extends { modules: infer M }
-  ? M extends readonly AnyModule[]
-    ? M
-    : []
-  : [];
+type NoOverlap<DepCtx, OwnSlice> = {
+  [K in keyof OwnSlice]: K extends keyof DepCtx
+    ? TypeError<`Key "${K & string}" is already owned by a dependency module`>
+    : OwnSlice[K];
+};
 
 /**
  * Module def shape when OwnSlice is explicitly provided.
@@ -296,32 +218,69 @@ type ModuleDef<
     | Promise<void>
     | (R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>)
     | Promise<R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>>;
-  shutdown?(ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>): Promise<void> | void;
-  beforeBoot?(ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>): Promise<void> | void;
-  afterBoot?(ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>): Promise<void> | void;
-  beforeShutdown?(ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>): Promise<void> | void;
-  afterShutdown?(ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>): Promise<void> | void;
+  shutdown?(
+    ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+  ): Promise<void> | void;
+  beforeBoot?(
+    ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+  ): Promise<void> | void;
+  afterBoot?(
+    ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+  ): Promise<void> | void;
+  beforeShutdown?(
+    ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+  ): Promise<void> | void;
+  afterShutdown?(
+    ctx: ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>
+  ): Promise<void> | void;
 };
 
 /**
- * Loose module def shape used when OwnSlice is inferred.
+ * Module def shape when OwnSlice is inferred from boot's return type.
  *
- * modules is typed as readonly AnyModule[] so TypeScript preserves the literal
- * tuple — Deps is extracted post-hoc via InferredDeps<Def>, not constrained here.
+ * Deps and Slice are independent generics — TypeScript infers Deps from the
+ * `modules` field and Slice from boot's return value in a single pass, with
+ * no mutual dependency between them.
  *
- * boot returns `any` intentionally — Exact<object, R> would collapse every
- * property to never if we used `object`. Enforcement is on the output Module<>.
+ * Hook ctx types:
+ *   boot      — ContextWriter<MergeSlices<Deps>>  (dep context only)
+ *               boot produces Slice, so Slice cannot appear in its own param
+ *               type without creating a cycle that collapses ctx to `any`.
+ *   all other — ContextWriter<FullContext<Deps, Slice>, Slice>
+ *               these run after boot has written Slice into context, so the
+ *               full context including own slice is available and safe to type.
  */
-type ModuleDefLoose = {
+type ModuleDefInfer<
+  Deps extends readonly AnyModule[],
+  Slice extends Record<string, unknown>
+> = {
   name: string;
   description?: string;
-  modules?: readonly AnyModule[];
-  boot?(ctx: ContextWriter<any, any>): any;
-  shutdown?(ctx: ContextWriter<any, any>): Promise<void> | void;
-  beforeBoot?(ctx: ContextWriter<any, any>): Promise<void> | void;
-  afterBoot?(ctx: ContextWriter<any, any>): Promise<void> | void;
-  beforeShutdown?(ctx: ContextWriter<any, any>): Promise<void> | void;
-  afterShutdown?(ctx: ContextWriter<any, any>): Promise<void> | void;
+  modules?: Deps;
+  /** ctx = dep context only — own slice not available (produced by this function). */
+  boot?(
+    ctx: ContextWriter<MergeSlices<Deps>, MergeSlices<Deps>>
+  ): void | Promise<void> | Slice | Promise<Slice>;
+  /** ctx = full context including own slice — runs after boot. */
+  shutdown?(
+    ctx: ContextWriter<FullContext<Deps, Slice>, Slice>
+  ): Promise<void> | void;
+  /** ctx = dep context only — runs before boot. */
+  beforeBoot?(
+    ctx: ContextWriter<MergeSlices<Deps>, MergeSlices<Deps>>
+  ): Promise<void> | void;
+  /** ctx = full context including own slice — runs after boot. */
+  afterBoot?(
+    ctx: ContextWriter<FullContext<Deps, Slice>, Slice>
+  ): Promise<void> | void;
+  /** ctx = full context including own slice — runs after boot. */
+  beforeShutdown?(
+    ctx: ContextWriter<FullContext<Deps, Slice>, Slice>
+  ): Promise<void> | void;
+  /** ctx = full context including own slice — runs after boot. */
+  afterShutdown?(
+    ctx: ContextWriter<FullContext<Deps, Slice>, Slice>
+  ): Promise<void> | void;
 };
 
 /**
@@ -336,21 +295,27 @@ type Infer = typeof INFER;
  * Selects the inner function signature based on whether OwnSlice was supplied.
  *
  * OwnSlice = Infer (no type arg given):
- *   Captures the whole def as const Def, extracts both Deps and OwnSlice
- *   from the def object post-hoc via InferredDeps<Def> and InferredOwnSlice<Def>.
+ *   Deps is inferred from `modules`. Slice is inferred from boot's return.
+ *   Both are independent generics — no cycle, no `any`.
+ *   boot ctx = dep context only (cycle prevention).
+ *   all other hook ctx = full context including own slice.
  *
  * OwnSlice = explicit type:
  *   Enforces boot return against the supplied OwnSlice via Exact/NoOverlap.
+ *   Unchanged from original — no regression.
  */
 type DefineModuleInner<OwnSlice> = OwnSlice extends Infer
-  ? <const Def extends ModuleDefLoose>(
-      def: Def
-    ) => Module<
-      FullContext<InferredDeps<Def>, Exclude<InferredOwnSlice<Def>, void>>,
-      Exclude<InferredOwnSlice<Def>, void>
-    >
+  ? <
+      const Deps extends readonly AnyModule[],
+      Slice extends Record<string, unknown> = Record<never, never>
+    >(
+      def: ModuleDefInfer<Deps, Slice>
+    ) => Module<FullContext<Deps, Slice>, Slice>
   : OwnSlice extends object
-  ? <const Deps extends readonly AnyModule[], R extends NoOverlap<MergeSlices<Deps>, OwnSlice>>(
+  ? <
+      const Deps extends readonly AnyModule[],
+      R extends NoOverlap<MergeSlices<Deps>, OwnSlice>
+    >(
       def: ModuleDef<Deps, OwnSlice, R>
     ) => Module<FullContext<Deps, OwnSlice>, OwnSlice>
   : never;
@@ -361,40 +326,22 @@ type DefineModuleInner<OwnSlice> = OwnSlice extends Infer
  * Explicit OwnSlice — boot return is enforced against the supplied type:
  *   defineModule<{ count: number }>()({ name: "counter", boot: () => ({ count: 0 }) })
  *
- * Inferred OwnSlice — OwnSlice is derived from boot's non-void return type,
- * and FullContext includes all dep module contexts via InferredDeps:
- *   defineModule()({ name: "C", modules: [A, B] as const, boot: () => ({ c: 1 }) })
- *   // Module<ContextOf<A> & ContextOf<B> & { c: number }, { c: number }>
+ * Inferred OwnSlice — Deps inferred from modules, OwnSlice inferred from boot return.
+ * ctx types per hook:
+ *   boot        — dep context only (own slice is being produced here, not available yet)
+ *   shutdown    — full context including own slice
+ *   beforeBoot  — dep context only (own slice not yet written)
+ *   afterBoot   — full context including own slice
+ *   beforeShutdown / afterShutdown — full context including own slice
  *
  * Void / absent boot — OwnSlice becomes Record<never, never>:
  *   defineModule()({ name: "logger", boot: () => { console.log("up") } })
  */
 export function defineModule<OwnSlice = Infer>(): DefineModuleInner<OwnSlice> {
-  return function (def: ModuleDefLoose): Module<any, any> {
-    return def as unknown as Module<any, any>;
+  return function (def: unknown): Module<any, any> {
+    return def as Module<any, any>;
   } as DefineModuleInner<OwnSlice>;
 }
-
-/**
- * Errors if U has any key not in T by mapping extra keys to never.
- */
-type Exact<T, U> = { [K in keyof U]: K extends keyof T ? T[K] : never };
-
-/**
- * Produces a readable type error message instead of `never`.
- * Msg appears directly in the IDE error output.
- */
-type TypeError<Msg extends string> = { readonly __error__: Msg };
-
-/**
- * Errors if OwnSlice declares a key that already exists in DepCtx.
- * Overlapping keys show a readable message instead of `never`.
- */
-type NoOverlap<DepCtx, OwnSlice> = {
-  [K in keyof OwnSlice]: K extends keyof DepCtx
-    ? TypeError<`Key "${K & string}" is already owned by a dependency module`>
-    : OwnSlice[K];
-};
 
 // ---------------------------------------------------------------------------
 // StartOptions
@@ -443,12 +390,10 @@ export default async function start<const Roots extends readonly AnyModule[]>(
     afterBoot,
     beforeShutdown,
     afterShutdown,
-
     beforeEachBoot,
     afterEachBoot,
     beforeEachShutdown,
     afterEachShutdown,
-
     onError,
   } = options;
 
