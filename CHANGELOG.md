@@ -1,5 +1,10 @@
 # TsdkArc Changelog
 
+## v1.2.2
+
+- Fix `ctx`'s type are any on hooks
+- Chore: Delete useless code
+
 ## v1.2.1
 
 - Fix `SetaOf` not exists
