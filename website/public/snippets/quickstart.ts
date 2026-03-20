@@ -2,7 +2,7 @@ import start, {
   defineModule,
   type ContextOf,
   type ContextWriterOf,
-  type ContextSetOf
+  type SetOf
 } from "tsdkarc";
 
 // interface ConfigSlice {
@@ -25,7 +25,7 @@ export type ConfigModuleCtx = ContextOf<typeof configModule>; // same as `Config
 // Get the `set` type of the module
 type ConfigModuleSet = ContextWriterOf<typeof configModule>["set"];
 // or
-type ConfigModuleSet2 = ContextSetOf<typeof configModule>
+type ConfigModuleSet2 = SetOf<typeof configModule>
 function test(set: ConfigModuleSet) { // type safe here 
   set("config", { port: 200 });
 }

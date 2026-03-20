@@ -1,9 +1,4 @@
-import {
-  defineModule,
-  ContextOf,
-  ContextWriterOf,
-  ContextSetOf,
-} from "../src";
+import { defineModule, ContextOf, ContextWriterOf, SetOf } from "../src";
 import { A } from "./A.module";
 
 type BOwnSlice = {
@@ -26,4 +21,9 @@ type BContext = ContextOf<typeof B>;
 type BContextWritter = ContextWriterOf<typeof B>;
 type Set1 = BContextWritter["set"];
 
-type Set2 = ContextSetOf<typeof B>;
+function a(set: Set1) {
+  // @ts-expect-error
+  set("valueB", 2);
+}
+
+type Set2 = SetOf<typeof B>;

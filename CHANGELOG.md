@@ -1,5 +1,9 @@
 # TsdkArc Changelog
 
+## v1.2.1
+
+- Fix `SetaOf` not exists
+
 ## v1.2.0
 
 - Feat: New unified type helpers: `ContextOf<Module>` / `ContextWritterOf<Module>` / `SetOf<Module>`

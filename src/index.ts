@@ -183,7 +183,7 @@ export type ContextOf<M> = M extends Module<infer Full, any>
 export type ContextWriterOf<M> = ContextWriter<M extends Module<any, infer Ctx> ? Ctx : never>;
 
 /** Get context writter's `set` type by typeof module*/
-export type ContextSetOf<M> = ContextWriter<M extends Module<any, infer Ctx> ? Ctx : never>['set'];
+export type SetOf<M> = ContextWriterOf<M>['set'];
 
 // ---------------------------------------------------------------------------
 // defineModule

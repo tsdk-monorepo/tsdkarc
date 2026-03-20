@@ -1,5 +1,6 @@
-import { defineModule, Module, type ContextOf } from 'tsdkarc';
+import { defineModule, Module, type ContextOf, type SetOf,type ContextWriterOf } from 'tsdkarc';
 
+defineModule()
 defineModule<OwnSlice>()({
   name: string;
   description?: string;
