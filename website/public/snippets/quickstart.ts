@@ -11,7 +11,6 @@ import start, {
 // const configModule = defineModule<ConfigSlice>()({
 const configModule = defineModule()({
   name: "config",
-  modules: [],
   boot: () => ({
     config: {
       port: 3000,
@@ -35,7 +34,7 @@ interface ServerSlice {
 }
 const serverModule = defineModule<ServerSlice>()({
   name: "server",
-  modules: [configModule], // 👈 Declares dependency
+  modules: [configModule] as const, // 👈 Declares dependency
   boot(ctx) {
     return {
       server: {

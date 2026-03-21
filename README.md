@@ -33,7 +33,6 @@ import start, { defineModule, type ContextOf, type ContextWriterOf, type SetOf }
 // const configModule = defineModule<ConfigSlice>()({
 const configModule = defineModule()({
   name: "config",
-  modules: [],
   boot(ctx) {
     return {
       config: {
@@ -129,7 +128,7 @@ interface DbSlice {
 
 const dbModule = defineModule<DbSlice>()({
   name: "db",
-  modules: [configModule], // ctx.config is typed here
+  modules: [configModule] as const, // ctx.config is typed here
   async boot(ctx) {
     const pool = new Pool({ connectionString: ctx.config.databaseUrl });
     await pool.connect();
@@ -146,7 +145,7 @@ interface ServerSlice {
 
 const serverModule = defineModule<ServerSlice>()({
   name: "server",
-  modules: [configModule, dbModule], // ctx.config + ctx.db both typed
+  modules: [configModule, dbModule] as const, // ctx.config + ctx.db both typed
   boot(ctx) {
     ctx.set("server", http.createServer(myHandler));
   },
@@ -200,7 +199,6 @@ interface AuthSlice {
 
 const authModule = defineModule<AuthSlice>()({
   name: "auth",
-  modules: [],
   boot(ctx) {
     ctx.set("authenticate", (req, res, next) => {
       if (!req.headers.authorization) return res.status(401).end();

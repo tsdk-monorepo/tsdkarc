@@ -7,7 +7,6 @@ type AContext = {
 
 export const A = defineModule<AContext>()({
   name: "A",
-  modules: [] as const,
   boot: () => ({ value: "module:A" }),
   async shutdown(ctx) {
     console.log(`shutdown ${ctx.value}`);

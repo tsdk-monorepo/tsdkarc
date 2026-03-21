@@ -7,7 +7,6 @@ interface AuthSlice {
 
 export const authModule = defineModule<AuthSlice>()({
   name: "auth",
-  modules: [],
   boot(ctx) {
     ctx.set("authenticate", (req, res, next) => {
       if (!req.headers.authorization) return res.status(401).end();

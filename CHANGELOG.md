@@ -11,7 +11,7 @@
 
 ## v1.2.1
 
-- Fix `SetaOf` not exists
+- Fix `SetOf` not exists
 
 ## v1.2.0
 
