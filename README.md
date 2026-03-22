@@ -24,7 +24,12 @@ npm install tsdkarc
 ```
 
 ```ts
-import start, { defineModule, type ContextOf, type ContextWriterOf, type SetOf } from "tsdkarc";
+import start, {
+  defineModule,
+  type ContextOf,
+  type ContextWriterOf,
+  type SetOf,
+} from "tsdkarc";
 
 // interface ConfigSlice {
 //   config: { port: number; env: string };
@@ -32,6 +37,7 @@ import start, { defineModule, type ContextOf, type ContextWriterOf, type SetOf }
 
 // const configModule = defineModule<ConfigSlice>()({
 const configModule = defineModule()({
+  // or return ctx from boot, no need <ConfigSlice>
   name: "config",
   boot(ctx) {
     return {
@@ -54,8 +60,8 @@ const configModule = defineModule()({
 type ConfigModuleCtx = ContextOf<typeof configModule>; // same as `ConfigSlice`
 
 // Get the `set` type of the module
-type ConfigModuleSet = ContextWriterOf<typeof configModule>['set'];
-type ConfigModuleSet = SetOf<typeof configModule>
+type ConfigModuleSet = ContextWriterOf<typeof configModule>["set"];
+type ConfigModuleSet = SetOf<typeof configModule>;
 
 // Run
 (async () => {
@@ -89,6 +95,7 @@ type ConfigModuleSet = SetOf<typeof configModule>
 ## API Outline
 
 ```ts
+// OwnSlice type is optional, it can auto infer the type from `boot()`'s return
 defineModule<OwnSlice>()({
   name: string,
   modules: Module[],
@@ -122,32 +129,26 @@ start(modules: Module[], hooks?: {
 Downstream modules declare upstream modules and get their context fully typed.
 
 ```ts
-interface DbSlice {
-  db: Pool;
-}
-
-const dbModule = defineModule<DbSlice>()({
+const dbModule = defineModule()({
   name: "db",
   modules: [configModule] as const, // ctx.config is typed here
   async boot(ctx) {
     const pool = new Pool({ connectionString: ctx.config.databaseUrl });
     await pool.connect();
-    ctx.set("db", pool);
+    // ctx.set("db", pool);
+    return { db: pool };
   },
   async shutdown(ctx) {
     await ctx.db.end();
   },
 });
 
-interface ServerSlice {
-  server: http.Server;
-}
-
-const serverModule = defineModule<ServerSlice>()({
+const serverModule = defineModule()({
   name: "server",
   modules: [configModule, dbModule] as const, // ctx.config + ctx.db both typed
   boot(ctx) {
-    ctx.set("server", http.createServer(myHandler));
+    // ctx.set("server", http.createServer(myHandler));
+    return { server: http.createServer(myHandler) };
   },
   afterBoot(ctx) {
     ctx.server.listen(ctx.config.port);

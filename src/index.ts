@@ -43,30 +43,30 @@ export type ContextWriter<
 // ---------------------------------------------------------------------------
 
 /** Converts U1 | U2 | U3 into U1 & U2 & U3 via contravariance. */
-type UnionToIntersection<U> =
+export type UnionToIntersection<U> =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (U extends any ? (x: U) => void : never) extends (x: infer I) => void
     ? I
     : never;
 
 /** Extracts full context S from a Module — so transitive deps propagate upward. */
-type SliceOf<M> = M extends Module<infer S, object> ? S : never;
+export type SliceOf<M> = M extends Module<infer S, object> ? S : never;
 
 /** Merges full context S from all modules in a tuple into one intersection. */
-type MergeSlices<T extends readonly AnyModule[]> = UnionToIntersection<
+export type MergeSlices<T extends readonly AnyModule[]> = UnionToIntersection<
   SliceOf<T[number]>
 > extends object
   ? UnionToIntersection<SliceOf<T[number]>>
   : Record<never, never>;
 
 /** Full context seen by a module = all deps merged context + own slice. */
-type FullContext<
+export type FullContext<
   Deps extends readonly AnyModule[],
   Own extends object
 > = MergeSlices<Deps> & Own;
 
 /** Opaque alias used at internal boundaries where generic params are erased. */
-type AnyModule = Module<object, object>;
+export type AnyModule = Module<object, object>;
 
 // ---------------------------------------------------------------------------
 // LifecycleHooks
@@ -179,19 +179,19 @@ export type SetOf<M> = ContextWriterOf<M>["set"];
 /**
  * Errors if U has any key not in T by mapping extra keys to never.
  */
-type Exact<T, U> = { [K in keyof U]: K extends keyof T ? T[K] : never };
+export type Exact<T, U> = { [K in keyof U]: K extends keyof T ? T[K] : never };
 
 /**
  * Produces a readable type error message instead of `never`.
  * Msg appears directly in the IDE error output.
  */
-type TypeError<Msg extends string> = { readonly __error__: Msg };
+export type TypeError<Msg extends string> = { readonly __error__: Msg };
 
 /**
  * Errors if OwnSlice declares a key that already exists in DepCtx.
  * Overlapping keys show a readable message instead of `never`.
  */
-type NoOverlap<DepCtx, OwnSlice> = {
+export type NoOverlap<DepCtx, OwnSlice> = {
   [K in keyof OwnSlice]: K extends keyof DepCtx
     ? TypeError<`Key "${K & string}" is already owned by a dependency module`>
     : OwnSlice[K];
@@ -200,7 +200,7 @@ type NoOverlap<DepCtx, OwnSlice> = {
 /**
  * Module def shape when OwnSlice is explicitly provided.
  */
-type ModuleDef<
+export type ModuleDef<
   Deps extends readonly AnyModule[],
   OwnSlice extends object,
   R extends object
@@ -250,7 +250,7 @@ type ModuleDef<
  *               these run after boot has written Slice into context, so the
  *               full context including own slice is available and safe to type.
  */
-type ModuleDefInfer<
+export type ModuleDefInfer<
   Deps extends readonly AnyModule[],
   Slice extends Record<string, unknown>
 > = {
@@ -304,7 +304,7 @@ type Infer = typeof INFER;
  *   Enforces boot return against the supplied OwnSlice via Exact/NoOverlap.
  *   Unchanged from original — no regression.
  */
-type DefineModuleInner<OwnSlice> = OwnSlice extends Infer
+export type DefineModuleInner<OwnSlice> = OwnSlice extends Infer
   ? <
       const Deps extends readonly AnyModule[],
       Slice extends Record<string, unknown> = Record<never, never>

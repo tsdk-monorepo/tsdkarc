@@ -27,6 +27,15 @@ const check: CContext2 = {
   noExist: 1,
 };
 
+const arrayTestModule = defineModule()({
+  name: "ArrayCtxModule",
+  modules: [B, A, CModule] as const,
+  boot() {
+    return { a: [1, "a"] as const };
+  },
+});
+type ArrayTestModuleCtx = ContextOf<typeof arrayTestModule>
+
 start([CModule]).then((app) => {
   app.ctx.echo();
   // @ts-expect-error
