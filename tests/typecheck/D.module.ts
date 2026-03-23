@@ -1,4 +1,4 @@
-import { start, defineModule, ContextOf } from "../src/define-module";
+import { start, defineModule, ContextOf } from "../../src/define-module";
 import { A } from "./A.module";
 import { B } from "./B.module";
 

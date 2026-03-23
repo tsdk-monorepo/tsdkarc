@@ -1,18 +1,5 @@
 /**
  * tsdkarc.ts
- *
- * Minimal module lifecycle manager.
- *
- * Exports: Module, defineModule, ContextWriter, LifecycleHooks, StartOptions, start.
- *
- * Type helpers (internal):
- *   UnionToIntersection<U>  — U1 | U2 | U3  →  U1 & U2 & U3
- *   SliceOf<M>              — extracts S (full context) from Module<S, Sl>
- *   MergeSlices<Tuple>      — intersects all S from a modules tuple
- *   FullContext<Deps, Own>  — MergeSlices<Deps> & Own
- *
- * Internal functions use AnyModule (Module<object, object>) at boundaries
- * where generic params are intentionally erased — the runtime does not need them.
  */
 
 // ---------------------------------------------------------------------------
@@ -219,19 +206,19 @@ export type ModuleDef<
     | (R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>)
     | Promise<R & Exact<NoOverlap<MergeSlices<Deps>, OwnSlice>, R>>;
   shutdown?(
-    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, 'set'>
+    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, "set">
   ): Promise<void> | void;
   beforeBoot?(
-    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, 'set'>
+    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, "set">
   ): Promise<void> | void;
   afterBoot?(
-    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, 'set'>
+    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, "set">
   ): Promise<void> | void;
   beforeShutdown?(
-    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, 'set'>
+    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, "set">
   ): Promise<void> | void;
   afterShutdown?(
-    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, 'set'>
+    ctx: Omit<ContextWriter<FullContext<Deps, OwnSlice>, OwnSlice>, "set">
   ): Promise<void> | void;
 };
 
@@ -263,23 +250,23 @@ export type ModuleDefInfer<
   ): void | Promise<void> | Slice | Promise<Slice>;
   /** ctx = full context including own slice — runs after boot. */
   shutdown?(
-    ctx: Omit<ContextWriter<FullContext<Deps, Slice>, Slice>, 'set'>
+    ctx: Omit<ContextWriter<FullContext<Deps, Slice>, Slice>, "set">
   ): Promise<void> | void;
   /** ctx = dep context only — runs before boot. */
   beforeBoot?(
-    ctx: Omit<ContextWriter<MergeSlices<Deps>, MergeSlices<Deps>>, 'set'>
+    ctx: Omit<ContextWriter<MergeSlices<Deps>, MergeSlices<Deps>>, "set">
   ): Promise<void> | void;
   /** ctx = full context including own slice — runs after boot. */
   afterBoot?(
-    ctx: Omit<ContextWriter<FullContext<Deps, Slice>, Slice>, 'set'>
+    ctx: Omit<ContextWriter<FullContext<Deps, Slice>, Slice>, "set">
   ): Promise<void> | void;
   /** ctx = full context including own slice — runs after boot. */
   beforeShutdown?(
-    ctx: Omit<ContextWriter<FullContext<Deps, Slice>, Slice>, 'set'>
+    ctx: Omit<ContextWriter<FullContext<Deps, Slice>, Slice>, "set">
   ): Promise<void> | void;
   /** ctx = full context including own slice — runs after boot. */
   afterShutdown?(
-    ctx: Omit<ContextWriter<FullContext<Deps, Slice>, Slice>, 'set'>
+    ctx: Omit<ContextWriter<FullContext<Deps, Slice>, Slice>, "set">
   ): Promise<void> | void;
 };
 

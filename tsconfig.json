@@ -8,6 +8,6 @@
     "outDir": "./lib",
     "noImplicitAny": true
   },
-  "include": ["./src", "./typecheck"],
+  "include": ["./src"],
   "exclude": ["node_modules"]
 }

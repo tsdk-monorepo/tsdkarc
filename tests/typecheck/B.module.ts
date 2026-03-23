@@ -1,4 +1,4 @@
-import { defineModule, ContextOf, ContextWriterOf, SetOf } from "../src/define-module";
+import { defineModule, ContextOf, ContextWriterOf, SetOf } from "../../src/define-module";
 import { A } from "./A.module";
 
 type BOwnSlice = {
