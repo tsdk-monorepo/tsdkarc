@@ -1,4 +1,4 @@
-import start, { defineModule, ContextOf, ContextWriterOf } from "../src";
+import { start, defineModule, ContextOf } from "../src/define-module";
 import { A } from "./A.module";
 import { B } from "./B.module";
 
@@ -34,7 +34,7 @@ const arrayTestModule = defineModule()({
     return { a: [1, "a"] as const };
   },
 });
-type ArrayTestModuleCtx = ContextOf<typeof arrayTestModule>
+type ArrayTestModuleCtx = ContextOf<typeof arrayTestModule>;
 
 start([CModule]).then((app) => {
   app.ctx.echo();

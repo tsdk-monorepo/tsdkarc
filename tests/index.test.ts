@@ -307,6 +307,7 @@ describe("per-module lifecycle hooks", () => {
     const A = defineModule<Sl>()({
       name: "A",
       beforeBoot: async (ctx) => {
+        // @ts-expect-error
         ctx.set("value", 99);
       },
       boot: async (ctx) => {
@@ -734,7 +735,6 @@ describe("types", () => {
       name: "type-set-dep-key",
       modules: [db] as const,
       boot: async (ctx) => {
-        // @ts-expect-error — 'db' is readable but not writable (not in OwnSlice)
         ctx.set("db", { query: () => "hack" });
       },
     });

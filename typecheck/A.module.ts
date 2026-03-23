@@ -1,4 +1,4 @@
-import { defineModule, ContextOf, Module } from "../src";
+import { defineModule, ContextOf, Module } from "../src/define-module";
 
 export const A = defineModule()({
   name: "A",
