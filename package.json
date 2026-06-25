@@ -1,45 +1,10 @@
 {
-  "name": "tsdkarc",
-  "version": "1.2.3",
-  "description": "TsdkArc is an elegant and fully type-safe module composable library",
+  "name": "tsdkarc-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Type-safe module composition library",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
   "homepage": "https://arc.tsdk.dev",
-  "main": "./lib/index.js",
-  "module": "./esm/index.js",
-  "types": "./lib/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./lib/index.js",
-      "import": "./esm/index.js",
-      "types": "./lib/index.d.ts"
-    }
-  },
-  "scripts": {
-    "build": "concurrently \"npm run build:cjs\"  \"npm run build:esm\"",
-    "build:cjs": "rm -rf lib && tsc --project tsconfig.cjs.json && rm -rf lib/tests",
-    "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests",
-    "checktype": "tsc --noEmit --project tsconfig.tests.json",
-    "test": "npm run checktype && vitest --run --testTimeout=120000 --hookTimeout=60000"
-  },
-  "files": [
-    "lib/*",
-    "esm/*",
-    "assets",
-    "README.md"
-  ],
-  "keywords": [
-    "typesafe",
-    "tsdk",
-    "module composable",
-    "functional composition",
-    "no dependency injection"
-  ],
-  "devDependencies": {
-    "typescript": "^5.9.3",
-    "@tsconfig/recommended": "^1.0.10",
-    "vitest": "^3.2.4",
-    "concurrently": "^9.2.1"
-  },
   "license": "MIT"
 }

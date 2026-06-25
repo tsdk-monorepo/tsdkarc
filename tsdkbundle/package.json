@@ -1,0 +1,61 @@
+{
+  "name": "tsdkbundle",
+  "version": "0.0.1",
+  "description": "A tool that watches your files and builds your apps automatically.",
+  "type": "module",
+  "bin": {
+    "bb": "./lib/cli.js",
+    "bundle": "./lib/cli.js"
+  },
+  "main": "./lib/index.js",
+  "module": "./esm/index.js",
+  "types": "./lib/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./lib/index.js",
+      "import": "./esm/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "files": [
+    "lib/",
+    "esm/",
+    "README.md"
+  ],
+  "scripts": {
+    "dev:test": "bun run src/cli.ts dev",
+    "build:test": "bun run src/cli.ts build",
+    "test": "bun test tests/",
+    "typecheck": "tsc --noEmit",
+    "build": "concurrently \"npm run build:cjs\"  \"npm run build:esm\"",
+    "build:cjs": "rm -rf lib && tsc --project tsconfig.cjs.json && rm -rf lib/tests",
+    "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^25.5.0",
+    "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "keywords": [
+    "bun",
+    "bundler",
+    "esm",
+    "dev",
+    "watch",
+    "build",
+    "typescript"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "drizzle-orm": "^0.45.2",
+    "pg": "^8.20.0",
+    "minimatch": "^10.2.5"
+  }
+}

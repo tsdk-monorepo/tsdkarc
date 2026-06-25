@@ -1,0 +1,115 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "My API", "version": "1.0.0" },
+  "servers": [],
+  "tags": [
+    { "name": "user", "description": "Get user modules." },
+    { "name": "ping", "description": "Health check utilities." }
+  ],
+  "paths": {
+    "/user/get": {
+      "get": {
+        "operationId": "user_get",
+        "tags": ["user"],
+        "x-kind": "query",
+        "summary": "Get user by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": { "type": "string" },
+            "required": true
+          },
+          {
+            "name": "msg",
+            "in": "query",
+            "schema": { "type": "number" },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "name": { "type": "string" }
+                  },
+                  "required": ["id", "name"]
+                }
+              }
+            }
+          },
+          "400": { "description": "Validation error" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/user/create": {
+      "post": {
+        "operationId": "user_create",
+        "tags": ["user"],
+        "x-kind": "mutation",
+        "summary": "Create a new user.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "name": { "type": "string" } },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "id": { "type": "string" }
+                  },
+                  "required": ["name", "id"]
+                }
+              }
+            }
+          },
+          "400": { "description": "Validation error" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/ping": {
+      "get": {
+        "operationId": "ping",
+        "tags": ["ping"],
+        "x-kind": "query",
+        "summary": "Health check.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "pong": { "type": "boolean" } },
+                  "required": ["pong"]
+                }
+              }
+            }
+          },
+          "400": { "description": "Validation error" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    }
+  }
+}

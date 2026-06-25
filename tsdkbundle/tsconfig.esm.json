@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "noImplicitAny": true,
+    "module": "esnext",
+    "target": "esnext",
+    "rootDir": "./src",
+    "outDir": "./esm",
+    "lib": ["esnext", "DOM", "ES2022.Array", "ES2019.Array", "ES2017.Object"],
+    "incremental": true,
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true
+  },
+  "include": ["./src/"],
+  "exclude": ["node_modules"]
+}
