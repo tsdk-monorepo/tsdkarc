@@ -42,7 +42,7 @@
     "typescript": "^6.0.3",
     "@tsconfig/recommended": "^1.0.10",
     "vitest": "^3.2.4",
-    "concurrently": "^9.2.1",
+    "concurrently": "^10.0.3",
     "@types/node": "^25.5.0",
     "xior": "^0.8.3",
     "@types/express": "^5.0.6",
