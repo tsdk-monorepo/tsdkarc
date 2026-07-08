@@ -21,6 +21,7 @@ function makeProject(
     port: null,
     watchDirs: [],
     plugins: [], // <-- ADDED
+    ignore: [],
     ...overrides,
   };
 }
