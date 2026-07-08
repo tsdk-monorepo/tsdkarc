@@ -1,6 +1,6 @@
 # .github/workflows/ci.yml
 #
-# Runs on push to main and on all pull requests. No publish — releases are tag-driven via publish.yml.
+# Runs on push to expirements and on all pull requests. No publish — releases are tag-driven via publish.yml.
 # Tags are explicitly excluded so CI does not double-run alongside publish.yml on release.
 #
 # Dependency graph:
@@ -13,7 +13,7 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - expirements
     paths-ignore:
       - "**.md"
       - "docs/**"

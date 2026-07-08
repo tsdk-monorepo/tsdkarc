@@ -8,7 +8,7 @@ describe("defineModule Runtime API", () => {
   // ───────────────────────────────────────────────────────────────────────────
 
   describe("1. Basic Initialization & Context Merging", () => {
-    it("should correctly merge contexts into a flat root context", async () => {
+    it("should correctly merge contexts into a flat root context with `ignoreConflicts`", async () => {
       const authRouteModule = defineModule().init(() => ({
         routes: { "/login": () => {} },
       }));
@@ -17,9 +17,13 @@ describe("defineModule Runtime API", () => {
         routes: { "/profile": () => {} },
       }));
 
-      // 组合模块：运行时 `routes` 会被深合并
       const appModule = defineModule({ ignoreConflicts: ["routes"] }).with(
         authRouteModule,
+        userRouteModule
+      );
+      const appModuleWithError = defineModule({ ignoreConflicts: [] }).with(
+        authRouteModule,
+        // @ts-expect-error
         userRouteModule
       );
       type typeOfModule = ContextOf<typeof appModule>;

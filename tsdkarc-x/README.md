@@ -1,4 +1,4 @@
-# tsdkrpc
+# tsdkarc-x
 
 Strongly-typed, High performance and Edge-compatible RPC for full-stack TypeScript. Type safety from backend middleware to frontend client — no API docs needed. Built-in OPENAPI support.
 
@@ -157,8 +157,8 @@ launchApp({ basePath, transport, createContext, routes, port });
 **Boot sequence:** collect DI modules → topological sort & boot → bind transport → listen.
 
 ```typescript
-import { launchApp, type RoutesOf } from "./core";
-import { ExpressAdapter } from "./express-adapter";
+import { launchApp, type RoutesOf } from "tsdkarc-x";
+import { ExpressAdapter } from "tsdkarc-x/express-adapter";
 
 const app = launchApp({
   basePath: "/api",
@@ -187,10 +187,10 @@ app.then(({ stop }) => {
 ### 4. Client
 
 ```typescript
-import { createClient } from "tsdkrpc/client";
-import { createSwrClient } from "tsdkrpc/react/swr";
-import { createQueryClient } from "tsdkrpc/react/query";
-import type { AppRoutes } from "../server";
+import { createClient } from "tsdkarc-x/client";
+import { createSwrClient } from "tsdkarc-x/react/swr";
+import { createQueryClient } from "tsdkarc-x/react/query";
+import type { AppRoutes } from "tsdkarc-x";
 
 const api = createClient<AppRoutes>({ url: "http://localhost:8080/api" });
 
@@ -207,6 +207,8 @@ await api.v1.users.deleteAccount.mutation();
 Throw `RpcError` in any middleware or handler:
 
 ```typescript
+import { RpcError } from "tsdkarc";
+
 throw new RpcError("UNAUTHORIZED", "Missing Bearer Token");
 throw new RpcError("FORBIDDEN", "Admin only.");
 throw new RpcError("NOT_FOUND", "User not found.");

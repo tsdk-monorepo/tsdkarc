@@ -32,10 +32,11 @@
   ],
   "keywords": [
     "typesafe",
-    "tsdk",
     "module composable",
     "functional composition",
-    "no dependency injection"
+    "no dependency injection",
+    "tsdkarc",
+    "tsdk"
   ],
   "devDependencies": {
     "typescript": "^6.0.3",
