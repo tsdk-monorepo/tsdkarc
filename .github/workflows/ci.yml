@@ -34,7 +34,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
       - uses: oven-sh/setup-bun@v2
 
@@ -56,8 +56,13 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: dist-tsdkarc
-          path: tsdkarc/dist
+          name: dist-tsdkarc-esm
+          path: tsdkarc/esm
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-tsdkarc-lib
+          path: tsdkarc/lib
           retention-days: 1
 
   # ── 2a. tsdkarc-x (depends on tsdkarc) ─────────────────────────────────────
@@ -69,7 +74,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
       - uses: oven-sh/setup-bun@v2
 
@@ -77,8 +82,12 @@ jobs:
       # reference tsdkarc/dist and will fail if it does not exist yet.
       - uses: actions/download-artifact@v4
         with:
-          name: dist-tsdkarc
-          path: tsdkarc/dist
+          name: dist-tsdkarc-esm
+          path: tsdkarc/esm
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkarc-lib
+          path: tsdkarc/lib
 
       - name: Install dependencies
         run: bun install
@@ -105,15 +114,18 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
       - uses: oven-sh/setup-bun@v2
 
-      # Restore tsdkarc dist before bun install — same reason as tsdkarc-x above.
       - uses: actions/download-artifact@v4
         with:
-          name: dist-tsdkarc
-          path: tsdkarc/dist
+          name: dist-tsdkarc-esm
+          path: tsdkarc/esm
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkarc-lib
+          path: tsdkarc/lib
 
       - name: Install dependencies
         run: bun install

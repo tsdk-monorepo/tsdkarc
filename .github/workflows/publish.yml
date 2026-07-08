@@ -84,7 +84,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
       - uses: oven-sh/setup-bun@v2
 
@@ -99,8 +99,14 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: dist-tsdkarc
-          path: tsdkarc/dist
+          name: dist-tsdkarc-esm
+          path: tsdkarc/esm
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-tsdkarc-lib
+          path: tsdkarc/lib
           retention-days: 1
 
   # ── 3. Build + verify the target package ────────────────────────────────────
@@ -119,7 +125,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
       - uses: oven-sh/setup-bun@v2
 
@@ -132,8 +138,13 @@ jobs:
       - uses: actions/download-artifact@v4
         if: needs.parse-tag.outputs.needs_tsdkarc == 'true'
         with:
-          name: dist-tsdkarc
-          path: tsdkarc/dist
+          name: dist-tsdkarc-esm
+          path: tsdkarc/esm
+      - uses: actions/download-artifact@v4
+        if: needs.parse-tag.outputs.needs_tsdkarc == 'true'
+        with:
+          name: dist-tsdkarc-lib
+          path: tsdkarc/lib
 
       - name: Typecheck and build ${{ env.PACKAGE }}
         run: |
@@ -171,7 +182,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           registry-url: "https://registry.npmjs.org"
 
       - uses: oven-sh/setup-bun@v2
@@ -181,8 +192,12 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: dist-${{ env.PACKAGE }}
-          path: ${{ env.PACKAGE }}/dist
+          name: dist-${{ env.PACKAGE }}-esm
+          path: ${{ env.PACKAGE }}/esm
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ env.PACKAGE }}-lib
+          path: ${{ env.PACKAGE }}/lib
 
       # Mirror purge-pkg-for-publish from release.yml — adjust path if the
       # script lives at repo root or inside each package folder.
