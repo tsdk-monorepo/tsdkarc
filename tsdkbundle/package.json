@@ -26,7 +26,7 @@
     "dev:test": "bun run src/cli.ts dev",
     "build:test": "bun run src/cli.ts build",
     "test": "bun test tests/",
-    "typecheck": "tsc --noEmit",
+    "checktype": "tsc --noEmit",
     "build": "concurrently \"npm run build:cjs\"  \"npm run build:esm\"",
     "build:cjs": "rm -rf lib && tsc --project tsconfig.cjs.json && rm -rf lib/tests",
     "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests"

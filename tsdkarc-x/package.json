@@ -53,6 +53,7 @@
     "build": "concurrently \"npm run build:cjs\"  \"npm run build:esm\"",
     "build:cjs": "rm -rf lib && tsc --project tsconfig.cjs.json && rm -rf lib/tests",
     "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests",
+    "checktype": "tsc --noEmit --project tsconfig.json",
     "perf": "echo Perf1 && tsc -p tsconfig.perf1.json && echo '\nPerf0' &&  tsc -p tsconfig.perf0.json",
     "bundev": "bb dev api"
   },
