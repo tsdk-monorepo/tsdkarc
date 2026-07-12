@@ -1,8 +1,154 @@
 import { describe, it, expect, vi } from "vitest";
-import { defineModule } from "../src/core";
+import { deepMerge, defineModule } from "../src/core";
 import { ContextOf } from "../src/types";
 
 describe("defineModule Runtime API", () => {
+  describe("0. Basic demo", () => {
+    it("basic demo", async () => {
+      const UserModule = defineModule({
+        name: "user",
+      }).init(() => {
+        const users = [{ id: 1, name: "Alice" }];
+
+        return {
+          findUser(id: number) {
+            return users.find((user) => user.id === id);
+          },
+        };
+      });
+
+      const LoggerModule = defineModule({
+        name: "logger",
+      }).init(
+        () => ({
+          log(message: string) {
+            console.log(message);
+          },
+        }),
+        {
+          beforeBoot() {
+            console.log("beforeBoot [logger]");
+          },
+        }
+      );
+
+      const App = defineModule().with(UserModule, LoggerModule);
+
+      const app = await App.start();
+
+      app.ctx.logger.log("Application started");
+
+      const user = app.ctx.user.findUser(1);
+
+      console.log(user?.name);
+
+      const App2 = defineModule({ modules: [App] });
+      const app2 = await App2.start();
+      app2.ctx.logger.log("Application started");
+      const user2 = app2.ctx.user.findUser(1);
+      console.log(user2?.name);
+
+      const hello = defineModule().init(() => {
+        return { greet: "hello" };
+      });
+
+      const name = defineModule().init(() => {
+        return { name: "tsdkarc" };
+      });
+
+      const combined1 = defineModule({ modules: [hello, name] }).init();
+      combined1.start({
+        afterBoot: ({ greet, name }) => {
+          console.log(`${greet}, ${name}!`);
+        },
+      });
+
+      const combined2 = defineModule().with(hello, name);
+      const app22 = await combined2.start({
+        afterBoot: ({ greet, name }) => {
+          console.log(`${greet}, ${name}!`);
+        },
+      });
+
+      console.log(`${app22.ctx.greet}, ${app22.ctx.name}!`);
+
+      // stop
+      app22.stop();
+
+      // Get the ctx type of a module
+      type AppCtx = ContextOf<typeof combined2>;
+
+      const namespaceExample = defineModule({ name: "example" }).init(() => {
+        return { test: "this is a test for namespace" };
+      });
+      type NamespaceExampleCtx = ContextOf<typeof namespaceExample>; // {example: {test: string}}
+    });
+
+    it("Conflict types", async () => {
+      const module1 = defineModule({ name: "example" }).init(() => {
+        return { test: "this is a test for namespace" };
+      });
+      const module2 = defineModule({ name: "example" }).init(() => {
+        return { test2: "this is a test for namespace 2" };
+      });
+      // @ts-expect-error
+      defineModule({ modules: [module1, module2] });
+      // @ts-expect-error
+      defineModule().with(module1, module2);
+
+      defineModule({ ignoreConflicts: ["example"] })
+        .with(module1, module2)
+        .start({
+          afterBoot(ctx) {
+            console.log(ctx.example.test, ctx.example.test2);
+          },
+        });
+    });
+
+    it("Classic example", async () => {
+      const userService = defineModule().init(() => ({
+        getUser() {
+          return "user";
+        },
+      }));
+
+      const userController = defineModule({ modules: [userService] }).init(
+        (ctx) => ({
+          hello() {
+            return ctx.getUser();
+          },
+        })
+      );
+
+      type ControllerCtx = ContextOf<typeof userController>; /* 
+      {
+       getUser: () => "user";
+       hello: () => "user"; 
+      }
+      */
+
+      const controller = await userController.start();
+      console.log(controller.ctx.hello());
+
+      const database = defineModule({ name: "database" }).init(() => {
+        return { uri: "real database URI", id1: 1 };
+      });
+      const fakeDatabase = defineModule({ name: "database" }).init(() => {
+        return { uri: "fakedatabse URI", id2: 2 };
+      });
+
+      const app = defineModule({ ignoreConflicts: ["database"] }).with(
+        database,
+        fakeDatabase
+      );
+
+      await app.start({
+        afterBoot(ctx) {
+          console.log(ctx);
+        },
+      });
+    });
+  });
   // ───────────────────────────────────────────────────────────────────────────
   // 1. Basic Initialization & Context Merging
   // ───────────────────────────────────────────────────────────────────────────
@@ -689,6 +835,216 @@ describe("defineModule Runtime API", () => {
       // @ts-expect-error
       const app = defineModule({ modules: [nodeA, nodeB] }).init();
       await expect(app.start()).rejects.toThrow(/[Cc]ircular/);
+    });
+  });
+
+  // deepMerge.security.test.ts
+
+  describe("deepMerge security", () => {
+    it("should not pollute Object.prototype via __proto__", () => {
+      const malicious = JSON.parse(`
+      {
+        "__proto__": {
+          "polluted": true
+        }
+      }
+    `);
+
+      deepMerge({}, malicious);
+
+      expect(({} as any).polluted).toBeUndefined();
+    });
+
+    it("should block nested __proto__ pollution", () => {
+      const malicious = {
+        database: {
+          __proto__: {
+            polluted: true,
+          },
+        },
+      };
+
+      deepMerge({}, malicious);
+
+      expect(({} as any).polluted).toBeUndefined();
+    });
+
+    it("should block constructor.prototype pollution", () => {
+      const malicious = {
+        constructor: {
+          prototype: {
+            polluted: true,
+          },
+        },
+      };
+
+      deepMerge({}, malicious);
+
+      expect(({} as any).polluted).toBeUndefined();
+    });
+
+    it("should not mutate source objects", () => {
+      const a = {
+        database: {
+          host: "localhost",
+        },
+      };
+
+      const b = {
+        database: {
+          port: 3306,
+        },
+      };
+
+      deepMerge(a, b);
+
+      expect(a).toEqual({
+        database: {
+          host: "localhost",
+        },
+      });
+
+      expect(b).toEqual({
+        database: {
+          port: 3306,
+        },
+      });
+    });
+
+    it("should create new nested objects", () => {
+      const a = {
+        config: {
+          host: "localhost",
+        },
+      };
+
+      const b = {
+        config: {
+          port: 3306,
+        },
+      };
+
+      const result = deepMerge(a, b);
+
+      expect(result.config).not.toBe(a.config);
+      expect(result.config).not.toBe(b.config);
+    });
+
+    it("should replace arrays instead of merging", () => {
+      const result = deepMerge(
+        {
+          items: [1, 2],
+        },
+        {
+          items: [3, 4],
+        }
+      );
+
+      expect(result.items).toEqual([3, 4]);
+    });
+
+    it("should replace Date objects instead of recursively merging", () => {
+      const date = new Date();
+
+      const result = deepMerge(
+        {
+          value: date,
+        },
+        {
+          value: {
+            foo: "bar",
+          },
+        }
+      );
+
+      expect(result.value).toEqual({
+        foo: "bar",
+      });
+    });
+
+    it("should merge plain objects recursively", () => {
+      const result = deepMerge(
+        {
+          database: {
+            host: "localhost",
+          },
+        },
+        {
+          database: {
+            port: 3306,
+          },
+        }
+      );
+
+      expect(result).toEqual({
+        database: {
+          host: "localhost",
+          port: 3306,
+        },
+      });
+    });
+
+    it("should use last-write-wins semantics", () => {
+      const result = deepMerge(
+        {
+          uri: "real database URI",
+        },
+        {
+          uri: "fake database URI",
+        }
+      );
+
+      expect(result.uri).toBe("fake database URI");
+    });
+
+    it("should support null prototype objects", () => {
+      const a = Object.create(null);
+      a.id1 = 1;
+
+      const b = Object.create(null);
+      b.id2 = 2;
+
+      const result = deepMerge(a, b);
+
+      expect(result).toEqual({
+        id1: 1,
+        id2: 2,
+      });
+    });
+
+    it("should handle deeply nested objects", () => {
+      const createDeepObject = (depth: number) => {
+        let obj: any = {
+          value: true,
+        };
+
+        for (let i = 0; i < depth; i++) {
+          obj = {
+            child: obj,
+          };
+        }
+
+        return obj;
+      };
+
+      expect(() => {
+        deepMerge({}, createDeepObject(1000));
+      }).not.toThrow();
+    });
+
+    it("should handle getter properties", () => {
+      let called = false;
+
+      const source = {
+        get value() {
+          called = true;
+          return 123;
+        },
+      };
+
+      deepMerge({}, source);
+
+      expect(called).toBe(true);
     });
   });
 });

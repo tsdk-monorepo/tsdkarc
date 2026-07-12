@@ -40,13 +40,18 @@ function nodeOf(m: any): ModuleNode {
 /**
  * Returns true if `value` is a plain object (not an array, Date, etc.).
  */
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return (
-    value !== null &&
-    typeof value === "object" &&
-    !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype
-  );
+export function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (value === null || typeof value !== "object") {
+    return false;
+  }
+
+  const proto = Object.getPrototypeOf(value);
+
+  return proto === Object.prototype || proto === null;
+}
+
+export function isSafeKey(key: string) {
+  return key !== "__proto__" && key !== "prototype";
 }
 
 /**
@@ -55,13 +60,19 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
  * - Otherwise → b wins (last-write semantics).
  * Always returns a new object; inputs are never mutated.
  */
-function deepMerge(
+export function deepMerge(
   a: Record<string, unknown>,
   b: Record<string, unknown>
 ): Record<string, unknown> {
-  const result: Record<string, unknown> = { ...a };
+  const result = {
+    ...a,
+  };
 
   for (const key of Object.keys(b)) {
+    if (!isSafeKey(key)) {
+      continue;
+    }
+
     const aVal = result[key];
     const bVal = b[key];
 
@@ -319,8 +330,7 @@ function makeModuleHandle(
  * const app = defineModule({
  *   modules: [routesA, routesB],
  *   ignoreConflicts: ["routes"],
- * }).init(...)
- * // ctx.routes is a deep-merged union of both modules' `routes` objects
+ * }).init(...) // ctx.routes is a deep-merged union of both modules' `routes` objects
  * ```
  */
 export function defineModule<
