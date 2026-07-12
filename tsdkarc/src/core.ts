@@ -8,6 +8,7 @@ import type {
   FindDuplicateName,
   ModuleLifecycleHooks,
   NameCollisionError,
+  ModuleGraphNode,
 } from "./types";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -40,7 +41,9 @@ function nodeOf(m: any): ModuleNode {
 /**
  * Returns true if `value` is a plain object (not an array, Date, etc.).
  */
-export function isPlainObject(value: unknown): value is Record<string, unknown> {
+export function isPlainObject(
+  value: unknown
+): value is Record<string, unknown> {
   if (value === null || typeof value !== "object") {
     return false;
   }
@@ -117,6 +120,52 @@ function flattenMembers(node: ModuleNode): ModuleNode[] {
     return node.members.flatMap(flattenMembers);
   }
   return [node];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Dependency graph inspection
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Builds a serializable dependency graph from a runtime ModuleNode.
+ * Named modules use their name; unnamed modules use "anonymous".
+ * `seen` dedupes shared dependencies (diamond graphs) so each node is
+ * only visited once and cycles cannot cause infinite recursion.
+ */
+function buildGraphNode(
+  node: ModuleNode,
+  seen: Map<ModuleNode, ModuleGraphNode>
+): ModuleGraphNode {
+  const existing = seen.get(node);
+  if (existing) return existing;
+
+  const graphNode: ModuleGraphNode = {
+    name: node.name ?? "anonymous",
+    deps: [],
+  };
+  seen.set(node, graphNode);
+
+  for (const dep of node.deps) {
+    graphNode.deps.push(buildGraphNode(dep, seen));
+  }
+
+  return graphNode;
+}
+
+/**
+ * Renders a ModuleGraphNode tree as an indented, printable string.
+ * @param graph  ModuleGraphNode
+ * @param depth  current indentation depth (internal, defaults to 0)
+ */
+export function formatModuleGraph(graph: ModuleGraphNode, depth = 0) {
+  const indent = "  ".repeat(depth);
+  const lines = [`${indent}- ${graph.name}`];
+
+  for (const dep of graph.deps) {
+    lines.push(formatModuleGraph(dep, depth + 1));
+  }
+
+  return lines.join("\n");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -250,6 +299,11 @@ function makeModuleHandle(
     _name: node.name,
     _depCtx: undefined,
     _ownSlice: undefined,
+
+    /** Returns this module's dependency graph, rooted at itself. */
+    graph() {
+      return buildGraphNode(node, new Map());
+    },
 
     with(...args: any[]) {
       let moduleArgs: any[];

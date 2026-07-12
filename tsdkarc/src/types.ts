@@ -210,6 +210,8 @@ export interface NamedModule<
   readonly _depCtx: DepCtx;
   readonly _ownSlice: OwnSlice;
 
+  graph(): ModuleGraphNode;
+
   with<Modules extends AnyModule[]>(
     ...modules: FindDuplicateName<
       [NamedModule<Name, DepCtx, OwnSlice, Ignored>, ...Modules],
@@ -247,6 +249,9 @@ export interface AnonModule<
   readonly _name: null;
   readonly _depCtx: DepCtx;
   readonly _ownSlice: OwnSlice;
+
+  /** Returns this module's dependency graph, rooted at itself. */
+  graph(): ModuleGraphNode;
 
   with<Modules extends [AnyModule, ...AnyModule[]]>(
     ...modules: FindDuplicateName<
@@ -383,3 +388,12 @@ export type FindSliceCollision<
 export type MapTupleToError<T extends readonly any[], Err extends string> = {
   [K in keyof T]: Err;
 };
+
+/**
+ * Serializable dependency graph node.
+ * `name` is "anonymous" when the module was defined without a name.
+ */
+export interface ModuleGraphNode {
+  name: string;
+  deps: ModuleGraphNode[];
+}

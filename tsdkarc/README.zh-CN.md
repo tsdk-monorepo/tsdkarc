@@ -3,10 +3,13 @@
 这是一个无需依赖装饰器注入的、类型安全且支持模块组合的 TypeScript 库。
 
 [![NPM Version](https://badgen.net/npm/v/tsdkarc?color=green)](https://www.npmjs.com/package/tsdkarc)
-![NPM Weekly Downloads](https://img.shields.io/npm/dw/tsdkarc)
-![NPM Month Downloads](https://img.shields.io/npm/dm/tsdkarc.svg?style=flat)
+
+<!-- ![NPM Weekly Downloads](https://img.shields.io/npm/dw/tsdkarc) -->
+<!-- ![NPM Month Downloads](https://img.shields.io/npm/dm/tsdkarc.svg?style=flat) -->
+
 ![typescript](https://badgen.net/badge/icon/typescript?icon=typescript&label&color=blue)
-[![jsDocs.io](https://img.shields.io/badge/jsDocs.io-reference-blue)](https://www.jsdocs.io/package/tsdkarc)
+
+<!-- [![jsDocs.io](https://img.shields.io/badge/jsDocs.io-reference-blue)](https://www.jsdocs.io/package/tsdkarc) -->
 
 🇨🇳 中文 · [🇺🇸 English](./README.md) · [📖 Website](xxx) · [🎮 Demo](xxx)
 
@@ -20,21 +23,16 @@ tsdkarc 是一个无需依赖装饰器注入的、类型安全且支持模块组
 
 # 🤔 为什么选择它
 
-相比 装饰器依赖注入：
+相比传统的装饰器依赖注入：
 
-- tsdkarc 使用普通 js 语法，无需 polyfill。
-
-相比其他传统方案：
-
-- tsdkarc 更专注轻量级和类型安全模块组合，提供开箱即用语法。
+- tsdkarc 使用普通的 js 语法，无需 polyfill，更专注轻量级和类型安全模块的组合，提供简单开箱即用语法。
 
 ---
 
 # ✨ 特性
 
 - 🚀 多模块类型安全组合
-- 🔄 不需要装饰器注入
-- 🛡️ 简单但强大的语法
+- 🔄 不需要装饰器注入，简单但强大的语法
 - 📦 轻量设计：支持 Tree Shaking
 - 🔧 TypeScript：提供完整类型支持
 
@@ -78,14 +76,14 @@ const app = await App.start();
 app.ctx.logger.log("Application started");
 
 const user = app.ctx.user.findUser(1);
-console.log(user?.name);
+console.log(user?.name); // Alice
 ```
 
 ---
 
 # 📚 示例
 
-展示真实业务使用方式。
+真实业务使用方式。
 
 ## 定义模块
 
@@ -135,20 +133,21 @@ app.stop();
 
 ```ts
 const combined2 = defineModule()
-  .with(greet, name);
-  .start(({ greet, name }) => {
-    console.log(`${greet}, ${name}!`);
+  .with(greet, name)
+  .start({
+    beforeBoot: ({ greet, name }) => {
+      console.log(`${greet}, ${name}!`);
+    },
   });
 
-
-const app2 = combined2.start({
+const app2 = await combined2.start({
   afterBoot: ({ greet, name }) => {
     console.log(`${greet}, ${name}!`);
   },
 });
 
 // 停止运行
-app2.stop()
+app2.stop();
 ```
 
 ### 生命周期
@@ -172,7 +171,7 @@ app2.stop()
 })
 ```
 
-另外一个地方是启动的时候 `.start`：
+另一处使用是启动的时候 `.start`：
 
 ```ts
 .start({
@@ -342,29 +341,6 @@ type HelloCtx = ContextOf<typeof hello>; // {greet: string}
 
 ---
 
-## 配置项
-
-| 参数 | 类型 | 默认值 | 说明 |
-| ---- | ---- | ------ | ---- |
-| xxx  | xxx  | xxx    | xxx  |
-
-完整文档：
-
-[Documentation](xxx)
-
----
-
-# 🌍 兼容性
-
-支持：
-
-- Node.js：
-- 浏览器：
-- TypeScript：
-- React / Vue / 其他：
-
----
-
 # ❓ 常见问题
 
 ## 这个和装饰器依赖注入方案比较有什么优缺点？
@@ -423,18 +399,6 @@ console.log(ctx.hello());
 # 🛠️ Contributing
 
 欢迎提交 Issue 和 Pull Request。
-
-本地开发：
-
-```bash
-git clone xxx
-
-cd xxx
-
-pnpm install
-
-pnpm dev
-```
 
 项目结构：
 

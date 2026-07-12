@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { deepMerge, defineModule } from "../src/core";
+import { deepMerge, defineModule, formatModuleGraph } from "../src/core";
 import { ContextOf } from "../src/types";
 
 describe("defineModule Runtime API", () => {
@@ -147,6 +147,24 @@ describe("defineModule Runtime API", () => {
           console.log(ctx);
         },
       });
+    });
+
+    it("graph print", () => {
+      const db = defineModule({ name: "db" }).init(() => {
+        uri: "db";
+      });
+      const cache = defineModule({ name: "cache" }).init(() => {
+        msg: "cache";
+      });
+      const app = defineModule({ name: "app", modules: [db, cache] }).init(
+        (ctx) => ({})
+      );
+
+      console.log(app.graph(), formatModuleGraph(app.graph()));
+
+      expect(formatModuleGraph(app.graph()).trim()).toBe(`- app
+  - db
+  - cache`);
     });
   });
   // ───────────────────────────────────────────────────────────────────────────
