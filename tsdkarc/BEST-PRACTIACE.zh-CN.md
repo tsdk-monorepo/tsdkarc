@@ -15,10 +15,13 @@
 
 ```ts
 // user.logic.ts —— 纯逻辑，deps 显式传入
-export async function createUser(deps: UserDeps, input: CreateUserInput) {
-  const [row] = await deps.db.insert(usersTable).values(input).returning();
-  deps.logger.info("user created", { id: row.id });
-  return row;
+export class UserService {
+  constructor(private logger, private db) {}
+  async createUser(input: CreateUserInput) {
+    onst[row] = await this.db.insert(usersTable).values(input).returning();
+    this.logger.info("user created", { id: row.id });
+    return row;
+  }
 }
 ```
 
@@ -28,8 +31,7 @@ export const userModule = defineModule({
   name: "user",
   modules: [dbModule, loggerModule],
 }).init((ctx) => {
-  const deps: UserDeps = { db: ctx.db.client, logger: ctx.logger };
-  return { createUser: (input: CreateUserInput) => createUser(deps, input) };
+  return new UserService(ctx.logger, ctx.db.client);
 });
 ```
 

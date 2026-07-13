@@ -166,6 +166,53 @@ describe("defineModule Runtime API", () => {
   - db
   - cache`);
     });
+
+    it("demo", async () => {
+      /**
+       * Logger module: provides structured logging.
+       */
+      const LoggerModule = defineModule({ name: "logger" }).init(() => ({
+        log: (message: string) => console.log(`[LOG] ${message}`),
+      }));
+
+      /** Public shape of the logger, used for typing UserService's constructor. */
+      type Logger = ContextOf<typeof LoggerModule>["logger"];
+
+      /**
+       * UserService: plain class, dependency passed in explicitly via constructor.
+       * No decorators, no reflect-metadata — deps are just constructor args.
+       */
+      class UserService {
+        constructor(private logger: Logger) {}
+
+        createUser(name: string) {
+          this.logger.log(`Creating user: ${name}`);
+        }
+      }
+
+      /**
+       * UserService module: depends on LoggerModule.
+       * init(ctx) receives the resolved dependency ctx and wires the class manually.
+       */
+      const UserServiceModule = defineModule({
+        name: "userService",
+        modules: [LoggerModule],
+      }).init((ctx) => new UserService(ctx.logger));
+
+      // Compose app and start
+      const appModule = defineModule({
+        name: "app",
+        modules: [UserServiceModule],
+      }).init();
+
+      const app = await appModule.start();
+
+      // Resolve and use
+      app.ctx.userService.createUser("Alice"); // [LOG] Creating user: Alice
+      console.log(appModule.graph(), formatModuleGraph(appModule.graph()));
+
+      await app.stop();
+    });
   });
   // ───────────────────────────────────────────────────────────────────────────
   // 1. Basic Initialization & Context Merging

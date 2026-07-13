@@ -195,21 +195,27 @@ await app.start({
 ## ❓ FAQ
 
 **Q: 与 NestJS / InversifyJS 等基于装饰器的 DI 库有何不同？**
+
 不需要引入 `reflect-metadata`，也没有 `@Injectable()` 等侵入式代码。`tsdkarc` 利用 TypeScript 强大的推导能力，仅通过普通函数就能让 `ctx` 类型做到全自动感知。
 
 **Q: 遇到循环依赖会怎样？**
+
 会在 `.start()` 的排序阶段立刻抛出异常：`[tsdkarc] Circular dependency detected at module "<name>"`。建议使用 `.graph()` 配合 `formatModuleGraph()` 进行排查。
 
 **Q: `init()` 返回字段和已注入的依赖 ctx 冲突了怎么办？**
+
 编译期会触发 `FindSliceCollision` 错误。⚠️ 注意，这是纯 TypeScript 静态检查，如果使用 `@ts-ignore` 绕过，运行时则会发生静默覆盖。
 
 **Q: 多模块依赖形成了“菱形依赖”（Diamond Dependency），会重复启动吗？**
+
 不会。`tsdkarc` 会对模块对象的引用进行拓扑排序并去重（不以 `name` 为基准）。同一模块即使被多条路径依赖，也**只会启动一次**，并确保排在所有依赖它的模块之前。
 
 **Q: 匿名模块字段冲突了会怎样？**
+
 运行时会抛出 `[tsdkarc] Anonymous module slice collision` 异常，除非该字段被显式加入了 `ignoreConflicts`。
 
 **Q: `ignoreConflicts` 的深合并策略是怎样的？**
+
 仅当两边都是**纯对象**（Plain Object，排除数组/`Date`/`Map`/实例对象等）时才会递归合并。非纯对象时，后者整体覆盖前者，数组不会被拼接。安全起见，引擎会始终跳过对 `__proto__` 和 `prototype` 的合并。
 
 ---
@@ -222,8 +228,8 @@ await app.start({
 
 ```text
 tsdkarc/       # 核心库代码
-tsdkarc-x/     # 官方扩充生态
-tsdkbundle/    # 打包工具链
+tsdkarc-x/     # 官方扩充生态：端到端类型安全开发框架
+tsdkbundle/    # 监测与打包应用工具
 website/       # 文档网站
 
 ```
