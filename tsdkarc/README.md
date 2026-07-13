@@ -48,6 +48,42 @@ app.ctx.userService.createUser("Alice"); // [LOG] Creating user: Alice
 
 ---
 
+## The Grand Idea: Modules as Reusable Building Blocks
+
+DI in tsdkarc isn't the point — **composability** is. A module is a self-contained, independently testable unit with an explicit dependency list and an explicit output shape. Because nothing is wired by name or token, a module carries no assumptions about which app it lives in.
+
+That means the same module can be:
+
+- **Reused** across multiple apps in the same repo (`LoggerModule` used by both an API server and a CLI tool)
+- **Published** as a standalone package and consumed by other projects, with `ctx` still fully typed on the consuming side
+- **Swapped** for a different implementation with the same shape, without touching any module that depends on it
+- **Composed** into larger modules, which themselves become reusable units — `modules: [...]` nests arbitrarily deep
+
+```ts
+// logger-module/index.ts — published independently, zero knowledge of any app
+export const LoggerModule = defineModule({ name: "logger" }).init(() => ({
+  log: (message: string) => console.log(`[LOG] ${message}`),
+}));
+```
+
+```ts
+// app-a: consumes LoggerModule as-is
+const appA = await defineModule({ modules: [LoggerModule, OrderModule] })
+  .init()
+  .start();
+```
+
+```ts
+// app-b: same LoggerModule, different composition, still fully typed
+const appB = await defineModule({ modules: [LoggerModule, ReportModule] })
+  .init()
+  .start();
+```
+
+A module is regenerable and rewriteable in isolation because its contract — inputs (`modules`), outputs (`init()`'s return value) — is fully declared. Nothing about it depends on where it's mounted.
+
+---
+
 ## Features
 
 - **Zero Decorators** — no `@Injectable()`, no `reflect-metadata`, ever
@@ -363,6 +399,7 @@ No `reflect-metadata`, no `@Injectable()`. TypeScript's own type inference deriv
 A compile-time `FindSliceCollision` error. This is a static check only — bypassing it with `@ts-ignore` causes a silent runtime overwrite.
 
 **Q: Do diamond dependencies boot twice?**
+
 No. Modules are deduplicated by object reference (not by `name`) during topological sort, so a shared module boots exactly once, ordered before everything that depends on it.
 
 **Q: An anonymous module's fields collide with another module's — what happens?**
@@ -370,6 +407,7 @@ No. Modules are deduplicated by object reference (not by `name`) during topologi
 Runtime throws `[tsdkarc] Anonymous module slice collision`, unless the field is explicitly listed in `ignoreConflicts`.
 
 **Q: How does the `ignoreConflicts` merge work?**
+
 Deep merge (later overrides earlier) only when both sides are plain objects — arrays, `Date`, `Map`, and class instances are replaced wholesale, never merged or concatenated. `__proto__` and `prototype` are always skipped for safety.
 
 ---
