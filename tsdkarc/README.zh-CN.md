@@ -1,424 +1,240 @@
+这份文案的底子非常扎实，技术细节也很完备。为了让它看起来更像一个成熟、高质量的开源项目 README，我对其进行了重新排版和润色。重点优化了信息的层级结构（Scannability）、语言的流畅度，并加入了适当的视觉分隔，使其对新用户更加友好。
+
+以下是优化后的版本：
+
+---
+
 # tsdkarc
 
-这是一个无需依赖装饰器注入的、类型安全且支持模块组合的 TypeScript 库。
+**一款无装饰器、类型安全的 TypeScript 模块组合与依赖注入库。**
 
-[![NPM Version](https://badgen.net/npm/v/tsdkarc?color=green)](https://www.npmjs.com/package/tsdkarc)
-
-<!-- ![NPM Weekly Downloads](https://img.shields.io/npm/dw/tsdkarc) -->
-<!-- ![NPM Month Downloads](https://img.shields.io/npm/dm/tsdkarc.svg?style=flat) -->
-
-![typescript](https://badgen.net/badge/icon/typescript?icon=typescript&label&color=blue)
-
-<!-- [![jsDocs.io](https://img.shields.io/badge/jsDocs.io-reference-blue)](https://www.jsdocs.io/package/tsdkarc) -->
-
-🇨🇳 中文 · [🇺🇸 English](./README.md) · [📖 Website](xxx) · [🎮 Demo](xxx)
+🇨🇳 中文 · [🇺🇸 English](https://www.google.com/search?q=./README.md) · [📖 Website](https://www.google.com/search?q=xxx) · [🎮 Demo](https://www.google.com/search?q=xxx)
 
 ---
 
-# 💡 tsdkarc 是什么
+## tsdkarc 是什么？
 
-tsdkarc 是一个无需依赖装饰器注入的、类型安全且支持模块组合的 TypeScript 库。
+摆脱装饰器，`tsdkarc` 通过纯函数组合实现优雅的依赖注入（DI）。模块的上下文（Context，简称 **ctx**）类型会根据 `init()` 的返回值进行**全自动推导**，彻底告别手动声明 Token 和冗余的类型绑定。
 
----
+## ✨ 核心特性
 
-# 🤔 为什么选择它
-
-相比传统的装饰器依赖注入：
-
-- tsdkarc 使用普通的 js 语法，无需 polyfill，更专注轻量级和类型安全模块的组合，提供简单开箱即用语法。
-
----
-
-# ✨ 特性
-
-- 🚀 多模块类型安全组合
-- 🔄 不需要装饰器注入，简单但强大的语法
-- 📦 轻量设计：支持 Tree Shaking
-- 🔧 TypeScript：提供完整类型支持
+- **🛡️ 极致类型安全**：多模块组合时，`ctx` 自动合并推导，编译期拦截字段冲突。
+- **🍃 零装饰器依赖**：完全摒弃 `reflect-metadata`，回归纯粹的函数式体验。
+- **⚡ 原生 Tree Shaking**：无副作用设计，未使用的模块与类型工具可被打包工具干净剔除。
+- **🔄 完善的生命周期**：内置多阶段 Hooks（全局/模块级），精确掌控启动与优雅停机（Graceful Shutdown）。
+- **🗺️ 清晰的依赖关系**：内置依赖图分析 `graph()`，支持打印拓扑结构，彻底告别“黑盒”调试。
 
 ---
 
-# ⚡ 快速开始
+## 🚀 快速开始
 
-## 安装
+**1. 安装**
 
 ```bash
 npm install tsdkarc
+
 ```
 
-## 使用
+**2. 基础使用**
 
 ```ts
 import { defineModule } from "tsdkarc";
 
-const UserModule = defineModule({
-  name: "user", // Namespace but optional
-}).init(() => {
+// 定义子模块 User
+const UserModule = defineModule({ name: "user" }).init(() => {
   const users = [{ id: 1, name: "Alice" }];
-  return {
-    findUser(id: number) {
-      return users.find((user) => user.id === id);
-    },
-  };
+  return { findUser: (id: number) => users.find((u) => u.id === id) };
 });
 
-const LoggerModule = defineModule({
-  name: "logger",
-}).init(() => ({
-  log(message: string) {
-    console.log(message);
-  },
+// 定义子模块 Logger
+const LoggerModule = defineModule({ name: "logger" }).init(() => ({
+  log: (msg: string) => console.log(`[LOG] ${msg}`),
 }));
 
-const App = defineModule({ modules: [UserModule, LoggerModule] }).init();
-const app = await App.start();
+// 组合成 App 并启动
+const app = await defineModule({
+  name: "app",
+  modules: [UserModule, LoggerModule],
+})
+  .init()
+  .start();
 
-app.ctx.logger.log("Application started");
+// 类型全自动推导，开箱即用
+app.ctx.logger.log("started");
+console.log(app.ctx.user.findUser(1)?.name); // 输出: Alice
 
-const user = app.ctx.user.findUser(1);
-console.log(user?.name); // Alice
+// 优雅停机
+await app.stop();
 ```
 
 ---
 
-# 📚 示例
+## 📚 核心概念
 
-真实业务使用方式。
+### 1. 模块定义与组合
 
-## 定义模块
+通过 `defineModule` 声明模块，支持命名空间和匿名展开：
 
-```tsx
-import { defineModule, type ContextOf } from "tsdkarc";
-
-const hello = defineModule().init(() => {
-  return { greet: "hello" };
-});
-
-const name = defineModule().init(() => {
-  return { name: "tsdkarc" };
-});
-
-type HelloCtx = ContextOf<typeof hello>; // {greet: string}
-type NameCtx = ContextOf<typeof name>; // {name: string}
-
-// 命名空间
-const namespaceExample = defineModule({ name: "example" }).init(() => {
-  return { test: "this is a test for namespace" };
-});
-type NamespaceExampleCtx = ContextOf<typeof namespaceExample>; // {example: {test: string}}
-```
-
-## 组合模块并运行
-
-组合模块有两种方式。
-
-第一种，使用 `modules` 参数：
+- **命名模块**：传入 `name`，返回值会被挂载到 `ctx[name]` 下。
+- **匿名模块**：不传 `name`，返回值会直接平铺合并进顶层 `ctx` 中。
 
 ```ts
-const combined = defineModule({ modules: [hello, name] }).init();
-const app = await combined.start({
-  afterBoot: ({ greet, name }) => {
-    console.log(`${greet}, ${name}!`);
-  },
-});
+// 匿名模块：直接展开
+const hello = defineModule().init(() => ({ greet: "hello" }));
+type HelloCtx = ContextOf<typeof hello>; // { greet: string }
 
-// 获取模块ctx类型
-type CombinedCtx = ContextOf<typeof combined>;
+// 命名模块：拥有独立命名空间
+const example = defineModule({ name: "example" }).init(() => ({ test: "x" }));
+type ExampleCtx = ContextOf<typeof example>; // { example: { test: string } }
 
-// 停止运行
-app.stop();
+// 组合模块（支持 modules 数组 或 .with 链式调用）
+const app = defineModule({ modules: [hello, example] }).init();
+// 等价于: const app = defineModule().with(hello, example);
 ```
 
-第二种使用 `.with` 语法：
+### 2. 生命周期 Hooks
+
+`tsdkarc` 提供模块级和全局级两种生命周期钩子，支持异步操作。
+
+**模块级钩子**（定义在 `.init()` 的第二个参数，仅影响自身）：
+
+| 钩子名称             | Context (`ctx`) 访问权限               | 说明                 |
+| -------------------- | -------------------------------------- | -------------------- |
+| `beforeBoot(depCtx)` | **仅依赖 ctx**（不含本模块自身 slice） | 模块初始化前触发     |
+| `afterBoot`          | 依赖 ctx + 本模块自身 slice            | 模块初始化完成后触发 |
+| `beforeShutdown`     | 依赖 ctx + 本模块自身 slice            | 模块销毁前触发       |
+| `shutdown`           | 依赖 ctx + 本模块自身 slice            | 执行模块核心销毁逻辑 |
+| `afterShutdown`      | 依赖 ctx + 本模块自身 slice            | 模块销毁后触发       |
+
+**全局级钩子**（定义在 `.start()` 的参数中，管理整个应用组合）：
+
+| 钩子名称             | 触发时机              | Context (`ctx`) 状态 |
+| -------------------- | --------------------- | -------------------- |
+| `beforeBoot`         | 所有模块启动 **前**   | 空对象 `{}`          |
+| `afterBoot`          | 所有模块启动 **后**   | 完整 `FinalCtx`      |
+| `beforeEachBoot`     | 每个子模块启动 **前** | 当前累积的部分 ctx   |
+| `afterEachBoot`      | 每个子模块启动 **后** | 当前累积的部分 ctx   |
+| `beforeShutdown`     | 整体销毁 **前**       | 完整 `FinalCtx`      |
+| `afterShutdown`      | 整体销毁 **后**       | 完整 `FinalCtx`      |
+| `beforeEachShutdown` | 每个子模块销毁 **前** | 完整 `FinalCtx`      |
+| `afterEachShutdown`  | 每个子模块销毁 **后** | 完整 `FinalCtx`      |
+
+> **💡 提示**：
+>
+> 1. `*Each*` 系列钩子会接收第二个参数 `meta: { name: string | null; kind: "named" | "anon" }`。可通过 `meta.kind === "anon"` 判断匿名模块。
+> 2. 启动过程中若发生异常，引擎会自动**按依赖倒序**回滚已启动模块的 `shutdown`，并将错误作为 `reason` 传递。
+
+### 3. 依赖图分析
+
+内置可视化树，便于排查复杂的依赖层级。
 
 ```ts
-const combined2 = defineModule()
-  .with(greet, name)
-  .start({
-    beforeBoot: ({ greet, name }) => {
-      console.log(`${greet}, ${name}!`);
-    },
-  });
+import { formatModuleGraph } from "tsdkarc";
 
-const app2 = await combined2.start({
-  afterBoot: ({ greet, name }) => {
-    console.log(`${greet}, ${name}!`);
-  },
-});
-
-// 停止运行
-app2.stop();
+console.log(formatModuleGraph(app.graph()));
+// 输出示例:
+// - app
+//   - user
+//   - logger
 ```
 
-### 生命周期
+---
 
-有两处地方可以放入模块生命周期钩子，第一处 `.init`：
+## 🛠 高阶技巧：命名冲突与深度合并
 
-```ts
-.init(({}) = ctx, {
-  beforeBoot?: (ctx: Record<never, never>) => any;
-  afterBoot?: (ctx: FinalCtx) => any;
-  beforeShutdown?: (ctx: FinalCtx, reason?: Reason) => any;
-  afterShutdown?: (ctx: FinalCtx, reason?: Reason) => any;
-  beforeEachBoot?: (ctx: object, module: ModuleMeta) => any;
-  afterEachBoot?: (ctx: object, module: ModuleMeta) => any;
-  beforeEachShutdown?: (
-    ctx: object,
-    module: ModuleMeta,
-    reason?: Reason
-  ) => any;
-  afterEachShutdown?: (ctx: object, module: ModuleMeta, reason?: Reason) => any;
-})
-```
-
-另一处使用是启动的时候 `.start`：
+多个模块若暴露出相同的命名，编译期会**直接报错**以保证类型安全。如果这是预期行为，可使用 `ignoreConflicts` 显式声明允许冲突，运行时将执行**深合并（后覆盖前）**：
 
 ```ts
-.start({
-  beforeBoot?: (ctx: Record<never, never>) => any;
-  afterBoot?: (ctx: FinalCtx) => any;
-  beforeShutdown?: (ctx: FinalCtx, reason?: Reason) => any;
-  afterShutdown?: (ctx: FinalCtx, reason?: Reason) => any;
-  beforeEachBoot?: (ctx: object, module: ModuleMeta) => any;
-  afterEachBoot?: (ctx: object, module: ModuleMeta) => any;
-  beforeEachShutdown?: (
-    ctx: object,
-    module: ModuleMeta,
-    reason?: Reason
-  ) => any;
-  afterEachShutdown?: (ctx: object, module: ModuleMeta, reason?: Reason) => any;
-})
-```
-
-到目前为止，我们已经可以定义模块，可选模块命名空间，获取该模块上下文类型（Ctx or Context），模块组合，生命周期，启动运行以及停止运行模块。
-
-## 高级用法
-
-### 1. 如果组合的多个模块，上下文(Context)冲突怎么办？
-
-如果属性冲突，组合的时候会报类型错误：
-
-`Error: Duplicate module name 'example' detected in array.`
-
-```ts
-const module1 = defineModule({ name: "example" }).init(() => {
-  return { test: "this is a test for namespace" };
-});
-const module2 = defineModule({ name: "example" }).init(() => {
-  return { test2: "this is a test for namespace" };
-});
-
-defineModule({ modules: [module1, module2] }); // Error: Duplicate module name 'example' detected in array.
-```
-
-或者使用 `.with` 语法报错： `Expected 1 arguments, but got 2`
-
-```ts
-const module1 = defineModule({ name: "example" }).init(() => {
-  return { test: "this is a test for namespace" };
-});
-const module2 = defineModule({ name: "example" }).init(() => {
-  return { test2: "this is a test for namespace" };
-});
-
-defineModule().with(module1, module2); // Expected 1 arguments, but got 2
-```
-
-**如何解决这种情况？** 使用 `ignoreConflicts` 参数：
-
-```ts
-const module1 = defineModule({ name: "example" }).init(() => {
-  return { test: "this is a test for namespace" };
-});
-const module2 = defineModule({ name: "example" }).init(() => {
-  return { test2: "this is a test for namespace" };
-});
-
-defineModule({ ignoreConflicts: ["example"] }).with(module1, module2);
-```
-
-利用 `ignoreConflicts` 特性合并模块属性，按照执行顺序，后面模块属性覆盖前面模块的：
-
-```ts
-const database = defineModule({ name: "database" }).init(() => {
-  return { uri: "real database URI", id1: 1 };
-});
-const fakeDatabase = defineModule({ name: "database" }).init(() => {
-  return { uri: "fakedatabse URI", id2: 2 };
-});
+const dbReal = defineModule({ name: "database" }).init(() => ({
+  uri: "real",
+  id1: 1,
+}));
+const dbFake = defineModule({ name: "database" }).init(() => ({
+  uri: "fake",
+  id2: 2,
+}));
 
 const app = defineModule({ ignoreConflicts: ["database"] }).with(
-  database,
-  fakeDatabase
+  dbReal,
+  dbFake
 );
 
 await app.start({
-  afterBoot(ctx) {
-    console.log(ctx); // { database: { uri: 'fakedatabse URI', id1: 1, id2: 2 } }
-  },
+  afterBoot: (ctx) => console.log(ctx.database),
+  // 深度合并结果: { uri: 'fake', id1: 1, id2: 2 }
 });
-```
-
-## 常见问题
-
-## 支持的运行环境
-
-tsdkarc 支持运行在任何能跑 JavaScript 语法的环境，比如：
-
-- Node.js
-- 浏览器环境
-- Bun
-- Deno
-- 其他 JS 运行环境
-
----
-
-# 📖 API
-
-核心 API：
-
-## `defineModule()`
-
-```
-defineModule({
-
-})
-.init()
-.with()
-.start().then(result => {
-  result.ctx;
-  result.stop();
-})
-```
-
-用途：定义，组合，运行，停止模块
-
-参数：
-
-返回：
-
-示例：
-
-```ts
-import { defineModule } from "tsdkarc";
-
-// 定义简单模块
-const hello = defineModule().init(() => {
-  return { greet: "hello" };
-});
-const world = defineModule().init(() => {
-  return { msg: "world" };
-});
-
-// 组合模块
-const awesome = defineModule({ modules: [hello, world] }).init((ctx) => {
-  // 访问其他模块信息
-  console.log(ctx.greet, ctx.msg);
-});
-
-// 运行模块
-const instance = await awesome.start();
-
-// 停止运行模块
-instance.stop();
-```
-
-## `ContextOf<T>`
-
-用途：获取模块的上下文类型，可以是单独模块，也可以是组合模块
-
-使用实例：
-
-```ts
-import { defineModule, type ContextOf } from "tsdkarc";
-
-const hello = defineModule().init(() => {
-  return { greet: "hello" };
-});
-
-type HelloCtx = ContextOf<typeof hello>; // {greet: string}
 ```
 
 ---
 
-# ❓ 常见问题
+## 📖 API 参考
 
-## 这个和装饰器依赖注入方案比较有什么优缺点？
+### `defineModule(meta?)`
 
-tsdkarc 方案更加轻量级，开箱即用。来一个对比。
+返回一个 `ModuleDeclaration` 实例。
 
-传统装饰器注入：
+| 参数              | 类型          | 说明                                        |
+| ----------------- | ------------- | ------------------------------------------- |
+| `name`            | `string`      | 可选。模块在 ctx 中的命名空间键             |
+| `modules`         | `AnyModule[]` | 可选。当前模块依赖的其他模块                |
+| `ignoreConflicts` | `string[]`    | 可选。允许命名冲突并执行深度合并的 key 列表 |
 
-```ts
-@Injectable()
-class UserService {
-  getUser() {
-    return "user";
-  }
-}
+### 模块实例方法
 
-@Injectable()
-class UserController {
-  constructor(private userService: UserService) {}
+| 方法                     | 说明                                           |
+| ------------------------ | ---------------------------------------------- |
+| `.init(bootFn?, hooks?)` | 实例化并返回 `NamedModule` 或 `AnonModule`     |
+| `.with(...modules)`      | 语法糖：组合模块（等价于 `.init().with(...)`） |
+| `.start(options?)`       | 启动并返回 `{ ctx, stop }`                     |
+| `.graph()`               | 返回 `ModuleGraphNode` 依赖树结构数据          |
 
-  hello() {
-    return this.userService.getUser();
-  }
-}
+### 核心类型工具
 
-const controller = container.resolve(UserController);
-
-console.log(controller.hello());
-```
-
-使用 `tsdkarc`:
-
-```ts
-import { defineModule, type ContextOf } from "tsdkarc";
-
-const userService = defineModule().init(() => ({
-  getUser() {
-    return "user";
-  },
-}));
-
-const userController = defineModule({ modules: [userService] }).init((ctx) => ({
-  hello() {
-    return ctx.getUser();
-  },
-}));
-
-type ControllerCtx = ContextOf<typeof userController>;
-
-const { ctx, stop } = await userController.start();
-console.log(ctx.hello());
-```
+| 类型            | 说明                                                |
+| --------------- | --------------------------------------------------- |
+| `ContextOf<M>`  | 获取模块启动完成后的完整 Context 类型               |
+| `DepCtxOf<M>`   | 获取当前模块依赖的 Context 类型（不包含自身返回值） |
+| `OwnSliceOf<M>` | 获取当前模块 `init()` 自身的返回值类型              |
 
 ---
 
-# 🛠️ Contributing
+## ❓ FAQ
 
-欢迎提交 Issue 和 Pull Request。
+**Q: 与 NestJS / InversifyJS 等基于装饰器的 DI 库有何不同？**
+不需要引入 `reflect-metadata`，也没有 `@Injectable()` 等侵入式代码。`tsdkarc` 利用 TypeScript 强大的推导能力，仅通过普通函数就能让 `ctx` 类型做到全自动感知。
 
-项目结构：
+**Q: 遇到循环依赖会怎样？**
+会在 `.start()` 的排序阶段立刻抛出异常：`[tsdkarc] Circular dependency detected at module "<name>"`。建议使用 `.graph()` 配合 `formatModuleGraph()` 进行排查。
+
+**Q: `init()` 返回字段和已注入的依赖 ctx 冲突了怎么办？**
+编译期会触发 `FindSliceCollision` 错误。⚠️ 注意，这是纯 TypeScript 静态检查，如果使用 `@ts-ignore` 绕过，运行时则会发生静默覆盖。
+
+**Q: 多模块依赖形成了“菱形依赖”（Diamond Dependency），会重复启动吗？**
+不会。`tsdkarc` 会对模块对象的引用进行拓扑排序并去重（不以 `name` 为基准）。同一模块即使被多条路径依赖，也**只会启动一次**，并确保排在所有依赖它的模块之前。
+
+**Q: 匿名模块字段冲突了会怎样？**
+运行时会抛出 `[tsdkarc] Anonymous module slice collision` 异常，除非该字段被显式加入了 `ignoreConflicts`。
+
+**Q: `ignoreConflicts` 的深合并策略是怎样的？**
+仅当两边都是**纯对象**（Plain Object，排除数组/`Date`/`Map`/实例对象等）时才会递归合并。非纯对象时，后者整体覆盖前者，数组不会被拼接。安全起见，引擎会始终跳过对 `__proto__` 和 `prototype` 的合并。
+
+---
+
+## 🤝 参与贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+代码仓库目录结构说明：
 
 ```text
-tsdkarc/
-tsdkarc-x/
-tsdkbundle/
-website/
+tsdkarc/       # 核心库代码
+tsdkarc-x/     # 官方扩充生态
+tsdkbundle/    # 打包工具链
+website/       # 文档网站
+
 ```
 
----
+## 📜 协议与更新日志
 
-# 📝 Changelog
-
-版本更新记录：
-
-[CHANGELOG.md](./CHANGELOG.md)
-
----
-
-# 📄 License
-
-MIT
+- 更新日志详见 [CHANGELOG.md](./CHANGELOG.md)。
+- 基于 [MIT](./LICENSE) 协议开源。

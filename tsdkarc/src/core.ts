@@ -157,12 +157,32 @@ function buildGraphNode(
  * @param graph  ModuleGraphNode
  * @param depth  current indentation depth (internal, defaults to 0)
  */
-export function formatModuleGraph(graph: ModuleGraphNode, depth = 0) {
+/**
+ * Renders a ModuleGraphNode tree as an indented, printable string.
+ * `seen` guards against cyclic graphs: buildGraphNode() can produce a
+ * self-referencing tree for circular deps, and without this guard printing
+ * one would recurse forever.
+ * @param graph  ModuleGraphNode
+ * @param depth  current indentation depth (internal, defaults to 0)
+ * @param seen   ancestor nodes on the current path (internal, for cycle detection)
+ */
+export function formatModuleGraph(
+  graph: ModuleGraphNode,
+  depth = 0,
+  seen: Set<ModuleGraphNode> = new Set()
+) {
   const indent = "  ".repeat(depth);
-  const lines = [`${indent}- ${graph.name}`];
 
+  if (seen.has(graph)) {
+    return `${indent}- ${graph.name} (circular, see above)`;
+  }
+
+  const nextSeen = new Set(seen);
+  nextSeen.add(graph);
+
+  const lines = [`${indent}- ${graph.name}`];
   for (const dep of graph.deps) {
-    lines.push(formatModuleGraph(dep, depth + 1));
+    lines.push(formatModuleGraph(dep, depth + 1, nextSeen));
   }
 
   return lines.join("\n");
