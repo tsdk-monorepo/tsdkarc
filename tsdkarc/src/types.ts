@@ -210,7 +210,10 @@ export interface NamedModule<
   readonly _depCtx: DepCtx;
   readonly _ownSlice: OwnSlice;
 
-  graph(): ModuleGraphNode;
+  graph(): {
+    nodes: ModuleGraphNode;
+    readonly formatted: string;
+  };
 
   with<Modules extends AnyModule[]>(
     ...modules: FindDuplicateName<
@@ -251,7 +254,10 @@ export interface AnonModule<
   readonly _ownSlice: OwnSlice;
 
   /** Returns this module's dependency graph, rooted at itself. */
-  graph(): ModuleGraphNode;
+  graph(): {
+    nodes: ModuleGraphNode;
+    readonly formatted: string;
+  };
 
   with<Modules extends [AnyModule, ...AnyModule[]]>(
     ...modules: FindDuplicateName<

@@ -322,7 +322,13 @@ function makeModuleHandle(
 
     /** Returns this module's dependency graph, rooted at itself. */
     graph() {
-      return buildGraphNode(node, new Map());
+      const nodes = buildGraphNode(node, new Map());
+      return {
+        nodes,
+        get formatted() {
+          return formatModuleGraph(nodes);
+        },
+      };
     },
 
     with(...args: any[]) {

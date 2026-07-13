@@ -1,194 +1,152 @@
 # tsdkarc
 
-**一款无装饰器、类型安全的 TypeScript 模块组合与依赖注入库。**
+> **无装饰器、类型安全的 TypeScript 模块组合与依赖注入库**
 
-🇨🇳 中文 · [🇺🇸 English](https://www.google.com/search?q=./README.md) · [📖 Website](https://www.google.com/search?q=xxx) · [🎮 Demo](https://www.google.com/search?q=xxx)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
+🇨🇳 中文 · [🇺🇸 English](./README.md)
 
----
-
-## tsdkarc 是什么？
-
-摆脱装饰器，`tsdkarc` 通过纯函数组合实现优雅的依赖注入（DI）。模块的上下文（Context，简称 **ctx**）类型会根据 `init()` 的返回值进行**全自动推导**，彻底告别手动声明 Token 和冗余的类型绑定。
-
-## ✨ 核心特性
-
-- **🛡️ 极致类型安全**：多模块组合时，`ctx` 自动合并推导，编译期拦截字段冲突。
-- **🍃 零装饰器依赖**：完全摒弃 `reflect-metadata`，回归纯粹的函数式体验。
-- **⚡ 原生 Tree Shaking**：无副作用设计，未使用的模块与类型工具可被打包工具干净剔除。
-- **🔄 完善的生命周期**：内置多阶段 Hooks（全局/模块级），精确掌控启动与优雅停机（Graceful Shutdown）。
-- **🗺️ 清晰的依赖关系**：内置依赖图分析 `graph()`，支持打印拓扑结构，彻底告别“黑盒”调试。
-
----
-
-## 🚀 快速开始
-
-**1. 安装**
-
-```bash
-npm install tsdkarc
-
-```
-
-**2. 基础使用**
+不用装饰器，不用 `reflect-metadata`。`ctx` 类型完全由每个模块 `init()` 的返回值在编译期自动推导。
 
 ```ts
-import { defineModule } from "tsdkarc";
+import { defineModule, type ContextOf } from "tsdkarc";
 
-// 定义子模块 User
-const UserModule = defineModule({ name: "user" }).init(() => {
-  const users = [{ id: 1, name: "Alice" }];
-  return { findUser: (id: number) => users.find((u) => u.id === id) };
+const LoggerModule = defineModule().init(() => {
+  console.log("[LOG] init LoggerModule"); // Only log once: [LOG] init LoggerModule
+  return {
+    logger: {
+      log: (message: string) => console.log(`[LOG] ${message}`),
+    },
+  };
 });
+type ILogger = ContextOf<typeof LoggerModule>["logger"];
 
-// 定义子模块 Logger
-const LoggerModule = defineModule({ name: "logger" }).init(() => ({
-  log: (msg: string) => console.log(`[LOG] ${msg}`),
-}));
+class UserService {
+  constructor(private logger: ILogger) {}
+  createUser(name: string) {
+    this.logger.log(`Creating user: ${name}`);
+  }
+}
 
-// 组合成 App 并启动
-const app = await defineModule({
-  name: "app",
-  modules: [UserModule, LoggerModule],
-})
-  .init()
+const UserServiceModule = defineModule({
+  name: "userService",
+  modules: [LoggerModule],
+}).init((ctx) => new UserService(ctx.logger));
+
+const app = await defineModule({ modules: [UserServiceModule, LoggerModule] })
+  .init((ctx) => {
+    ctx.logger.log("The application is running..."); // [LOG] The application is running...
+  })
   .start();
-
-// 类型全自动推导，开箱即用
-app.ctx.logger.log("started");
-console.log(app.ctx.user.findUser(1)?.name); // 输出: Alice
-
-// 优雅停机
+app.ctx.userService.createUser("Alice"); // [LOG] Creating user: Alice
 await app.stop();
 ```
 
 ---
 
-## 📚 核心概念
+## 核心理念：模块是可复用的积木
 
-### 1. 模块定义与组合
-
-通过 `defineModule` 声明模块，支持命名空间和匿名展开：
-
-- **命名模块**：传入 `name`，返回值会被挂载到 `ctx[name]` 下。
-- **匿名模块**：不传 `name`，返回值会直接平铺合并进顶层 `ctx` 中。
+DI 不是重点，**可组合性**才是。一个模块的契约完全由它声明：`modules` 是输入，`init()` 的返回值是输出。它不知道自己会被装进哪个 app，因此可以被跨项目复用、独立发布、整体替换、或嵌套组合成更大的模块。
 
 ```ts
-// 匿名模块：直接展开
+// logger-module/index.ts —— 独立发布，不知道任何 app 的存在
+export const LoggerModule = defineModule({ name: "logger" }).init(() => ({
+  log: (message: string) => console.log(`[LOG] ${message}`),
+}));
+
+// 不同 app 复用同一个模块，ctx 类型依然完整
+const appA = await defineModule({ modules: [LoggerModule, OrderModule] })
+  .init()
+  .start();
+const appB = await defineModule({ modules: [LoggerModule, ReportModule] })
+  .init()
+  .start();
+```
+
+---
+
+## 特性
+
+- **零装饰器**，摆脱 `reflect-metadata`
+- **自动类型推导**：`ctx` 由 `init()` 返回值结构化推导，无需 token
+- **编译期冲突检测**：字段重名在类型检查阶段就会报错
+- **原生 Tree Shaking**：无副作用设计
+- **完整生命周期钩子**：模块级 + 全局级，启动失败自动按依赖倒序回滚
+- **依赖图可视化**：`graph()` + `formatModuleGraph()`
+- **菱形依赖安全**：按引用去重，共享模块只启动一次
+
+---
+
+## 安装
+
+```bash
+npm install tsdkarc
+```
+
+无需 transformer、无需 `ts-patch`，纯 `tsc`/打包器即可运行。
+
+---
+
+## 模块定义与组合
+
+```ts
+// 匿名模块：返回值直接铺平进父级 ctx
 const hello = defineModule().init(() => ({ greet: "hello" }));
 type HelloCtx = ContextOf<typeof hello>; // { greet: string }
 
-// 命名模块：拥有独立命名空间
+// 命名模块：返回值挂载到 ctx[name] 下
 const example = defineModule({ name: "example" }).init(() => ({ test: "x" }));
 type ExampleCtx = ContextOf<typeof example>; // { example: { test: string } }
-
-// 组合模块（支持 modules 数组 或 .with 链式调用）
-const app = defineModule({ modules: [hello, example] }).init();
-// 等价于: const app = defineModule().with(hello, example);
 ```
 
-### 2. 生命周期 Hooks
-
-`tsdkarc` 提供模块级和全局级两种生命周期钩子，支持异步操作。
-
-**模块级钩子**（定义在 `.init()` 的第二个参数，仅影响自身）：
-
-| 钩子名称             | Context (`ctx`) 访问权限               | 说明                 |
-| -------------------- | -------------------------------------- | -------------------- |
-| `beforeBoot(depCtx)` | **仅依赖 ctx**（不含本模块自身 slice） | 模块初始化前触发     |
-| `afterBoot`          | 依赖 ctx + 本模块自身 slice            | 模块初始化完成后触发 |
-| `beforeShutdown`     | 依赖 ctx + 本模块自身 slice            | 模块销毁前触发       |
-| `shutdown`           | 依赖 ctx + 本模块自身 slice            | 执行模块核心销毁逻辑 |
-| `afterShutdown`      | 依赖 ctx + 本模块自身 slice            | 模块销毁后触发       |
-
-**全局级钩子**（定义在 `.start()` 的参数中，管理整个应用组合）：
-
-| 钩子名称             | 触发时机              | Context (`ctx`) 状态 |
-| -------------------- | --------------------- | -------------------- |
-| `beforeBoot`         | 所有模块启动 **前**   | 空对象 `{}`          |
-| `afterBoot`          | 所有模块启动 **后**   | 完整 `FinalCtx`      |
-| `beforeEachBoot`     | 每个子模块启动 **前** | 当前累积的部分 ctx   |
-| `afterEachBoot`      | 每个子模块启动 **后** | 当前累积的部分 ctx   |
-| `beforeShutdown`     | 整体销毁 **前**       | 完整 `FinalCtx`      |
-| `afterShutdown`      | 整体销毁 **后**       | 完整 `FinalCtx`      |
-| `beforeEachShutdown` | 每个子模块销毁 **前** | 完整 `FinalCtx`      |
-| `afterEachShutdown`  | 每个子模块销毁 **后** | 完整 `FinalCtx`      |
-
-> **💡 提示**：
->
-> 1. `*Each*` 系列钩子会接收第二个参数 `meta: { name: string | null; kind: "named" | "anon" }`。可通过 `meta.kind === "anon"` 判断匿名模块。
-> 2. 启动过程中若发生异常，引擎会自动**按依赖倒序**回滚已启动模块的 `shutdown`，并将错误作为 `reason` 传递。
-
-### 3. 依赖图分析
-
-内置可视化树，便于排查复杂的依赖层级。
+`init(ctx)` 收到的 `ctx` 只包含**依赖**的 context，不含自身 slice —— 这也是循环自引用在结构上不可能发生的原因。诸如环境变量、密钥等非模块值，直接在 `init()` 内闭包获取即可，无需额外的“显式映射”API：
 
 ```ts
-import { formatModuleGraph } from "tsdkarc";
+const ConfigModule = defineModule({ name: "config" }).init(() => ({
+  apiKey: process.env.API_KEY!,
+}));
+```
 
-console.log(formatModuleGraph(app.graph()));
-// 输出示例:
+**菱形依赖**：`LoggerModule` 若被多条路径依赖，tsdkarc 按模块引用（而非 `name`）去重，只启动一次，且排在所有依赖它的模块之前。
+
+---
+
+## 生命周期钩子
+
+**模块级**（`.init()` 第二参数，仅影响自身）：`beforeBoot` `afterBoot` `beforeShutdown` `shutdown` `afterShutdown`
+
+**全局级**（`.start()` 参数，管理整个组合）：`beforeBoot` `afterBoot` `beforeEachBoot` `afterEachBoot` `beforeShutdown` `afterShutdown` `beforeEachShutdown` `afterEachShutdown`
+
+`*Each*` 钩子额外接收 `meta: { name: string | null; kind: "named" | "anon" }`。启动失败时，已启动模块会按依赖倒序自动回滚 `shutdown`，无需手动清理。
+
+---
+
+## 依赖图
+
+```ts
+console.log(app.graph().formatted);
 // - app
-//   - user
-//   - logger
+//   - userService
+//     - logger
 ```
+
+排查 `[tsdkarc] Circular dependency detected at module "<name>"` 的第一入口。
 
 ---
 
-## 🛠 高阶技巧：命名冲突与深度合并
+## API 参考
 
-多个模块若暴露出相同的命名，编译期会**直接报错**以保证类型安全。如果这是预期行为，可使用 `ignoreConflicts` 显式声明允许冲突，运行时将执行**深合并（后覆盖前）**：
+**`defineModule(meta?)`** → `ModuleDeclaration`
 
-```ts
-const dbReal = defineModule({ name: "database" }).init(() => ({
-  uri: "real",
-  id1: 1,
-}));
-const dbFake = defineModule({ name: "database" }).init(() => ({
-  uri: "fake",
-  id2: 2,
-}));
+| 参数              | 类型          | 说明                         |
+| ----------------- | ------------- | ---------------------------- |
+| `name`            | `string`      | 可选，ctx 命名空间键         |
+| `modules`         | `AnyModule[]` | 可选，依赖的其他模块         |
+| `ignoreConflicts` | `string[]`    | 可选，允许冲突并深合并的 key |
 
-const app = defineModule({ ignoreConflicts: ["database"] }).with(
-  dbReal,
-  dbFake
-);
+**模块实例方法**：`.init(bootFn?, hooks?)` `.with(...modules)` `.start(options?)` `.graph()`
 
-await app.start({
-  afterBoot: (ctx) => console.log(ctx.database),
-  // 深度合并结果: { uri: 'fake', id1: 1, id2: 2 }
-});
-```
-
----
-
-## 📖 API 参考
-
-### `defineModule(meta?)`
-
-返回一个 `ModuleDeclaration` 实例。
-
-| 参数              | 类型          | 说明                                        |
-| ----------------- | ------------- | ------------------------------------------- |
-| `name`            | `string`      | 可选。模块在 ctx 中的命名空间键             |
-| `modules`         | `AnyModule[]` | 可选。当前模块依赖的其他模块                |
-| `ignoreConflicts` | `string[]`    | 可选。允许命名冲突并执行深度合并的 key 列表 |
-
-### 模块实例方法
-
-| 方法                     | 说明                                           |
-| ------------------------ | ---------------------------------------------- |
-| `.init(bootFn?, hooks?)` | 实例化并返回 `NamedModule` 或 `AnonModule`     |
-| `.with(...modules)`      | 语法糖：组合模块（等价于 `.init().with(...)`） |
-| `.start(options?)`       | 启动并返回 `{ ctx, stop }`                     |
-| `.graph()`               | 返回 `ModuleGraphNode` 依赖树结构数据          |
-
-### 核心类型工具
-
-| 类型            | 说明                                                |
-| --------------- | --------------------------------------------------- |
-| `ContextOf<M>`  | 获取模块启动完成后的完整 Context 类型               |
-| `DepCtxOf<M>`   | 获取当前模块依赖的 Context 类型（不包含自身返回值） |
-| `OwnSliceOf<M>` | 获取当前模块 `init()` 自身的返回值类型              |
+**类型工具**：`ContextOf<M>` 完整 ctx 类型 · `DepCtxOf<M>` 依赖 ctx 类型（不含自身） · `OwnSliceOf<M>` 自身 `init()` 返回类型
 
 ---
 
@@ -200,7 +158,7 @@ await app.start({
 
 **Q: 遇到循环依赖会怎样？**
 
-会在 `.start()` 的排序阶段立刻抛出异常：`[tsdkarc] Circular dependency detected at module "<name>"`。建议使用 `.graph()` 配合 `formatModuleGraph()` 进行排查。
+会在 `.start()` 的排序阶段立刻抛出异常：`[tsdkarc] Circular dependency detected at module "<name>"`。可以配合打印 `.graph().formatted` 进行排查。
 
 **Q: `init()` 返回字段和已注入的依赖 ctx 冲突了怎么办？**
 
@@ -220,21 +178,17 @@ await app.start({
 
 ---
 
-## 🤝 参与贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-代码仓库目录结构说明：
+## 仓库结构
 
 ```text
-tsdkarc/       # 核心库代码
-tsdkarc-x/     # 官方扩充生态：端到端类型安全开发框架
-tsdkbundle/    # 监测与打包应用工具
+tsdkarc/       # 核心库
+tsdkarc-x/     # 官方扩充生态
+tsdkbundle/    # 监测与打包工具
 website/       # 文档网站
-
 ```
 
-## 📜 协议与更新日志
+---
 
-- 更新日志详见 [CHANGELOG.md](./CHANGELOG.md)。
-- 基于 [MIT](./LICENSE) 协议开源。
+## 协议
+
+[MIT](./LICENSE) · [CHANGELOG.md](./CHANGELOG.md)

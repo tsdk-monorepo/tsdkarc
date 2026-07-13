@@ -160,9 +160,9 @@ describe("defineModule Runtime API", () => {
         (ctx) => ({})
       );
 
-      console.log(app.graph(), formatModuleGraph(app.graph()));
+      console.log(app.graph(), app.graph().formatted);
 
-      expect(formatModuleGraph(app.graph()).trim()).toBe(`- app
+      expect(app.graph().formatted.trim()).toBe(`- app
   - db
   - cache`);
     });
@@ -171,9 +171,14 @@ describe("defineModule Runtime API", () => {
       /**
        * Logger module: provides structured logging.
        */
-      const LoggerModule = defineModule({ name: "logger" }).init(() => ({
-        log: (message: string) => console.log(`[LOG] ${message}`),
-      }));
+      const LoggerModule = defineModule().init(() => {
+        console.log("init LoggerModule");
+        return {
+          logger: {
+            log: (message: string) => console.log(`[LOG] ${message}`),
+          },
+        };
+      });
 
       /** Public shape of the logger, used for typing UserService's constructor. */
       type Logger = ContextOf<typeof LoggerModule>["logger"];
@@ -202,14 +207,16 @@ describe("defineModule Runtime API", () => {
       // Compose app and start
       const appModule = defineModule({
         name: "app",
-        modules: [UserServiceModule],
-      }).init();
+        modules: [UserServiceModule, LoggerModule],
+      }).init((ctx) => {
+        ctx.logger.log("The application is running...");
+      });
 
       const app = await appModule.start();
 
       // Resolve and use
       app.ctx.userService.createUser("Alice"); // [LOG] Creating user: Alice
-      console.log(appModule.graph(), formatModuleGraph(appModule.graph()));
+      console.log(appModule.graph().formatted);
 
       await app.stop();
     });
