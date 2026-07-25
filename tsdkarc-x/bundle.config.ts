@@ -20,7 +20,7 @@ const config: BundleConfigFn = (({ command }) => {
         sourcemap: isProd ? "none" : "linked",
         minify: isProd,
 
-        port: 3000,
+        port: 3010,
       },
     },
   };

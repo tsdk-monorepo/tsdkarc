@@ -363,3 +363,7 @@ export type InferRouteTree<T> = T extends RouteTreeModule<infer R>
 /** Extracts the final AppRoutes type for the frontend client */
 export type RoutesOf<T extends { routes: any } | Promise<{ routes: any }>> =
   Awaited<T>["routes"];
+
+export type DeepFlat<T> = T extends object
+  ? { [K in keyof T]: DeepFlat<T[K]> }
+  : T;

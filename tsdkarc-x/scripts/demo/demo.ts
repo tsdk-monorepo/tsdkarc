@@ -4,7 +4,7 @@ import { RpcError, type RoutesOf, type InferRouteTree } from "../../src/types";
 import { HonoAdapter } from "../../src/hono-adapter";
 import { ExpressAdapter } from "../../src/express-adapter";
 import { apiReference } from "@scalar/express-api-reference";
-import { appRouter, createContext, verifyMfaMw } from "./router-demo";
+import { appRouter, createContext, verifyMfaMw } from "./app";
 import mockRoutes from "../routes";
 import { extractOpenApi } from "../../src/scripts/openapi";
 
@@ -148,7 +148,7 @@ const adapter = new ExpressAdapter();
 adapter.app.use('*', cors({ origin: 'http://localhost:5173' })); // 给前端 Vite 放行跨域
 adapter.app.use('*', logger());
 */
-const routes2 = {
+const routes = {
   v1: {
     users: userRoutes, // Accessible at /api/v1/users/...
   },
@@ -156,14 +156,14 @@ const routes2 = {
   mock: mockRoutes,
 };
 
-const port = 3000;
+const port = 3011;
 const basePath = "/api";
 export const app = launchApp({
   basePath,
   transport: adapter,
   // Lazy evaluation: extracting headers costs 0 overhead if middlewares don't read them
   createContext,
-  routes: routes2,
+  routes: routes,
   port,
 }).then(async (res) => {
   console.time(`extract app routes types`);
@@ -172,7 +172,7 @@ export const app = launchApp({
     {
       entryFile: path.resolve("./scripts/demo/demo.ts"),
       tsConfigFilePath: path.resolve("./tsconfig.json"),
-      routesExportName: "routes2",
+      routesExportName: "routes",
       includeSourceLocation: false,
     }
   );
@@ -189,11 +189,11 @@ export const app = launchApp({
     res.routes,
     {
       info: { title: "My API", version: "1.0.0" },
-      servers: [{ url: "http://localhost:3000/api" }],
+      servers: [{ url: `http://localhost:${port}/api` }],
     },
     {
       entryFile: path.resolve("./scripts/demo/demo.ts"), // Path to your main router
-      routesExportName: "routes2", // The variable name of your exported router
+      routesExportName: "routes", // The variable name of your exported router
       tsConfigFilePath: path.resolve("./tsconfig.json"), // Optional, helps with path resolution
     }
   );

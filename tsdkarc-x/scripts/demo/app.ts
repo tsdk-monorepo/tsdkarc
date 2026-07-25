@@ -1,13 +1,9 @@
 import { z } from "zod";
-import { defineModule } from "tsdkarc"; // Adjust path to your DI core
-import { defineMiddleware, defineRoutes, launchApp } from "../../src/server";
-import { RpcError, type RoutesOf } from "../../src/types";
-import { HonoAdapter } from "../../src/hono-adapter";
-import { ExpressAdapter } from "../../src/express-adapter";
-import { apiReference } from "@scalar/express-api-reference";
+import { defineModule } from "tsdkarc";
+import { defineMiddleware, defineRoutes } from "../../src/server";
 import { Request } from "express";
 import { ContextOf } from "tsdkarc";
-import { extractOpenApi } from "../../src/scripts/openapi";
+import { DeepFlat } from "../../src/types";
 
 export const dbModule = defineModule({ name: "db" }).init(() => ({
   findUser: (id: string) => ({ id, name: "Alice", role: "admin" }),
@@ -35,9 +31,11 @@ export const createContext = async (c: Request) => ({
   },
 });
 
-export type BaseCtx = Awaited<ReturnType<typeof createContext>> &
-  ContextOf<typeof dbModule> &
-  ContextOf<typeof emailModule>;
+export type BaseCtx = DeepFlat<
+  Awaited<ReturnType<typeof createContext>> &
+    ContextOf<typeof dbModule> &
+    ContextOf<typeof emailModule>
+>;
 
 // 1. Auth Middleware (Auto-infers { user: { id: string, role: string } })
 export const authMw = defineMiddleware<BaseCtx>()(async (ctx, next) => {
@@ -64,6 +62,6 @@ export const loggerMw = defineMiddleware<{ ip: string | null }>()(
 );
 
 export const appRouter = defineRoutes({
-  modules: [dbModule, emailModule], // 👈 Perfect DI Isolation
-  middlewares: [authMw, loggerMw], // 👈 Module-level onion pipeline
+  modules: [dbModule, emailModule],
+  middlewares: [authMw, loggerMw],
 });
