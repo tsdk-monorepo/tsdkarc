@@ -54,6 +54,6 @@ export const auditRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Update log retention policy. */
   retention(ctx) {
-    return ctx.mutation(z.object({ orgId:z.string(), retentionDays:z.number().int().min(30).max(3650) }), (data) => ({ updated:true, retentionDays: data.retentionDays }));
+    return ctx.mutate(z.object({ orgId:z.string(), retentionDays:z.number().int().min(30).max(3650) }), (data) => ({ updated:true, retentionDays: data.retentionDays }));
   },
 });

@@ -58,14 +58,14 @@ async function runStandardTests() {
   // @ts-expect-error
   api.hello.query().catch((e) => {});
 
-  api.updateSettings.mutation({ theme: "light" });
+  api.updateSettings.mutate({ theme: "light" });
 
   // Catching Zod Validation Error (name < 6 chars)
   const errRes = await api.hello.query({ name: "Jon" }).catch((e) => e.message);
   console.log("Validation Error Caught:", errRes);
 
   // Mutation & Namespace
-  const mutRes = await api.updateSettings.mutation({ theme: "dark" });
+  const mutRes = await api.updateSettings.mutate({ theme: "dark" });
 
   const userRes = await api.users.get.query({ id: "999" });
   console.log("Settings:", mutRes, "| User:", userRes);

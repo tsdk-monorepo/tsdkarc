@@ -47,22 +47,22 @@ export const documentsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Create document. */
   create(ctx) {
-    return ctx.mutation(DocumentSchema.omit({ id:true, version:true, createdAt:true, updatedAt:true, publishedAt:true }), (data) => ({ id:"doc_new", title: data.title }));
+    return ctx.mutate(DocumentSchema.omit({ id:true, version:true, createdAt:true, updatedAt:true, publishedAt:true }), (data) => ({ id:"doc_new", title: data.title }));
   },
 
   /** Update title/blocks/visibility. */
   update(ctx) {
-    return ctx.mutation(z.object({ id:z.string(), title:z.string().min(1).max(500).optional(), blocks:z.array(BlockSchema).optional(), visibility:z.enum(["private","project","public"]).optional() }), (data) => ({ id:data.id, version:2 }));
+    return ctx.mutate(z.object({ id:z.string(), title:z.string().min(1).max(500).optional(), blocks:z.array(BlockSchema).optional(), visibility:z.enum(["private","project","public"]).optional() }), (data) => ({ id:data.id, version:2 }));
   },
 
   /** Delete document. */
   delete(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ deleted: true }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ deleted: true }));
   },
 
   /** Publish document publicly. */
   publish(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ publishedAt: new Date().toISOString(), url:"https://docs.example.com/doc_01" }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ publishedAt: new Date().toISOString(), url:"https://docs.example.com/doc_01" }));
   },
 
   /** Document version history. */

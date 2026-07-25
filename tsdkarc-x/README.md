@@ -73,10 +73,10 @@ factory(r, ctx) => Record<string, RouteEndpoint>
 | Method                         | Transport           | Notes                                                            |
 | ------------------------------ | ------------------- | ---------------------------------------------------------------- |
 | `r.query(schema?, handler)`    | GET                 | Read-only.                                                       |
-| `r.mutation(schema?, handler)` | POST / PUT          | State-mutating.                                                  |
+| `r.mutate(schema?, handler)` | POST / PUT          | State-mutating.                                                  |
 | `r.stream(schema?, handler)`   | SSE                 | Handler must be `async function*`.                               |
 | `r.upload(schema?, handler)`   | multipart/form-data | File uploads.                                                    |
-| `r.use(middleware)`            | —                   | Returns a new `r` — chain before `.query()`, `.mutation()`, etc. |
+| `r.use(middleware)`            | —                   | Returns a new `r` — chain before `.query()`, `.mutate()`, etc. |
 
 #### Handler Signature: `(input, env)`
 
@@ -113,7 +113,7 @@ export const protectedRouter = appRouter.extend({
 
 // Route handlers
 export const userRoutes = protectedRouter.init((r, ctx) => ({
-  updateProfile: r.mutation(
+  updateProfile: r.mutate(
     z.object({ name: z.string() }),
     async (input, env) => {
       await env.ctx.db.updateUser(env.meta.user.id, input.name);
@@ -122,7 +122,7 @@ export const userRoutes = protectedRouter.init((r, ctx) => ({
     }
   ),
 
-  deleteAccount: r.use(verifyMfaMw).mutation(z.void(), async (_, env) => {
+  deleteAccount: r.use(verifyMfaMw).mutate(z.void(), async (_, env) => {
     if (!env.meta.mfaPassed) throw new RpcError("FORBIDDEN", "MFA Failed");
     return "Deleted";
   }),
@@ -197,7 +197,7 @@ const api = createClient<AppRoutes>({ url: "http://localhost:8080/api" });
 const profile = await api.v1.users.getProfile.query({ id: "123" });
 console.log(profile.name); // fully typed
 
-await api.v1.users.deleteAccount.mutation();
+await api.v1.users.deleteAccount.mutate();
 ```
 
 ---

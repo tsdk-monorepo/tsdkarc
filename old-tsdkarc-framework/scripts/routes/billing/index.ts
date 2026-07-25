@@ -44,12 +44,12 @@ export const billingRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Stripe checkout session. */
   createCheckout(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), tier: z.enum(["starter","pro","business","enterprise"]), seats: z.number().int().min(1), billingInterval: z.enum(["monthly","annual"]), addons: z.array(z.object({ id:z.string(), quantity:z.number().int().min(1) })).default([]), successUrl: z.string().url(), cancelUrl: z.string().url(), couponCode: z.string().optional() }), (data) => ({ checkoutUrl:"https://checkout.stripe.com/pay/cs_xxx", sessionId:"cs_xxx" }));
+    return ctx.mutate(z.object({ orgId: z.string(), tier: z.enum(["starter","pro","business","enterprise"]), seats: z.number().int().min(1), billingInterval: z.enum(["monthly","annual"]), addons: z.array(z.object({ id:z.string(), quantity:z.number().int().min(1) })).default([]), successUrl: z.string().url(), cancelUrl: z.string().url(), couponCode: z.string().optional() }), (data) => ({ checkoutUrl:"https://checkout.stripe.com/pay/cs_xxx", sessionId:"cs_xxx" }));
   },
 
   /** Schedule cancellation. */
   cancelSubscription(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), reason: z.string().max(500).optional() }), (data) => ({ cancelAtPeriodEnd: true }));
+    return ctx.mutate(z.object({ orgId: z.string(), reason: z.string().max(500).optional() }), (data) => ({ cancelAtPeriodEnd: true }));
   },
 
   /** Paginated invoice list. */
@@ -69,16 +69,16 @@ export const billingRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Apply discount code. */
   applyPromoCode(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), code: z.string().min(4).max(32) }), (data) => ({ applied: true, discountPercent: 20 }));
+    return ctx.mutate(z.object({ orgId: z.string(), code: z.string().min(4).max(32) }), (data) => ({ applied: true, discountPercent: 20 }));
   },
 
   /** Attach new payment method. */
   updatePaymentMethod(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), paymentMethodId: z.string() }), (data) => ({ updated: true }));
+    return ctx.mutate(z.object({ orgId: z.string(), paymentMethodId: z.string() }), (data) => ({ updated: true }));
   },
 
   /** Update VAT/tax ID settings. */
   taxSettings(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), taxId: z.string().optional(), taxIdType: z.enum(["eu_vat","us_ein","au_abn","gb_vat"]).optional(), address: z.object({ country: z.string().length(2), postalCode: z.string() }).optional() }), (data) => ({ updated: true }));
+    return ctx.mutate(z.object({ orgId: z.string(), taxId: z.string().optional(), taxIdType: z.enum(["eu_vat","us_ein","au_abn","gb_vat"]).optional(), address: z.object({ country: z.string().length(2), postalCode: z.string() }).optional() }), (data) => ({ updated: true }));
   },
 });

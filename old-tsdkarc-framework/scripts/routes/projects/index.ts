@@ -40,17 +40,17 @@ export const projectsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Create project. */
   create(ctx) {
-    return ctx.mutation(ProjectSchema.omit({ id:true, createdAt:true, updatedAt:true }), (data) => ({ id:"proj_new", name: data.name }));
+    return ctx.mutate(ProjectSchema.omit({ id:true, createdAt:true, updatedAt:true }), (data) => ({ id:"proj_new", name: data.name }));
   },
 
   /** Update project. */
   update(ctx) {
-    return ctx.mutation(ProjectSchema.omit({ id:true, createdAt:true, updatedAt:true }).partial().extend({ id: z.string() }), (data) => ({ id: data.id, updated:true }));
+    return ctx.mutate(ProjectSchema.omit({ id:true, createdAt:true, updatedAt:true }).partial().extend({ id: z.string() }), (data) => ({ id: data.id, updated:true }));
   },
 
   /** Archive project. */
   archive(ctx) {
-    return ctx.mutation(z.object({ id: z.string(), reason: z.string().max(500).optional() }), (data) => ({ archived: true }));
+    return ctx.mutate(z.object({ id: z.string(), reason: z.string().max(500).optional() }), (data) => ({ archived: true }));
   },
 
   /** Project members. */
@@ -60,7 +60,7 @@ export const projectsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Add project member. */
   addMember(ctx) {
-    return ctx.mutation(z.object({ projectId: z.string(), userId: z.string().uuid(), role: z.enum(["lead","contributor","viewer"]) }), (data) => ({ added: true }));
+    return ctx.mutate(z.object({ projectId: z.string(), userId: z.string().uuid(), role: z.enum(["lead","contributor","viewer"]) }), (data) => ({ added: true }));
   },
 
   /** Project aggregate stats. */
@@ -70,7 +70,7 @@ export const projectsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Clone project structure. */
   duplicate(ctx) {
-    return ctx.mutation(z.object({ id: z.string(), newName: z.string().min(1).max(120), includeTasks: z.boolean().default(true), includeMembers: z.boolean().default(false) }), (data) => ({ id:"proj_clone", name: data.newName }));
+    return ctx.mutate(z.object({ id: z.string(), newName: z.string().min(1).max(120), includeTasks: z.boolean().default(true), includeMembers: z.boolean().default(false) }), (data) => ({ id:"proj_clone", name: data.newName }));
   },
 
   /** Stream full project export. */

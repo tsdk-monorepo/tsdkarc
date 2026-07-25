@@ -36,27 +36,27 @@ export const integrationsRoutes = defineRoutes({ middleware: [authMiddleware] })
 
   /** Start OAuth install flow. */
   install(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), integrationId: IntegrationId, redirectUri: z.string().url(), scopes: z.array(z.string()).optional() }), (data) => ({ authUrl:"https://slack.com/oauth/authorize?..." }));
+    return ctx.mutate(z.object({ orgId: z.string(), integrationId: IntegrationId, redirectUri: z.string().url(), scopes: z.array(z.string()).optional() }), (data) => ({ authUrl:"https://slack.com/oauth/authorize?..." }));
   },
 
   /** Exchange OAuth code for tokens. */
   oauthCallback(ctx) {
-    return ctx.mutation(z.object({ code: z.string(), state: z.string(), integrationId: IntegrationId }), (data) => ({ installed:true, integrationId: data.integrationId }));
+    return ctx.mutate(z.object({ code: z.string(), state: z.string(), integrationId: IntegrationId }), (data) => ({ installed:true, integrationId: data.integrationId }));
   },
 
   /** Remove integration and revoke. */
   uninstall(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), integrationId: IntegrationId }), (data) => ({ uninstalled: true }));
+    return ctx.mutate(z.object({ orgId: z.string(), integrationId: IntegrationId }), (data) => ({ uninstalled: true }));
   },
 
   /** Update integration configuration. */
   updateConfig(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), integrationId: IntegrationId, config: z.record(z.string(), z.unknown()) }), (data) => ({ updated: true }));
+    return ctx.mutate(z.object({ orgId: z.string(), integrationId: IntegrationId, config: z.record(z.string(), z.unknown()) }), (data) => ({ updated: true }));
   },
 
   /** Manual sync trigger. */
   triggerSync(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), integrationId: IntegrationId }), (data) => ({ jobId:"job_sync_01", queued:true }));
+    return ctx.mutate(z.object({ orgId: z.string(), integrationId: IntegrationId }), (data) => ({ jobId:"job_sync_01", queued:true }));
   },
 
   /** Stream sync progress events. */

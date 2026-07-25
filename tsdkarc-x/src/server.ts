@@ -39,10 +39,10 @@ function makeRouteBuilder<AppCtx extends object, Meta extends object>(
         ___routeMiddlewares: routeMiddlewares,
       };
     },
-    mutation(...args: any[]): any {
+    mutate(...args: any[]): any {
       const hasSchema = args[1] !== undefined;
       return {
-        _kind: "mutation",
+        _kind: "mutate",
         schema: hasSchema ? args[0] : undefined,
         handler: hasSchema ? args[1] : args[0],
         ___routeMiddlewares: routeMiddlewares,

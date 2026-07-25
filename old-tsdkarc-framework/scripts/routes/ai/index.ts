@@ -60,22 +60,22 @@ export const aiRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Non-streaming completion. */
   complete(ctx) {
-    return ctx.mutation(ChatRequestSchema.extend({ stream: z.literal(false).default(false) }), (data) => ({ id:"msg_01", role:"assistant" as const, content:"Hello!" as Message["content"], finishReason:"stop" as const, usage:{ promptTokens:100, completionTokens:50 } }));
+    return ctx.mutate(ChatRequestSchema.extend({ stream: z.literal(false).default(false) }), (data) => ({ id:"msg_01", role:"assistant" as const, content:"Hello!" as Message["content"], finishReason:"stop" as const, usage:{ promptTokens:100, completionTokens:50 } }));
   },
 
   /** Batch embedding generation. */
   embed(ctx) {
-    return ctx.mutation(z.object({ inputs: z.array(z.union([z.string().min(1).max(8192), z.object({ text:z.string(), id:z.string() })])).min(1).max(100), model: z.enum(["text-embedding-3-small","text-embedding-3-large"]), dimensions: z.number().int().min(64).max(3072).optional(), outputFormat: z.enum(["float","base64","int8"]).default("float") }), (data) => ({ embeddings: [] as Array<{ index:number; embedding:number[]; inputTokens:number }>, model:data.model, totalTokens:0 }));
+    return ctx.mutate(z.object({ inputs: z.array(z.union([z.string().min(1).max(8192), z.object({ text:z.string(), id:z.string() })])).min(1).max(100), model: z.enum(["text-embedding-3-small","text-embedding-3-large"]), dimensions: z.number().int().min(64).max(3072).optional(), outputFormat: z.enum(["float","base64","int8"]).default("float") }), (data) => ({ embeddings: [] as Array<{ index:number; embedding:number[]; inputTokens:number }>, model:data.model, totalTokens:0 }));
   },
 
   /** Content moderation. */
   moderateContent(ctx) {
-    return ctx.mutation(z.object({ inputs: z.array(z.object({ id:z.string(), text:z.string().max(10000) })).min(1).max(50), categories: z.array(z.enum(["hate","harassment","self_harm","sexual","violence","dangerous"])).optional() }), (data) => ({ results: [] as Array<{ id:string; flagged:boolean; categories:Partial<Record<string,boolean>>; scores:Partial<Record<string,number>> }> }));
+    return ctx.mutate(z.object({ inputs: z.array(z.object({ id:z.string(), text:z.string().max(10000) })).min(1).max(50), categories: z.array(z.enum(["hate","harassment","self_harm","sexual","violence","dangerous"])).optional() }), (data) => ({ results: [] as Array<{ id:string; flagged:boolean; categories:Partial<Record<string,boolean>>; scores:Partial<Record<string,number>> }> }));
   },
 
   /** Structured summarization. */
   summarize(ctx) {
-    return ctx.mutation(z.object({ text: z.string().min(50).max(50000), format: z.enum(["bullets","paragraph","tldr"]).default("paragraph"), maxLength: z.number().int().max(1000).default(200), language: z.string().optional() }), (data) => ({ summary:"This document covers...", wordCount:42 }));
+    return ctx.mutate(z.object({ text: z.string().min(50).max(50000), format: z.enum(["bullets","paragraph","tldr"]).default("paragraph"), maxLength: z.number().int().max(1000).default(200), language: z.string().optional() }), (data) => ({ summary:"This document covers...", wordCount:42 }));
   },
 
   /** Token usage for billing period. */

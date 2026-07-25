@@ -233,7 +233,7 @@ interface ParsedRoute {
   handlerKey: string;
   originalPath: string;
   method: "get" | "post" | "put" | "patch" | "delete";
-  kind: "query" | "mutation";
+  kind: "query" | "mutate";
   operation: Operation;
   parameters: Parameter[];
   bodySchema: JsonSchema | null;
@@ -324,7 +324,7 @@ function parsePath(
     handlerKey,
     originalPath: path,
     method,
-    kind: method === "get" ? "query" : "mutation",
+    kind: method === "get" ? "query" : "mutate",
     operation,
     parameters,
     bodySchema,
@@ -416,7 +416,7 @@ function generateHandlerBody(
     .filter((p) => p.in === "query")
     .map((p) => p.name);
 
-  const helperCall = route.kind === "query" ? "ctx.query" : "ctx.mutation";
+  const helperCall = route.kind === "query" ? "ctx.query" : "ctx.mutate";
 
   const jsdocLines = [
     route.operation.summary ? ` * ${route.operation.summary}` : null,

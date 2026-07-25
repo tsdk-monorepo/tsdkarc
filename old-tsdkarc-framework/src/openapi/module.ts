@@ -230,7 +230,7 @@ function extractJsDoc(checker: ts.TypeChecker, symbol: ts.Symbol): JsDocInfo {
 export interface RouteInfo {
   path: string;
   method: "get" | "post";
-  kind: "query" | "mutation" | "stream";
+  kind: "query" | "mutate" | "stream";
   input: object;
   output: object;
   summary?: string;
@@ -248,15 +248,15 @@ function unwrapReturnType(
   checker: ts.TypeChecker,
   ret: ts.Type
 ): {
-  kind: "query" | "mutation" | "stream";
+  kind: "query" | "mutate" | "stream";
   input: object;
   outputType: ts.Type;
 } {
   const kindProp = ret.getProperty("__kind");
-  const kind: "query" | "mutation" | "stream" = kindProp
+  const kind: "query" | "mutate" | "stream" = kindProp
     ? ((checker.getTypeOfSymbol(kindProp) as ts.StringLiteralType).value as
         | "query"
-        | "mutation"
+        | "mutate"
         | "stream")
     : "query";
 
@@ -308,7 +308,7 @@ function extractRoutes(
 
       routes.push({
         path,
-        method: kind === "mutation" || kind === "stream" ? "post" : "get",
+        method: kind === "mutate" || kind === "stream" ? "post" : "get",
         kind,
         input,
         output: typeToSchema(checker, outputType),

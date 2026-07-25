@@ -51,7 +51,7 @@ const TaskCreateSchema = z.object({
 export const tasksRoutes = defineRoutes({ middleware: [authMiddleware] })({
   /** Create task with full fields. */
   create(ctx) {
-    return ctx.mutation(TaskCreateSchema, (data) => ({ id:"task_new", title:data.title, status:data.status, priority:data.priority } satisfies Pick<TaskNode,"id"|"title"|"status"|"priority">));
+    return ctx.mutate(TaskCreateSchema, (data) => ({ id:"task_new", title:data.title, status:data.status, priority:data.priority } satisfies Pick<TaskNode,"id"|"title"|"status"|"priority">));
   },
 
   /** Task tree with subtasks. */
@@ -61,17 +61,17 @@ export const tasksRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Patch task fields. */
   update(ctx) {
-    return ctx.mutation(TaskCreateSchema.partial().extend({ id: z.string() }), (data) => ({ id: data.id, updated: true }));
+    return ctx.mutate(TaskCreateSchema.partial().extend({ id: z.string() }), (data) => ({ id: data.id, updated: true }));
   },
 
   /** Delete task. */
   delete(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ deleted: true }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ deleted: true }));
   },
 
   /** Batch status/priority update. */
   bulkUpdate(ctx) {
-    return ctx.mutation(z.object({ ids: z.array(z.string()).min(1).max(500), patch: z.object({ status: TaskStatus.optional(), priority: TaskPriority.optional(), assigneeIds: z.array(z.string().uuid()).max(10).optional(), dueDate: z.string().datetime().nullable().optional() }).refine(o => Object.values(o).some(v => v !== undefined), { message:"At least one field required" }) }), (data) => ({ updated: data.ids.length }));
+    return ctx.mutate(z.object({ ids: z.array(z.string()).min(1).max(500), patch: z.object({ status: TaskStatus.optional(), priority: TaskPriority.optional(), assigneeIds: z.array(z.string().uuid()).max(10).optional(), dueDate: z.string().datetime().nullable().optional() }).refine(o => Object.values(o).some(v => v !== undefined), { message:"At least one field required" }) }), (data) => ({ updated: data.ids.length }));
   },
 
   /** Task comment thread. */
@@ -81,7 +81,7 @@ export const tasksRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Post comment on task. */
   addComment(ctx) {
-    return ctx.mutation(z.object({ taskId: z.string(), body: z.string().min(1).max(5000), mentions: z.array(z.string().uuid()).default([]) }), (data) => ({ id:"cmt_new", body: data.body }));
+    return ctx.mutate(z.object({ taskId: z.string(), body: z.string().min(1).max(5000), mentions: z.array(z.string().uuid()).default([]) }), (data) => ({ id:"cmt_new", body: data.body }));
   },
 
   /** Typed audit trail. */

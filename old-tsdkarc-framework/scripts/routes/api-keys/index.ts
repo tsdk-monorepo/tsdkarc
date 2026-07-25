@@ -39,17 +39,17 @@ export const apiKeysRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Create API key. */
   create(ctx) {
-    return ctx.mutation(ApiKeySchema.omit({ id:true, prefix:true, lastUsedAt:true, createdAt:true }).extend({ orgId:z.string() }), (data) => ({ key:"sk_live_xxxxxxxx", id:"key_new", prefix:"sk_live_" }));
+    return ctx.mutate(ApiKeySchema.omit({ id:true, prefix:true, lastUsedAt:true, createdAt:true }).extend({ orgId:z.string() }), (data) => ({ key:"sk_live_xxxxxxxx", id:"key_new", prefix:"sk_live_" }));
   },
 
   /** Revoke an API key. */
   revoke(ctx) {
-    return ctx.mutation(z.object({ id: z.string(), reason: z.string().max(500).optional() }), (data) => ({ revoked: true }));
+    return ctx.mutate(z.object({ id: z.string(), reason: z.string().max(500).optional() }), (data) => ({ revoked: true }));
   },
 
   /** Rotate key secret. */
   rotate(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ newKey:"sk_live_yyyyyyyy", id: data.id }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ newKey:"sk_live_yyyyyyyy", id: data.id }));
   },
 
   /** API key metadata. */

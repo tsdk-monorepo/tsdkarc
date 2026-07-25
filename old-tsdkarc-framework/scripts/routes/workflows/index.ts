@@ -39,7 +39,7 @@ const WorkflowDefSchema = z.object({
 export const workflowsRoutes = defineRoutes({ middleware: [authMiddleware] })({
   /** Create workflow with recursive conditions. */
   create(ctx) {
-    return ctx.mutation(WorkflowDefSchema.extend({ orgId: z.string() }), (data) => ({ id:"wf_new", name:data.name, enabled:data.enabled }));
+    return ctx.mutate(WorkflowDefSchema.extend({ orgId: z.string() }), (data) => ({ id:"wf_new", name:data.name, enabled:data.enabled }));
   },
 
   /** List workflows with run stats. */
@@ -54,12 +54,12 @@ export const workflowsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Update workflow definition. */
   update(ctx) {
-    return ctx.mutation(WorkflowDefSchema.partial().extend({ id: z.string() }), (data) => ({ id: data.id, updated: true }));
+    return ctx.mutate(WorkflowDefSchema.partial().extend({ id: z.string() }), (data) => ({ id: data.id, updated: true }));
   },
 
   /** Delete workflow. */
   delete(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ deleted: true }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ deleted: true }));
   },
 
   /** Paginated run history. */

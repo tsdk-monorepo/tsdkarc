@@ -52,7 +52,7 @@
       "post": {
         "operationId": "user_create",
         "tags": ["user"],
-        "x-kind": "mutation",
+        "x-kind": "mutate",
         "summary": "Create a new user.",
         "requestBody": {
           "required": true,

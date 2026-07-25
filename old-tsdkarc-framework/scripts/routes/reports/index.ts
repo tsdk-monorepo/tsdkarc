@@ -39,22 +39,22 @@ export const reportsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Create report definition. */
   create(ctx) {
-    return ctx.mutation(ReportSchema.omit({ id:true, lastRunAt:true, lastRunStatus:true, createdAt:true }), (data) => ({ id:"rep_new", name: data.name }));
+    return ctx.mutate(ReportSchema.omit({ id:true, lastRunAt:true, lastRunStatus:true, createdAt:true }), (data) => ({ id:"rep_new", name: data.name }));
   },
 
   /** Update report. */
   update(ctx) {
-    return ctx.mutation(ReportSchema.omit({ id:true, lastRunAt:true, lastRunStatus:true, createdAt:true }).partial().extend({ id:z.string() }), (data) => ({ id: data.id, updated:true }));
+    return ctx.mutate(ReportSchema.omit({ id:true, lastRunAt:true, lastRunStatus:true, createdAt:true }).partial().extend({ id:z.string() }), (data) => ({ id: data.id, updated:true }));
   },
 
   /** Delete report. */
   delete(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ deleted: true }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ deleted: true }));
   },
 
   /** Trigger report run. */
   run(ctx) {
-    return ctx.mutation(z.object({ id:z.string(), format:z.enum(["pdf","csv","html"]).optional() }), (data) => ({ jobId:"job_rep_01", queued:true }));
+    return ctx.mutate(z.object({ id:z.string(), format:z.enum(["pdf","csv","html"]).optional() }), (data) => ({ jobId:"job_rep_01", queued:true }));
   },
 
   /** Get report download URL. */

@@ -44,17 +44,17 @@ export const permissionsRoutes = defineRoutes({ middleware: [authMiddleware] })(
 
   /** Create ABAC policy. */
   createPolicy(ctx) {
-    return ctx.mutation(PolicySchema.omit({ id:true, createdAt:true }), (data) => ({ id:"pol_new", name: data.name }));
+    return ctx.mutate(PolicySchema.omit({ id:true, createdAt:true }), (data) => ({ id:"pol_new", name: data.name }));
   },
 
   /** Update policy definition. */
   updatePolicy(ctx) {
-    return ctx.mutation(PolicySchema.omit({ id:true, createdAt:true }).partial().extend({ id:z.string() }), (data) => ({ id: data.id, updated:true }));
+    return ctx.mutate(PolicySchema.omit({ id:true, createdAt:true }).partial().extend({ id:z.string() }), (data) => ({ id: data.id, updated:true }));
   },
 
   /** Delete policy. */
   deletePolicy(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ deleted: true }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ deleted: true }));
   },
 
   /** Evaluate access for subject. */
@@ -64,6 +64,6 @@ export const permissionsRoutes = defineRoutes({ middleware: [authMiddleware] })(
 
   /** Batch permission check. */
   bulkCheck(ctx) {
-    return ctx.mutation(z.object({ orgId:z.string(), subjectId:z.string().uuid(), checks:z.array(z.object({ resource:Resource, action:Action, resourceId:z.string().optional() })).min(1).max(100) }), (data) => ({ results: [] as Array<{ resource:Resource; action:Action; allowed:boolean }> }));
+    return ctx.mutate(z.object({ orgId:z.string(), subjectId:z.string().uuid(), checks:z.array(z.object({ resource:Resource, action:Action, resourceId:z.string().optional() })).min(1).max(100) }), (data) => ({ results: [] as Array<{ resource:Resource; action:Action; allowed:boolean }> }));
   },
 });

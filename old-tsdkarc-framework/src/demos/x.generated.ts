@@ -56,7 +56,7 @@ export const xModule = defineRoutes()({
      * Create a new user.
      */
     create(ctx) {
-      return ctx.mutation(
+      return ctx.mutate(
         z.object({
       name: z.string()
     }),
@@ -103,7 +103,7 @@ export const xModuleProxy = defineRoutes()({
      * Create a new user.
      */
     create(ctx) {
-      return ctx.mutation(
+      return ctx.mutate(
         z.object({
       name: z.string()
     }),

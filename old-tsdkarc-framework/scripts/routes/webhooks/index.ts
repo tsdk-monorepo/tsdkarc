@@ -78,7 +78,7 @@ export const webhooksRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Register webhook. */
   create(ctx) {
-    return ctx.mutation(
+    return ctx.mutate(
       WebhookSchema.omit({ id: true, createdAt: true }),
       (data) => ({ id: "wh_new", url: data.url })
     );
@@ -86,7 +86,7 @@ export const webhooksRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Update webhook. */
   update(ctx) {
-    return ctx.mutation(
+    return ctx.mutate(
       WebhookSchema.omit({ id: true, createdAt: true })
         .partial()
         .extend({ id: z.string() }),
@@ -96,7 +96,7 @@ export const webhooksRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Remove webhook. */
   delete(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({
       deleted: true,
     }));
   },
@@ -123,14 +123,14 @@ export const webhooksRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Retry failed delivery. */
   redeliver(ctx) {
-    return ctx.mutation(z.object({ deliveryId: z.string() }), (data) => ({
+    return ctx.mutate(z.object({ deliveryId: z.string() }), (data) => ({
       queued: true,
     }));
   },
 
   /** Send test event to webhook. */
   testPing(ctx) {
-    return ctx.mutation(
+    return ctx.mutate(
       z.object({ webhookId: z.string(), eventType: WebhookEventType }),
       (data) => ({ sent: true, deliveryId: "del_test" })
     );

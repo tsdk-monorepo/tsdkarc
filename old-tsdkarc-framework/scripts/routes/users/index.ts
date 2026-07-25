@@ -45,22 +45,22 @@ export const usersRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Create user account. */
   create(ctx) {
-    return ctx.mutation(UserProfileSchema.omit({ id:true, createdAt:true, updatedAt:true, emailVerified:true, permissions:true }).extend({ password: z.string().min(8) }), (data) => ({ id:"usr_new", email: data.email }));
+    return ctx.mutate(UserProfileSchema.omit({ id:true, createdAt:true, updatedAt:true, emailVerified:true, permissions:true }).extend({ password: z.string().min(8) }), (data) => ({ id:"usr_new", email: data.email }));
   },
 
   /** Partial profile update. */
   update(ctx) {
-    return ctx.mutation(UserUpdateSchema.extend({ id: z.string().uuid() }), (data) => ({ id: data.id, updated: true }));
+    return ctx.mutate(UserUpdateSchema.extend({ id: z.string().uuid() }), (data) => ({ id: data.id, updated: true }));
   },
 
   /** Soft-delete user. */
   deactivate(ctx) {
-    return ctx.mutation(z.object({ id: z.string().uuid(), reason: z.string().max(500).optional() }), (data) => ({ deactivated: true }));
+    return ctx.mutate(z.object({ id: z.string().uuid(), reason: z.string().max(500).optional() }), (data) => ({ deactivated: true }));
   },
 
   /** Change role for many users. */
   bulkRoleChange(ctx) {
-    return ctx.mutation(z.object({ userIds: z.array(z.string().uuid()).min(1).max(500), role: RoleSchema, reason: z.string().max(500).optional() }), (data) => ({ updated: data.userIds.length, role: data.role }));
+    return ctx.mutate(z.object({ userIds: z.array(z.string().uuid()).min(1).max(500), role: RoleSchema, reason: z.string().max(500).optional() }), (data) => ({ updated: data.userIds.length, role: data.role }));
   },
 
   /** All permissions by resource. */
@@ -75,7 +75,7 @@ export const usersRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Admin impersonation token. */
   impersonate(ctx) {
-    return ctx.mutation(z.object({ targetUserId: z.string().uuid(), reason: z.string().min(10) }), (data) => ({ impersonationToken: "imp.jwt", expiresIn: 900 }));
+    return ctx.mutate(z.object({ targetUserId: z.string().uuid(), reason: z.string().min(10) }), (data) => ({ impersonationToken: "imp.jwt", expiresIn: 900 }));
   },
 
   /** GDPR data export stream. */

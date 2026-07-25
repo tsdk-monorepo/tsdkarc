@@ -20,7 +20,7 @@ export interface ClientConfig {
 
 // ─── Legacy Type Mapping (Fallback for non-generated backend types) ─────────
 
-type RouteKind = "query" | "mutation" | "stream" | "upload" | "plain";
+type RouteKind = "query" | "mutate" | "stream" | "upload" | "plain";
 
 type InferInput<R> = R extends { _input?: infer I } ? I : never;
 type InferOutput<R> = R extends { _output?: infer O } ? O : never;
@@ -54,8 +54,8 @@ type ClientFn<Kind extends RouteKind, I, O> = IsOptional<I> extends true
 
 type ExtractRoute<T, Kind> = Kind extends "query" | "plain"
   ? { query: ClientFn<"query", InferInput<T>, InferOutput<T>> }
-  : Kind extends "mutation"
-  ? { mutation: ClientFn<"mutation", InferInput<T>, InferOutput<T>> }
+  : Kind extends "mutate"
+  ? { mutate: ClientFn<"mutate", InferInput<T>, InferOutput<T>> }
   : Kind extends "stream"
   ? { stream: ClientFn<"stream", InferInput<T>, InferStreamChunk<T>> }
   : Kind extends "upload"

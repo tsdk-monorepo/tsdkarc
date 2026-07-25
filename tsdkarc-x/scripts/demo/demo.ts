@@ -43,23 +43,23 @@ export const userRoutes = appRouter.init((r, ctx) => ({
     }
   ),
 
-  getProfile2: r.query(async (input: { includeHistory: number[] }, env) => {
+  getProfile2: r.query(async (input: { includeHistory: number[] } | undefined, env) => {
     // TS auto-completes env.ctx.db
     const user = env.ctx.db.findUser(env.meta.user.id);
-    return { ...user, history: input.includeHistory ? [] : null };
+    return { ...user, history: input?.includeHistory ? [] : null };
   }),
 
   // ✅ Feature D: Route-Level Middleware & Mutation
   updatePassword: r
     .use(verifyMfaMw) // 🌟 Granular middleware only for this endpoint!
-    .mutation(z.object({ newPwd: z.string().min(8) }), async (input, env) => {
+    .mutate(z.object({ newPwd: z.string().min(8) }), async (input, env) => {
       // Strict types check: env.meta now has `mfaPassed: boolean`
       if (!env.meta.mfaPassed) throw new RpcError("FORBIDDEN", "MFA Failed");
       return "Password updated securely";
     }),
 
   // ✅ Feature E: Serverless Background Tasks (waitUntil)
-  registerDevice: r.mutation(
+  registerDevice: r.mutate(
     z.object({ deviceId: z.string() }),
     async (input, env) => {
       // This HTTP request returns instantly...
@@ -110,7 +110,7 @@ export const userRoutes = appRouter.init((r, ctx) => ({
   // ✅ Feature I: Nested Namespaces
   settings: {
     getTheme: r.query(() => "dark_mode"),
-    updateTheme: r.mutation(
+    updateTheme: r.mutate(
       z.object({ theme: z.enum(["dark_mode", "light_mode"]) }),
       (input) => `Theme changed to ${input.theme}`
     ),

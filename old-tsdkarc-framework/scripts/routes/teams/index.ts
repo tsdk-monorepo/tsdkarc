@@ -36,17 +36,17 @@ export const teamsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Create team. */
   create(ctx) {
-    return ctx.mutation(TeamSchema.omit({ id:true, memberCount:true, createdAt:true }), (data) => ({ id:"team_new", name: data.name }));
+    return ctx.mutate(TeamSchema.omit({ id:true, memberCount:true, createdAt:true }), (data) => ({ id:"team_new", name: data.name }));
   },
 
   /** Update team metadata. */
   update(ctx) {
-    return ctx.mutation(TeamSchema.omit({ id:true, memberCount:true, createdAt:true }).partial().extend({ id:z.string() }), (data) => ({ id: data.id, updated:true }));
+    return ctx.mutate(TeamSchema.omit({ id:true, memberCount:true, createdAt:true }).partial().extend({ id:z.string() }), (data) => ({ id: data.id, updated:true }));
   },
 
   /** Delete team. */
   delete(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ deleted: true }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ deleted: true }));
   },
 
   /** Team member list. */
@@ -56,11 +56,11 @@ export const teamsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Add user to team. */
   addMember(ctx) {
-    return ctx.mutation(z.object({ teamId:z.string(), userId:z.string().uuid(), role:z.enum(["lead","member"]) }), (data) => ({ added: true }));
+    return ctx.mutate(z.object({ teamId:z.string(), userId:z.string().uuid(), role:z.enum(["lead","member"]) }), (data) => ({ added: true }));
   },
 
   /** Remove user from team. */
   removeMember(ctx) {
-    return ctx.mutation(z.object({ teamId:z.string(), userId:z.string().uuid() }), (data) => ({ removed: true }));
+    return ctx.mutate(z.object({ teamId:z.string(), userId:z.string().uuid() }), (data) => ({ removed: true }));
   },
 });

@@ -46,17 +46,17 @@ type QueryResult = {
 export const analyticsRoutes = defineRoutes({ middleware: [authMiddleware] })({
   /** Arbitrary analytics query. */
   query(ctx) {
-    return ctx.mutation(QuerySchema, (data) => ({ rows:[], totals:{}, comparison:undefined, meta:{ executionMs:42, rowsScanned:10000, cached:false, granularity:data.dateRange.granularity } } satisfies QueryResult));
+    return ctx.mutate(QuerySchema, (data) => ({ rows:[], totals:{}, comparison:undefined, meta:{ executionMs:42, rowsScanned:10000, cached:false, granularity:data.dateRange.granularity } } satisfies QueryResult));
   },
 
   /** Multi-step funnel conversion. */
   funnel(ctx) {
-    return ctx.mutation(z.object({ orgId:z.string(), steps:z.array(z.object({ name:z.string(), event:z.string(), filters:z.array(z.object({ field:z.string(), operator:FilterOperatorSchema })).default([]) })).min(2).max(10), dateRange:z.object({ from:z.string().datetime(), to:z.string().datetime() }) }), (data) => ({ steps: [] as Array<{ name:string; count:number; conversionRate:number; avgTimeToNextStep:number|null }>, overallConversion:0 }));
+    return ctx.mutate(z.object({ orgId:z.string(), steps:z.array(z.object({ name:z.string(), event:z.string(), filters:z.array(z.object({ field:z.string(), operator:FilterOperatorSchema })).default([]) })).min(2).max(10), dateRange:z.object({ from:z.string().datetime(), to:z.string().datetime() }) }), (data) => ({ steps: [] as Array<{ name:string; count:number; conversionRate:number; avgTimeToNextStep:number|null }>, overallConversion:0 }));
   },
 
   /** Cohort retention analysis. */
   retention(ctx) {
-    return ctx.mutation(z.object({ orgId:z.string(), cohortEvent:z.string(), returnEvent:z.string(), dateRange:z.object({ from:z.string().datetime(), to:z.string().datetime() }), granularity:Granularity.default("week") }), (data) => ({ cohorts: [] as Array<{ date:string; size:number; retention:number[] }> }));
+    return ctx.mutate(z.object({ orgId:z.string(), cohortEvent:z.string(), returnEvent:z.string(), dateRange:z.object({ from:z.string().datetime(), to:z.string().datetime() }), granularity:Granularity.default("week") }), (data) => ({ cohorts: [] as Array<{ date:string; size:number; retention:number[] }> }));
   },
 
   /** Saved report definitions. */
@@ -66,7 +66,7 @@ export const analyticsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Persist a report definition. */
   saveReport(ctx) {
-    return ctx.mutation(z.object({ orgId:z.string(), name:z.string().min(1).max(200), query:QuerySchema, schedule:z.object({ cron:z.string(), recipients:z.array(z.email()).min(1) }).optional() }), (data) => ({ id:"report_new", name: data.name }));
+    return ctx.mutate(z.object({ orgId:z.string(), name:z.string().min(1).max(200), query:QuerySchema, schedule:z.object({ cron:z.string(), recipients:z.array(z.email()).min(1) }).optional() }), (data) => ({ id:"report_new", name: data.name }));
   },
 
   /** Stream query results row by row. */

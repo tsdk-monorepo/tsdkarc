@@ -41,12 +41,12 @@ export interface OpenApiSpec {
 
 const ROUTE_KINDS = new Set([
   "query",
-  "mutation",
+  "mutate",
   "stream",
   "upload",
   "plain",
 ] as const);
-type RouteKind = "query" | "mutation" | "stream" | "upload" | "plain";
+type RouteKind = "query" | "mutate" | "stream" | "upload" | "plain";
 
 interface NormalisedRoute {
   _kind: RouteKind;
@@ -109,7 +109,7 @@ function collectRoutes(tree: RuntimeRouteTree, prefix = ""): RouteInfo[] {
         segments: path.split("/"),
         kind: kind === "plain" ? "query" : kind,
         method:
-          kind === "mutation" || kind === "stream" || kind === "upload"
+          kind === "mutate" || kind === "stream" || kind === "upload"
             ? "post"
             : "get",
         inputSchema: zodSchemaToJson(value.schema),

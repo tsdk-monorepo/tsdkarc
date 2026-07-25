@@ -37,17 +37,17 @@ export const rateLimitsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Create rate limit rule. */
   createRule(ctx) {
-    return ctx.mutation(RateLimitRuleSchema.omit({ id:true, createdAt:true }), (data) => ({ id:"rl_new", name: data.name }));
+    return ctx.mutate(RateLimitRuleSchema.omit({ id:true, createdAt:true }), (data) => ({ id:"rl_new", name: data.name }));
   },
 
   /** Update rule. */
   updateRule(ctx) {
-    return ctx.mutation(RateLimitRuleSchema.omit({ id:true, createdAt:true }).partial().extend({ id:z.string() }), (data) => ({ id: data.id, updated:true }));
+    return ctx.mutate(RateLimitRuleSchema.omit({ id:true, createdAt:true }).partial().extend({ id:z.string() }), (data) => ({ id: data.id, updated:true }));
   },
 
   /** Delete rule. */
   deleteRule(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ deleted: true }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ deleted: true }));
   },
 
   /** Current usage against limits. */
@@ -57,6 +57,6 @@ export const rateLimitsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Manually reset a counter. */
   resetCounter(ctx) {
-    return ctx.mutation(z.object({ ruleId:z.string(), targetId:z.string() }), (data) => ({ reset: true }));
+    return ctx.mutate(z.object({ ruleId:z.string(), targetId:z.string() }), (data) => ({ reset: true }));
   },
 });

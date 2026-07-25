@@ -34,7 +34,7 @@ type StreamFn<F> = F extends (...args: infer Args) => AsyncIterable<any>
 // ─── Tree Mapped Types ────────────────────────────────────────────────────────
 
 /** * Maps the entire route tree, replacing the leaf functions with
- * { query: ... }, { mutation: ... }, or { stream: ... }
+ * { query: ... }, { mutate: ... }, or { stream: ... }
  */
 export type MapClientTree<T> = {
   [K in keyof T as K extends string ? K : never]: T[K] extends (
@@ -42,8 +42,8 @@ export type MapClientTree<T> = {
   ) => any
     ? KindOf<T[K]> extends "query"
       ? { query: ClientFn<T[K]> }
-      : KindOf<T[K]> extends "mutation"
-      ? { mutation: ClientFn<T[K]> }
+      : KindOf<T[K]> extends "mutate"
+      ? { mutate: ClientFn<T[K]> }
       : KindOf<T[K]> extends "stream"
       ? { stream: StreamFn<T[K]> }
       : never
@@ -173,7 +173,7 @@ function createPathProxy(baseUrl: string, pathSegments: string[] = []): any {
         if (prop === "query") {
           const url = `${baseUrl}/${pathSegments.join("/")}`;
           result = (data?: unknown) => fetchGet(url, data);
-        } else if (prop === "mutation") {
+        } else if (prop === "mutate") {
           const url = `${baseUrl}/${pathSegments.join("/")}`;
           result = (data?: unknown) => fetchPost(url, data);
         } else if (prop === "stream") {
@@ -198,7 +198,7 @@ function createPathProxy(baseUrl: string, pathSegments: string[] = []): any {
  * * @example
  * const api = createClient<App>("http://localhost:5001");
  * * const data = await api.users.get.query({ id: "1" });
- * const updated = await api.settings.update.mutation({ theme: "dark" });
+ * const updated = await api.settings.update.mutate({ theme: "dark" });
  * * for await (const chunk of api.ai.chat.stream({ msg: "hi" })) {
  * console.log(chunk);
  * }

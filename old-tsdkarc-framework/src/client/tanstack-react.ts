@@ -76,7 +76,7 @@ type MapHooksTree<T> = {
   ) => any
     ? KindOf<T[K]> extends "query"
       ? { useQuery: TanstackQueryHook<T[K]> }
-      : KindOf<T[K]> extends "mutation"
+      : KindOf<T[K]> extends "mutate"
       ? { useMutation: TanstackMutationHook<T[K]> }
       : KindOf<T[K]> extends "stream"
       ? { useStream: StreamHookFn<T[K]> }
@@ -128,7 +128,7 @@ function createHookProxy(client: any, pathSegments: string[] = []): any {
           const fetcher = pathSegments.reduce(
             (acc, part) => acc?.[part],
             client
-          )?.mutation;
+          )?.mutate;
           if (typeof fetcher === "function")
             result = makeMutationHook(fetcher, pathSegments);
         } else if (prop === "useStream") {

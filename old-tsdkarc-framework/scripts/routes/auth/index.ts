@@ -43,32 +43,32 @@ const LoginSchema = z.intersection(CredentialSchema, z.object({ device: DeviceSc
 export const authRoutes = defineRoutes({})({
   /** Multi-method login. */
   login(ctx) {
-    return ctx.mutation(LoginSchema, (data) => ({ tokens: { accessToken:"jwt.a", refreshToken:"jwt.r", expiresIn:3600, tokenType:"Bearer" as const, scope:["read"] } satisfies TokenPair, user: { id:"usr_01" as UserId } }));
+    return ctx.mutate(LoginSchema, (data) => ({ tokens: { accessToken:"jwt.a", refreshToken:"jwt.r", expiresIn:3600, tokenType:"Bearer" as const, scope:["read"] } satisfies TokenPair, user: { id:"usr_01" as UserId } }));
   },
 
   /** Rotate tokens. */
   refresh(ctx) {
-    return ctx.mutation(z.object({ refreshToken: z.string(), sessionId: z.string().uuid() }), (data) => ({ accessToken:"jwt.new", refreshToken:"jwt.r2", expiresIn:3600, tokenType:"Bearer" as const, scope:["read"] } satisfies TokenPair));
+    return ctx.mutate(z.object({ refreshToken: z.string(), sessionId: z.string().uuid() }), (data) => ({ accessToken:"jwt.new", refreshToken:"jwt.r2", expiresIn:3600, tokenType:"Bearer" as const, scope:["read"] } satisfies TokenPair));
   },
 
   /** Invalidate session. */
   logout(ctx) {
-    return ctx.mutation(z.object({ sessionId: z.string().uuid() }), (data) => ({ revoked: true, sessionId: data.sessionId as SessionId }));
+    return ctx.mutate(z.object({ sessionId: z.string().uuid() }), (data) => ({ revoked: true, sessionId: data.sessionId as SessionId }));
   },
 
   /** Validate MFA after credential. */
   mfaChallenge(ctx) {
-    return ctx.mutation(z.object({ challengeToken: z.string(), code: z.string().length(6), method: z.enum(["totp","sms","email","webauthn"]) }), (data) => ({ verified: true }));
+    return ctx.mutate(z.object({ challengeToken: z.string(), code: z.string().length(6), method: z.enum(["totp","sms","email","webauthn"]) }), (data) => ({ verified: true }));
   },
 
   /** Send reset link. */
   forgotPassword(ctx) {
-    return ctx.mutation(z.object({ email: z.email() }), (data) => ({ sent: true }));
+    return ctx.mutate(z.object({ email: z.email() }), (data) => ({ sent: true }));
   },
 
   /** Apply new password. */
   resetPassword(ctx) {
-    return ctx.mutation(z.object({ token: z.string(), newPassword: z.string().min(8) }), (data) => ({ success: true }));
+    return ctx.mutate(z.object({ token: z.string(), newPassword: z.string().min(8) }), (data) => ({ success: true }));
   },
 
   /** List active sessions. */
@@ -83,11 +83,11 @@ export const authRoutes = defineRoutes({})({
 
   /** Confirm email via code. */
   verifyEmail(ctx) {
-    return ctx.mutation(z.object({ code: z.string().length(6) }), (data) => ({ verified: true }));
+    return ctx.mutate(z.object({ code: z.string().length(6) }), (data) => ({ verified: true }));
   },
 
   /** Handle OAuth code exchange. */
   oauthCallback(ctx) {
-    return ctx.mutation(z.object({ code: z.string(), state: z.string(), provider: z.enum(["google","github","microsoft","okta"]) }), (data) => ({ tokens: { accessToken:"jwt.oauth", refreshToken:"jwt.r", expiresIn:3600, tokenType:"Bearer" as const, scope:["read"] } satisfies TokenPair }));
+    return ctx.mutate(z.object({ code: z.string(), state: z.string(), provider: z.enum(["google","github","microsoft","okta"]) }), (data) => ({ tokens: { accessToken:"jwt.oauth", refreshToken:"jwt.r", expiresIn:3600, tokenType:"Bearer" as const, scope:["read"] } satisfies TokenPair }));
   },
 });

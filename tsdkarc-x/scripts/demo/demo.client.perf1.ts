@@ -45,7 +45,7 @@ async function run() {
     const theme = await client2.v1.users.settings.getTheme.query();
     console.log("   ✅ Current Theme:", theme);
 
-    const updatedTheme = await client2.v1.users.settings.updateTheme.mutation({
+    const updatedTheme = await client2.v1.users.settings.updateTheme.mutate({
       theme: "light_mode",
     });
     console.log("   ✅ Update Theme:", updatedTheme);
@@ -89,7 +89,7 @@ async function run() {
     // E. 幽灵任务 (Serverless waitUntil)
     // ─────────────────────────────────────────────────────────────────────────────
     console.log("\n6️⃣  Testing Background Task (waitUntil)...");
-    const deviceRes = await client2.v1.users.registerDevice.mutation({
+    const deviceRes = await client2.v1.users.registerDevice.mutate({
       deviceId: "macbook-pro-m3",
     });
     console.log("   ✅ HTTP Resolved instantly:", deviceRes.success);
@@ -119,7 +119,7 @@ async function run() {
   try {
     console.log("\n8️⃣  Testing Zod Validation Error...");
     // 故意传入低于限制的值 (min: 8)
-    await client2.v1.users.updatePassword.mutation({ newPwd: "123" });
+    await client2.v1.users.updatePassword.mutate({ newPwd: "123" });
   } catch (err) {
     if (isRpcError(err)) {
       console.log(`   ❌ [Zod Blocked] ${err.code}:`, err.issues);
@@ -134,13 +134,13 @@ async function run() {
     client2.v1.users.health.query(undefined);
     client2.v1.users.health.query();
     client2.mock.aiRoutes1.chat.stream;
-    client2.mock.aiRoutes2.complete.mutation;
+    client2.mock.aiRoutes2.complete.mutate;
     client2.mock.aiRoutes2.complete;
     client2.a.health.query();
     client2.mock.aiRoutes4.complete;
-    client2.mock.aiRoutes2.moderateContent.mutation;
+    client2.mock.aiRoutes2.moderateContent.mutate;
     client2.mock.aiRoutes0.chat;
-    client2.mock.documentsRoutes9.delete.mutation;
+    client2.mock.documentsRoutes9.delete.mutate;
     client2.zResolved__;
     client2.mock.aiRoutes2.complete;
     client2.v1.users.health.query;

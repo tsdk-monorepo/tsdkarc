@@ -149,7 +149,7 @@ export interface MutationRoute<
   TOutput,
   AppCtx extends object,
   Meta extends object
-> extends RouteDef<"mutation", TInput, TOutput> {
+> extends RouteDef<"mutate", TInput, TOutput> {
   schema: TSchema;
   handler: (
     input: TInput,
@@ -241,14 +241,14 @@ export interface RouteBuilder<AppCtx extends object, Meta extends object> {
   ): QueryRoute<TSchema, Flat<z.infer<TSchema>>, TOutput, AppCtx, Meta>;
 
   // --- MUTATION ---
-  mutation<TInput, TOutput>(
+  mutate<TInput, TOutput>(
     handler: (
       input: TInput,
       env: HandlerEnv<AppCtx, Meta>
     ) => MaybePromise<TOutput>
   ): MutationRoute<undefined, TInput, TOutput, AppCtx, Meta>;
 
-  mutation<TSchema extends ZodType, TOutput>(
+  mutate<TSchema extends ZodType, TOutput>(
     schema: TSchema,
     handler: (
       input: Flat<z.infer<TSchema>>,

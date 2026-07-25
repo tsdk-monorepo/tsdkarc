@@ -48,17 +48,17 @@ export const organizationsRoutes = defineRoutes({ middleware: [authMiddleware] }
 
   /** Create new org. */
   create(ctx) {
-    return ctx.mutation(OrgSchema.omit({ id:true, memberCount:true, createdAt:true }).extend({ ownerId: z.string().uuid() }), (data) => ({ id:"org_new", slug: data.slug }));
+    return ctx.mutate(OrgSchema.omit({ id:true, memberCount:true, createdAt:true }).extend({ ownerId: z.string().uuid() }), (data) => ({ id:"org_new", slug: data.slug }));
   },
 
   /** Update org metadata. */
   update(ctx) {
-    return ctx.mutation(z.object({ id: z.string(), name: z.string().min(2).max(100).optional(), logoUrl: z.string().url().nullable().optional(), settings: OrgSettingsSchema.partial().optional() }), (data) => ({ id: data.id, updated: true }));
+    return ctx.mutate(z.object({ id: z.string(), name: z.string().min(2).max(100).optional(), logoUrl: z.string().url().nullable().optional(), settings: OrgSettingsSchema.partial().optional() }), (data) => ({ id: data.id, updated: true }));
   },
 
   /** Permanently delete org. */
   delete(ctx) {
-    return ctx.mutation(z.object({ id: z.string(), confirmSlug: z.string() }), (data) => ({ deleted: true }));
+    return ctx.mutate(z.object({ id: z.string(), confirmSlug: z.string() }), (data) => ({ deleted: true }));
   },
 
   /** List org members. */
@@ -68,17 +68,17 @@ export const organizationsRoutes = defineRoutes({ middleware: [authMiddleware] }
 
   /** Add user to org. */
   addMember(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), userId: z.string().uuid(), role: z.enum(["owner","admin","member"]) }), (data) => ({ added: true }));
+    return ctx.mutate(z.object({ orgId: z.string(), userId: z.string().uuid(), role: z.enum(["owner","admin","member"]) }), (data) => ({ added: true }));
   },
 
   /** Remove user from org. */
   removeMember(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), userId: z.string().uuid() }), (data) => ({ removed: true }));
+    return ctx.mutate(z.object({ orgId: z.string(), userId: z.string().uuid() }), (data) => ({ removed: true }));
   },
 
   /** Transfer org ownership. */
   transferOwner(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), newOwnerId: z.string().uuid(), reason: z.string().optional() }), (data) => ({ transferred: true }));
+    return ctx.mutate(z.object({ orgId: z.string(), newOwnerId: z.string().uuid(), reason: z.string().optional() }), (data) => ({ transferred: true }));
   },
 
   /** Org-scoped audit log. */

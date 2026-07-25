@@ -3,7 +3,7 @@ import useSWR, { type SWRResponse, type SWRConfiguration } from "swr";
 import useSWRMutation, {
   type SWRMutationResponse,
   type SWRMutationConfiguration,
-} from "swr/mutation";
+} from "swr/mutate";
 import type { MapClientTree } from "./"; // 👈 Use the unified tree type
 import {
   type Expand,
@@ -67,7 +67,7 @@ type MapSWRHooksTree<T> = {
   ) => any
     ? KindOf<T[K]> extends "query"
       ? { useQuery: SWRQueryHook<T[K]> }
-      : KindOf<T[K]> extends "mutation"
+      : KindOf<T[K]> extends "mutate"
       ? { useMutation: SWRMutationHook<T[K]> }
       : KindOf<T[K]> extends "stream"
       ? { useStream: StreamHookFn<T[K]> }
@@ -117,11 +117,11 @@ function createHookProxy(client: any, pathSegments: string[] = []): any {
           if (typeof fetcher === "function")
             result = makeQueryHook(fetcher, pathSegments);
         } else if (prop === "useMutation") {
-          // 👈 Walk the tree, then grab `.mutation` at the very end
+          // 👈 Walk the tree, then grab `.mutate` at the very end
           const fetcher = pathSegments.reduce(
             (acc, part) => acc?.[part],
             client
-          )?.mutation;
+          )?.mutate;
           if (typeof fetcher === "function")
             result = makeMutationHook(fetcher, pathSegments);
         } else if (prop === "useStream") {

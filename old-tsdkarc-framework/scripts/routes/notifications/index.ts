@@ -40,12 +40,12 @@ export const notificationsRoutes = defineRoutes({ middleware: [authMiddleware] }
 
   /** Mark notifications read. */
   markRead(ctx) {
-    return ctx.mutation(z.object({ ids: z.array(z.string()).min(1).max(100) }), (data) => ({ marked: data.ids.length }));
+    return ctx.mutate(z.object({ ids: z.array(z.string()).min(1).max(100) }), (data) => ({ marked: data.ids.length }));
   },
 
   /** Mark all as read. */
   markAllRead(ctx) {
-    return ctx.mutation(z.object({}), (data) => ({ marked: true }));
+    return ctx.mutate(z.object({}), (data) => ({ marked: true }));
   },
 
   /** Notification preferences. */
@@ -55,7 +55,7 @@ export const notificationsRoutes = defineRoutes({ middleware: [authMiddleware] }
 
   /** Update preferences. */
   updatePreferences(ctx) {
-    return ctx.mutation(z.object({ channels: z.record(z.string(), z.boolean()).optional(), types: z.record(z.string(), z.boolean()).optional() }), (data) => ({ updated: true }));
+    return ctx.mutate(z.object({ channels: z.record(z.string(), z.boolean()).optional(), types: z.record(z.string(), z.boolean()).optional() }), (data) => ({ updated: true }));
   },
 
   /** Real-time notification SSE. */
@@ -68,6 +68,6 @@ export const notificationsRoutes = defineRoutes({ middleware: [authMiddleware] }
 
   /** Register push subscription. */
   pushSubscribe(ctx) {
-    return ctx.mutation(z.object({ endpoint: z.string().url(), keys: z.object({ p256dh: z.string(), auth: z.string() }) }), (data) => ({ subscribed: true }));
+    return ctx.mutate(z.object({ endpoint: z.string().url(), keys: z.object({ p256dh: z.string(), auth: z.string() }) }), (data) => ({ subscribed: true }));
   },
 });

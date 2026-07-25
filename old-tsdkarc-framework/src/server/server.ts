@@ -15,7 +15,7 @@ import { ReqMeta, Transport } from "../transport/interface";
 export type ZodResult<
   Input,
   Result,
-  Kind extends "query" | "mutation" = "query"
+  Kind extends "query" | "mutate" = "query"
 > = Promise<Result> & { __input: Input; __kind: Kind };
 
 // ─── Path Utility ─────────────────────────────────────────────────────────────
@@ -105,7 +105,7 @@ export type RoutesMap<Ctx, Raw = unknown> = {
 
 // ─── ArcCtx ───────────────────────────────────────────────────────────────────
 
-export interface RouteHelper<Kind extends "query" | "mutation", Raw = unknown> {
+export interface RouteHelper<Kind extends "query" | "mutate", Raw = unknown> {
   <S extends ZodType, R>(
     schema: S,
     fn: (data: ZInfer<S>, meta: ReqMeta<Raw>) => R
@@ -133,7 +133,7 @@ export interface StreamHelper {
 export interface ArcCtx {
   transport: Transport;
   query: RouteHelper<"query">;
-  mutation: RouteHelper<"mutation">;
+  mutate: RouteHelper<"mutate">;
   stream: StreamHelper;
   /** Register route */
   r<R extends Record<string, RouteEntry>>(
@@ -193,12 +193,12 @@ type HandlerKind<H extends PlainHandler> = ReturnType<H> extends StreamResult<
 
 /**
  * Client function with kind brand preserved for RoutesOfKind filtering.
- * - query/mutation → returns Promise<R> & { __kind, __input }
+ * - query/mutate → returns Promise<R> & { __kind, __input }
  * - stream         → returns AsyncGenerator<Y> & { __kind, __input, __yield }
  */
 type BrandedClientFn<
   H extends PlainHandler,
-  Kind extends "query" | "mutation" | "stream"
+  Kind extends "query" | "mutate" | "stream"
 > = Kind extends "stream"
   ? HandlerInput<H> extends undefined | void
     ? () => AsyncGenerator<HandlerYield<H>> & {
@@ -343,13 +343,13 @@ function runZodStream<S extends ZodType, Y>(
 function makeRouteHelper(
   data: unknown,
   meta: ReqMeta
-): RouteHelper<"query"> & RouteHelper<"mutation"> {
+): RouteHelper<"query"> & RouteHelper<"mutate"> {
   return function (schemaOrFn: any, fn: any): any {
     if (typeof schemaOrFn === "function") {
       return Promise.resolve(schemaOrFn(data, meta));
     }
     return runZod(schemaOrFn, data, meta, fn);
-  } as RouteHelper<"query"> & RouteHelper<"mutation">;
+  } as RouteHelper<"query"> & RouteHelper<"mutate">;
 }
 
 function makeStreamHelper(data: unknown, meta: ReqMeta): StreamHelper {
@@ -370,9 +370,9 @@ export interface ArcOptions {
   modules?: readonly AnyModule[];
 }
 
-const HELPER_STUB: RouteHelper<"query"> & RouteHelper<"mutation"> = (() => {
-  throw new Error("ctx.query/mutation called outside request scope");
-}) as unknown as RouteHelper<"query"> & RouteHelper<"mutation">;
+const HELPER_STUB: RouteHelper<"query"> & RouteHelper<"mutate"> = (() => {
+  throw new Error("ctx.query/mutate called outside request scope");
+}) as unknown as RouteHelper<"query"> & RouteHelper<"mutate">;
 
 const STREAM_STUB: StreamHelper = (() => {
   throw new Error("ctx.stream called outside stream route scope");
@@ -417,7 +417,7 @@ export function createArcModule<const M extends readonly AnyModule[] = []>(
                 const reqCtx: ArcCtx & { meta: ReqMeta } = {
                   transport,
                   query: HELPER_STUB,
-                  mutation: HELPER_STUB,
+                  mutate: HELPER_STUB,
                   stream: STREAM_STUB,
                   r: registerRoute,
                   meta,
@@ -446,7 +446,7 @@ export function createArcModule<const M extends readonly AnyModule[] = []>(
               const reqCtx: ArcCtx & { meta: ReqMeta } = {
                 transport,
                 query: HELPER_STUB,
-                mutation: HELPER_STUB,
+                mutate: HELPER_STUB,
                 stream: STREAM_STUB,
                 r: registerRoute,
                 meta,
@@ -466,7 +466,7 @@ export function createArcModule<const M extends readonly AnyModule[] = []>(
       return {
         transport,
         query: HELPER_STUB,
-        mutation: HELPER_STUB,
+        mutate: HELPER_STUB,
         stream: STREAM_STUB,
         r: registerRoute,
       };
@@ -507,7 +507,7 @@ export function _defineRoutes<
       boot(arcCtx) {
         const ctx = arcCtx as unknown as Ctx;
 
-        /** Probe a handler to detect query / mutation / stream. */
+        /** Probe a handler to detect query / mutate / stream. */
         function probeMethod(handler: PlainHandler): "GET" | "POST" | "STREAM" {
           let detected: "GET" | "POST" | "STREAM" = "GET";
 
@@ -519,7 +519,7 @@ export function _defineRoutes<
           const mutationHelper = function () {
             detected = "POST";
             return Promise.resolve(undefined);
-          } as unknown as RouteHelper<"mutation">;
+          } as unknown as RouteHelper<"mutate">;
 
           const streamHelper = function () {
             detected = "STREAM";
@@ -529,7 +529,7 @@ export function _defineRoutes<
           const probeCtx = {
             ...ctx,
             query: trackingHelper,
-            mutation: mutationHelper,
+            mutate: mutationHelper,
             stream: streamHelper,
           } as unknown as Ctx;
 
@@ -552,7 +552,7 @@ export function _defineRoutes<
               const reqCtx = {
                 ...ctx,
                 query: helper,
-                mutation: helper,
+                mutate: helper,
                 stream: STREAM_STUB,
               } as unknown as Ctx;
               return Promise.resolve(handler(reqCtx, data));
@@ -564,7 +564,7 @@ export function _defineRoutes<
               const reqCtx = {
                 ...ctx,
                 query: HELPER_STUB,
-                mutation: HELPER_STUB,
+                mutate: HELPER_STUB,
                 stream: helper,
               } as unknown as Ctx;
               return handler(reqCtx, data) as AsyncGenerator<unknown>;

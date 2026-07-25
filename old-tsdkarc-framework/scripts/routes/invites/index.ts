@@ -34,31 +34,31 @@ export const invitesRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Send invite. */
   create(ctx) {
-    return ctx.mutation(InviteSchema.omit({ id:true, status:true, invitedBy:true, expiresAt:true, acceptedAt:true, createdAt:true }), (data) => ({ id:"inv_new", email:data.email }));
+    return ctx.mutate(InviteSchema.omit({ id:true, status:true, invitedBy:true, expiresAt:true, acceptedAt:true, createdAt:true }), (data) => ({ id:"inv_new", email:data.email }));
   },
 
   /** Bulk invite by email list. */
   bulkCreate(ctx) {
-    return ctx.mutation(z.object({ orgId:z.string(), emails:z.array(z.email()).min(1).max(50), role:z.enum(["admin","member","viewer"]).default("member"), teams:z.array(z.string()).default([]) }), (data) => ({ invited:data.emails.length, failed:[] as string[] }));
+    return ctx.mutate(z.object({ orgId:z.string(), emails:z.array(z.email()).min(1).max(50), role:z.enum(["admin","member","viewer"]).default("member"), teams:z.array(z.string()).default([]) }), (data) => ({ invited:data.emails.length, failed:[] as string[] }));
   },
 
   /** Accept an invite. */
   accept(ctx) {
-    return ctx.mutation(z.object({ token:z.string() }), (data) => ({ accepted:true, orgId:"org_01" }));
+    return ctx.mutate(z.object({ token:z.string() }), (data) => ({ accepted:true, orgId:"org_01" }));
   },
 
   /** Decline an invite. */
   decline(ctx) {
-    return ctx.mutation(z.object({ token:z.string() }), (data) => ({ declined: true }));
+    return ctx.mutate(z.object({ token:z.string() }), (data) => ({ declined: true }));
   },
 
   /** Revoke a pending invite. */
   revoke(ctx) {
-    return ctx.mutation(z.object({ id:z.string() }), (data) => ({ revoked: true }));
+    return ctx.mutate(z.object({ id:z.string() }), (data) => ({ revoked: true }));
   },
 
   /** Resend invite email. */
   resend(ctx) {
-    return ctx.mutation(z.object({ id:z.string() }), (data) => ({ sent: true }));
+    return ctx.mutate(z.object({ id:z.string() }), (data) => ({ sent: true }));
   },
 });

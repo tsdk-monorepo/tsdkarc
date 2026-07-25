@@ -38,27 +38,27 @@ export const filesRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Presigned S3 upload URL. */
   requestUpload(ctx) {
-    return ctx.mutation(z.object({ fileName: z.string().min(1).max(255), mimeType: z.string(), sizeBytes: z.number().int().max(100_000_000), resourceType: z.enum(["project","task","comment","message","profile"]), resourceId: z.string() }), (data) => ({ uploadUrl:"https://s3.amazonaws.com/presigned", fileId:"file_pending", expiresIn:3600 }));
+    return ctx.mutate(z.object({ fileName: z.string().min(1).max(255), mimeType: z.string(), sizeBytes: z.number().int().max(100_000_000), resourceType: z.enum(["project","task","comment","message","profile"]), resourceId: z.string() }), (data) => ({ uploadUrl:"https://s3.amazonaws.com/presigned", fileId:"file_pending", expiresIn:3600 }));
   },
 
   /** Mark upload complete. */
   confirmUpload(ctx) {
-    return ctx.mutation(z.object({ fileId: z.string(), etag: z.string() }), (data) => ({ id:data.fileId, confirmed:true, url:"https://cdn.example.com/"+data.fileId }));
+    return ctx.mutate(z.object({ fileId: z.string(), etag: z.string() }), (data) => ({ id:data.fileId, confirmed:true, url:"https://cdn.example.com/"+data.fileId }));
   },
 
   /** Delete file and storage object. */
   delete(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ deleted: true }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ deleted: true }));
   },
 
   /** Delete multiple files. */
   bulkDelete(ctx) {
-    return ctx.mutation(z.object({ ids: z.array(z.string()).min(1).max(100) }), (data) => ({ deleted: data.ids.length }));
+    return ctx.mutate(z.object({ ids: z.array(z.string()).min(1).max(100) }), (data) => ({ deleted: data.ids.length }));
   },
 
   /** Trigger thumbnail generation. */
   generateThumb(ctx) {
-    return ctx.mutation(z.object({ fileId: z.string(), width: z.number().int().min(16).max(2048).default(256), height: z.number().int().min(16).max(2048).default(256), fit: z.enum(["cover","contain","fill"]).default("cover") }), (data) => ({ jobId:"job_thumb", queued:true }));
+    return ctx.mutate(z.object({ fileId: z.string(), width: z.number().int().min(16).max(2048).default(256), height: z.number().int().min(16).max(2048).default(256), fit: z.enum(["cover","contain","fill"]).default("cover") }), (data) => ({ jobId:"job_thumb", queued:true }));
   },
 
   /** Stream file processing events. */

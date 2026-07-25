@@ -38,15 +38,15 @@ export interface ExtractTypesResult {
 
 const ROUTE_KINDS = new Set([
   "query",
-  "mutation",
+  "mutate",
   "stream",
   "upload",
   "plain",
 ] as const);
 
-type RouteKind = "query" | "mutation" | "stream" | "upload" | "plain";
+type RouteKind = "query" | "mutate" | "stream" | "upload" | "plain";
 
-const HANDLER_METHODS = new Set(["query", "mutation", "stream", "upload"]);
+const HANDLER_METHODS = new Set(["query", "mutate", "stream", "upload"]);
 
 interface NormalisedRoute {
   _kind: RouteKind;
@@ -413,7 +413,7 @@ function unwrapReturnType(rawReturn: ts.Type, checker: ts.TypeChecker): string {
  *   Most reliable when the handler is a standalone arrow.
  *
  * Strategy B — getContextualType on the handler node:
- *   Gives the expected function type from the outer generic call (r.mutation).
+ *   Gives the expected function type from the outer generic call (r.mutate).
  *   The return type may still be a free type parameter if TOutput is inferred,
  *   so we reject it if it's a TypeParameter.
  *
@@ -422,7 +422,7 @@ function unwrapReturnType(rawReturn: ts.Type, checker: ts.TypeChecker): string {
  *   We look for properties named "_output", "output", "_result", "result".
  *
  * Strategy D — call getReturnTypeOfSignature on the outer call expression type:
- *   If the outer r.mutation() call itself is typed as returning Promise<TOutput>,
+ *   If the outer r.mutate() call itself is typed as returning Promise<TOutput>,
  *   we can extract TOutput from the call's return type arguments.
  */
 function resolveOutputType(
@@ -799,7 +799,7 @@ function walkObjectLiteral(
       });
     };
 
-    // r.query(handler) / r.mutation(schema, handler) / r.stream(...) / r.upload(...)
+    // r.query(handler) / r.mutate(schema, handler) / r.stream(...) / r.upload(...)
     if (
       ts.isCallExpression(val) &&
       ts.isPropertyAccessExpression(val.expression) &&
@@ -900,7 +900,7 @@ function emitSwrMethod(route: FlatRoute): string {
   if (route.kind === "plain" || route.kind === "query") {
     return `useQuery(${inputArg}, opts?: SWRConfiguration<${route.outputTs}>): SWRResponse<${route.outputTs}>;`;
   }
-  if (route.kind === "mutation" || route.kind === "upload") {
+  if (route.kind === "mutate" || route.kind === "upload") {
     return `useMutation(opts?: SWRMutationConfiguration<${route.outputTs}, Error, string, ${inputTs}>): SWRMutationResponse<${route.outputTs}, Error, string, ${inputTs}>;`;
   }
   if (route.kind === "stream") {
@@ -922,7 +922,7 @@ function emitReactQueryMethod(route: FlatRoute): string {
   if (route.kind === "plain" || route.kind === "query") {
     return `useQuery(${inputArg}, opts?: Omit<UseQueryOptions<${route.outputTs}, Error, ${route.outputTs}>, "queryKey" | "queryFn">): UseQueryResult<${route.outputTs}, Error>;`;
   }
-  if (route.kind === "mutation" || route.kind === "upload") {
+  if (route.kind === "mutate" || route.kind === "upload") {
     return `useMutation(opts?: Omit<UseMutationOptions<${route.outputTs}, Error, ${inputTs}>, "mutationFn">): UseMutationResult<${route.outputTs}, Error, ${inputTs}>;`;
   }
   if (route.kind === "stream") {
@@ -1049,7 +1049,7 @@ function assembleDts(
     finalExportName = `${exportName}Swr`;
     header =
       `import type { SWRConfiguration, SWRResponse } from "swr";\n` +
-      `import type { SWRMutationConfiguration, SWRMutationResponse } from "swr/mutation";\n` +
+      `import type { SWRMutationConfiguration, SWRMutationResponse } from "swr/mutate";\n` +
       `import type { SWRStreamState } from "./swr";\n`;
   } else if (flavor === "react-query") {
     finalExportName = `${exportName}ReactQuery`;

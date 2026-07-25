@@ -99,12 +99,12 @@ type LegacyQueryHook<T> = IsOptional<InferLegacyInput<T>> extends true
 type LegacyMutationHook<T> = (
   opts?: MutationOpts<
     InferLegacyOutput<T>,
-    LegacyInput<"mutation", InferLegacyInput<T>>
+    LegacyInput<"mutate", InferLegacyInput<T>>
   >
 ) => UseMutationResult<
   InferLegacyOutput<T>,
   Error,
-  LegacyInput<"mutation", InferLegacyInput<T>>
+  LegacyInput<"mutate", InferLegacyInput<T>>
 >;
 
 type LegacyStreamHook<T> = IsOptional<InferLegacyInput<T>> extends true
@@ -121,13 +121,13 @@ type LegacyStreamHook<T> = IsOptional<InferLegacyInput<T>> extends true
 
 type MapRQNode<T> = T extends { _kind: "query" | "plain" }
   ? { useQuery: LegacyQueryHook<T> }
-  : T extends { _kind: "mutation" | "upload" }
+  : T extends { _kind: "mutate" | "upload" }
   ? { useMutation: LegacyMutationHook<T> }
   : T extends { _kind: "stream" }
   ? { useStream: LegacyStreamHook<T> }
   : T extends { query: infer Q }
   ? { useQuery: StaticQueryHook<Q> }
-  : T extends { mutation: infer M }
+  : T extends { mutate: infer M }
   ? { useMutation: StaticMutationHook<M> }
   : T extends { upload: infer U }
   ? { useMutation: StaticMutationHook<U> }
@@ -244,7 +244,7 @@ function buildProxy(client: any, cache: ProxyCache, path: string[] = []): any {
           );
         } else if (key === "useMutation") {
           const routeProxy = resolveNode(client, path);
-          result = makeMutationHook(routeProxy.mutation ?? routeProxy.upload);
+          result = makeMutationHook(routeProxy.mutate ?? routeProxy.upload);
         } else if (key === "useStream") {
           const routeProxy = resolveNode(client, path);
           result = makeStreamHook(routeProxy.stream);

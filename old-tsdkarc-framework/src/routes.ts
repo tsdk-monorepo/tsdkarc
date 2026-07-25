@@ -40,7 +40,7 @@ export const apiRoutes = defineRoutes({
 
   /** Mutation pattern for creating or updating data. */
   updateSettings(ctx) {
-    return ctx.mutation(
+    return ctx.mutate(
       z.object({ theme: z.enum(["light", "dark"]) }),
       (data, meta) => {
         console.log(meta().headers);
@@ -54,7 +54,7 @@ export const apiRoutes = defineRoutes({
 
   /** Mutation pattern for creating or updating data. */
   updateSettingsOptional(ctx) {
-    return ctx.mutation(
+    return ctx.mutate(
       z.object({ theme: z.enum(["light", "dark"]).optional() }),
       (data) => ({
         success: true,

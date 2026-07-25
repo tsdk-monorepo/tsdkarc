@@ -35,22 +35,22 @@ export const commentsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Post a comment. */
   create(ctx) {
-    return ctx.mutation(CommentSchema.omit({ id:true, bodyHtml:true, reactions:true, editedAt:true, createdAt:true }), (data) => ({ id:"cmt_new" }));
+    return ctx.mutate(CommentSchema.omit({ id:true, bodyHtml:true, reactions:true, editedAt:true, createdAt:true }), (data) => ({ id:"cmt_new" }));
   },
 
   /** Edit comment body. */
   update(ctx) {
-    return ctx.mutation(z.object({ id: z.string(), body: z.string().min(1).max(50000) }), (data) => ({ id: data.id, updated: true }));
+    return ctx.mutate(z.object({ id: z.string(), body: z.string().min(1).max(50000) }), (data) => ({ id: data.id, updated: true }));
   },
 
   /** Delete comment. */
   delete(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ deleted: true }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ deleted: true }));
   },
 
   /** Toggle emoji reaction. */
   react(ctx) {
-    return ctx.mutation(z.object({ commentId: z.string(), emoji: z.string().max(8) }), (data) => ({ added: true, emoji: data.emoji }));
+    return ctx.mutate(z.object({ commentId: z.string(), emoji: z.string().max(8) }), (data) => ({ added: true, emoji: data.emoji }));
   },
 
   /** Threaded replies for comment. */
@@ -60,7 +60,7 @@ export const commentsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Mark comment thread resolved. */
   resolve(ctx) {
-    return ctx.mutation(z.object({ commentId: z.string() }), (data) => ({ resolved: true }));
+    return ctx.mutate(z.object({ commentId: z.string() }), (data) => ({ resolved: true }));
   },
 
   /** Stream new comments live. */

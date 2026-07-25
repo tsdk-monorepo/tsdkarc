@@ -113,26 +113,26 @@ type LegacyMutationHook<T> = IsOptional<InferLegacyInput<T>> extends true
         InferLegacyOutput<T>,
         Error,
         string,
-        LegacyInput<"mutation", InferLegacyInput<T>> | void
+        LegacyInput<"mutate", InferLegacyInput<T>> | void
       >
     ) => SWRMutationResponse<
       InferLegacyOutput<T>,
       Error,
       string,
-      LegacyInput<"mutation", InferLegacyInput<T>> | void
+      LegacyInput<"mutate", InferLegacyInput<T>> | void
     >
   : (
       opts?: SWRMutationConfiguration<
         InferLegacyOutput<T>,
         Error,
         string,
-        LegacyInput<"mutation", InferLegacyInput<T>>
+        LegacyInput<"mutate", InferLegacyInput<T>>
       >
     ) => SWRMutationResponse<
       InferLegacyOutput<T>,
       Error,
       string,
-      LegacyInput<"mutation", InferLegacyInput<T>>
+      LegacyInput<"mutate", InferLegacyInput<T>>
     >;
 
 type LegacyStreamHook<T> = IsOptional<InferLegacyInput<T>> extends true
@@ -149,13 +149,13 @@ type LegacyStreamHook<T> = IsOptional<InferLegacyInput<T>> extends true
 
 type MapSWRNode<T> = T extends { _kind: "query" | "plain" }
   ? { useQuery: LegacyQueryHook<T> }
-  : T extends { _kind: "mutation" | "upload" }
+  : T extends { _kind: "mutate" | "upload" }
   ? { useMutation: LegacyMutationHook<T> }
   : T extends { _kind: "stream" }
   ? { useStream: LegacyStreamHook<T> }
   : T extends { query: infer Q }
   ? { useQuery: StaticQueryHook<Q> }
-  : T extends { mutation: infer M }
+  : T extends { mutate: infer M }
   ? { useMutation: StaticMutationHook<M> }
   : T extends { upload: infer U }
   ? { useMutation: StaticMutationHook<U> }
@@ -260,7 +260,7 @@ function buildProxy(client: any, cache: ProxyCache, path: string[] = []): any {
         } else if (key === "useMutation") {
           const routeProxy = resolveNode(client, path);
           result = makeMutationHook(
-            routeProxy.mutation ?? routeProxy.upload,
+            routeProxy.mutate ?? routeProxy.upload,
             path.join("/")
           );
         } else if (key === "useStream") {

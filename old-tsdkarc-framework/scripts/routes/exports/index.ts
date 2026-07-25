@@ -40,7 +40,7 @@ type ExportJob = z.infer<typeof ExportJobSchema>;
 export const exportsRoutes = defineRoutes({ middleware: [authMiddleware] })({
   /** Queue an export job. */
   create(ctx) {
-    return ctx.mutation(z.object({ orgId:z.string(), resource:ExportResourceSchema, format:ExportFormat, notifyEmail:z.email().optional() }), (data) => ({ id:"exp_new", status:"queued" as const }));
+    return ctx.mutate(z.object({ orgId:z.string(), resource:ExportResourceSchema, format:ExportFormat, notifyEmail:z.email().optional() }), (data) => ({ id:"exp_new", status:"queued" as const }));
   },
 
   /** Export job history. */
@@ -55,7 +55,7 @@ export const exportsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Cancel queued export. */
   cancel(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ cancelled: true }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ cancelled: true }));
   },
 
   /** Fresh signed download URL. */

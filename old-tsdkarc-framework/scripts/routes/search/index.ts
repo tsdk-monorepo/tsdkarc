@@ -54,6 +54,6 @@ export const searchRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Trigger manual reindex. */
   reindex(ctx) {
-    return ctx.mutation(z.object({ orgId: z.string(), types: z.array(SearchableType).optional() }), (data) => ({ jobId:"job_reindex", queued:true }));
+    return ctx.mutate(z.object({ orgId: z.string(), types: z.array(SearchableType).optional() }), (data) => ({ jobId:"job_reindex", queued:true }));
   },
 });

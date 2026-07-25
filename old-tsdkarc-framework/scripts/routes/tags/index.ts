@@ -28,31 +28,31 @@ export const tagsRoutes = defineRoutes({ middleware: [authMiddleware] })({
 
   /** Create tag. */
   create(ctx) {
-    return ctx.mutation(TagSchema.omit({ id:true, usageCount:true, createdAt:true }), (data) => ({ id:"tag_new", name: data.name }));
+    return ctx.mutate(TagSchema.omit({ id:true, usageCount:true, createdAt:true }), (data) => ({ id:"tag_new", name: data.name }));
   },
 
   /** Update tag name/color. */
   update(ctx) {
-    return ctx.mutation(z.object({ id:z.string(), name:z.string().min(1).max(80).optional(), color:z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(), description:z.string().max(300).optional() }), (data) => ({ id: data.id, updated:true }));
+    return ctx.mutate(z.object({ id:z.string(), name:z.string().min(1).max(80).optional(), color:z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(), description:z.string().max(300).optional() }), (data) => ({ id: data.id, updated:true }));
   },
 
   /** Delete tag. */
   delete(ctx) {
-    return ctx.mutation(z.object({ id: z.string() }), (data) => ({ deleted: true }));
+    return ctx.mutate(z.object({ id: z.string() }), (data) => ({ deleted: true }));
   },
 
   /** Merge tags into one. */
   merge(ctx) {
-    return ctx.mutation(z.object({ sourceIds:z.array(z.string()).min(2).max(20), targetId:z.string() }), (data) => ({ merged: data.sourceIds.length, targetId: data.targetId }));
+    return ctx.mutate(z.object({ sourceIds:z.array(z.string()).min(2).max(20), targetId:z.string() }), (data) => ({ merged: data.sourceIds.length, targetId: data.targetId }));
   },
 
   /** Attach tags to resources. */
   attach(ctx) {
-    return ctx.mutation(z.object({ tagIds:z.array(z.string()).min(1).max(20), resourceType:z.enum(["task","project","document"]), resourceId:z.string() }), (data) => ({ attached: data.tagIds.length }));
+    return ctx.mutate(z.object({ tagIds:z.array(z.string()).min(1).max(20), resourceType:z.enum(["task","project","document"]), resourceId:z.string() }), (data) => ({ attached: data.tagIds.length }));
   },
 
   /** Detach tags from resource. */
   detach(ctx) {
-    return ctx.mutation(z.object({ tagIds:z.array(z.string()).min(1), resourceType:z.enum(["task","project","document"]), resourceId:z.string() }), (data) => ({ detached: data.tagIds.length }));
+    return ctx.mutate(z.object({ tagIds:z.array(z.string()).min(1), resourceType:z.enum(["task","project","document"]), resourceId:z.string() }), (data) => ({ detached: data.tagIds.length }));
   },
 });
