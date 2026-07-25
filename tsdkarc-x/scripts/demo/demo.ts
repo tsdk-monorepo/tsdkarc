@@ -12,12 +12,11 @@ import { extractAppRoutesTypesFull } from "../../src/scripts/extract-types";
 import fs from "fs/promises";
 import path from "path";
 
-import { HonoAdapter } from "tsdkarc-x";
 import type { Context } from "hono";
 
-export const createContext = async (c: Context) => ({
+const createContext2 = async (c: Context) => ({
   get token() {
-    return c.header("Authorization") || null;
+    return c.req.header('Authorization') ?? null;
   },
 });
 
@@ -52,11 +51,13 @@ export const userRoutes = appRouter.init((r, ctx) => ({
     }
   ),
 
-  getProfile2: r.query(async (input: { includeHistory: number[] } | undefined, env) => {
-    // TS auto-completes env.ctx.db
-    const user = env.ctx.db.findUser(env.meta.user.id);
-    return { ...user, history: input?.includeHistory ? [] : null };
-  }),
+  getProfile2: r.query(
+    async (input: { includeHistory: number[] } | undefined, env) => {
+      // TS auto-completes env.ctx.db
+      const user = env.ctx.db.findUser(env.meta.user.id);
+      return { ...user, history: input?.includeHistory ? [] : null };
+    }
+  ),
 
   // ✅ Feature D: Route-Level Middleware & Mutation
   updatePassword: r

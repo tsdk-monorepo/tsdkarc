@@ -373,7 +373,7 @@ import type { Context } from "hono";
 
 export const createContext = async (c: Context) => ({
   get token() {
-    return c.header("Authorization") || null;
+    return c.req.header("Authorization") || null;
   },
 });
 
