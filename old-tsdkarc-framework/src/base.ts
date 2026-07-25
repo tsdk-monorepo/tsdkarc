@@ -20,7 +20,7 @@ const ctxModule2 = defineModule()({
   },
 });
 
-const { defineRoutes, createApp, app } = createServer({
+const { defineRouter, createApp, app } = createServer({
   prefix: "/x",
   transport: honoTransport(),
   port: 5001,
@@ -38,4 +38,4 @@ const { defineRoutes, createApp, app } = createServer({
   },
 });
 
-export { defineRoutes, createApp };
+export { defineRouter, createApp };

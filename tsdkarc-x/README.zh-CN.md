@@ -30,11 +30,11 @@ npm install tsdkarc-x tsdkarc zod
 
 ```ts
 // server.ts
-import { defineRoutes } from "tsdkarc-x";
+import { defineRouter } from "tsdkarc-x";
 import { launchApp } from "tsdkarc-x";
 import { ExpressAdapter } from "tsdkarc-x";
 
-const appRouter = defineRoutes({}); // 先不接模块、不接中间件
+const appRouter = defineRouter({}); // 先不接模块、不接中间件
 
 const userRoutes = appRouter.init(() => ({
   health: () => "OK", // 最简单的 handler：一个同步函数
@@ -122,7 +122,7 @@ updateTheme: r.mutate(
 
 ## 第四步：注入依赖（Context 与 DI）
 
-真实的 handler 通常需要访问数据库、邮件服务这类依赖。`tsdkarc-x` 直接复用 `tsdkarc` 的模块系统：先用 `defineModule` 声明一个模块，再把它塞进 `defineRoutes({ modules: [...] })`，handler 的第二个参数 `env.ctx` 上就会出现对应的依赖，并且类型是自动推导出来的：
+真实的 handler 通常需要访问数据库、邮件服务这类依赖。`tsdkarc-x` 直接复用 `tsdkarc` 的模块系统：先用 `defineModule` 声明一个模块，再把它塞进 `defineRouter({ modules: [...] })`，handler 的第二个参数 `env.ctx` 上就会出现对应的依赖，并且类型是自动推导出来的：
 
 ```ts
 import { defineModule } from "tsdkarc";
@@ -131,7 +131,7 @@ export const dbModule = defineModule({ name: "db" }).init(() => ({
   findUser: (id: string) => ({ id, name: "Alice", role: "admin" }),
 }));
 
-export const appRouter = defineRoutes({
+export const appRouter = defineRouter({
   modules: [dbModule], // 声明依赖
 });
 
@@ -182,10 +182,10 @@ export const loggerMw = defineMiddleware<{ ip: string | null }>()(
 );
 ```
 
-把 `createContext` 和全局中间件一起接到 `launchApp` / `defineRoutes`：
+把 `createContext` 和全局中间件一起接到 `launchApp` / `defineRouter`：
 
 ```ts
-export const appRouter = defineRoutes({
+export const appRouter = defineRouter({
   modules: [dbModule],
   middlewares: [authMw, loggerMw], // 按顺序执行，产出依次合并
 });
@@ -432,7 +432,7 @@ adapter.app.use(
 
 | API                                                              | 说明                                                                              |
 | ---------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `defineRoutes({ modules, middlewares })`                         | 创建 `appRouter`，`modules` 为 `tsdkarc` 模块列表，`middlewares` 为全局中间件列表 |
+| `defineRouter({ modules, middlewares })`                         | 创建 `appRouter`，`modules` 为 `tsdkarc` 模块列表，`middlewares` 为全局中间件列表 |
 | `appRouter.init((r, ctx) => routesObject)`                       | 声明一棵路由树，`r` 提供 `query` / `mutate` / `stream` / `upload` / `use`         |
 | `r.use(middleware)`                                              | 返回带路由级中间件的 `r`，链式调用后接 `.query` / `.mutate` 等                    |
 | `defineMiddleware<InputCtx>()(async (ctx, next) => next(patch))` | 定义可链式组合的中间件                                                            |
@@ -473,7 +473,7 @@ adapter.app.use(
 
 **Q: `tsdkarc-x` 和 `tsdkarc` 是什么关系？**
 
-`tsdkarc` 负责模块化依赖注入；`tsdkarc-x` 在其上构建 RPC 路由层，`defineRoutes` 的 `modules` 参数直接接收 `tsdkarc` 的模块，两者的 `ctx` 推导机制完全打通。
+`tsdkarc` 负责模块化依赖注入；`tsdkarc-x` 在其上构建 RPC 路由层，`defineRouter` 的 `modules` 参数直接接收 `tsdkarc` 的模块，两者的 `ctx` 推导机制完全打通。
 
 **Q: `r.query` 不传 Schema 会怎样？**
 

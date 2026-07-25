@@ -49,11 +49,11 @@ const requireAdminMw = defineMiddleware<{ user: { role: string } }>()(
 
 ---
 
-### 2. `defineRoutes`
+### 2. `defineRouter`
 
 Composes typed **Route Blueprints**. No side effects until `.init()` is called.
 
-**`defineRoutes({ modules?, middlewares? })`** — Creates a base blueprint.
+**`defineRouter({ modules?, middlewares? })`** — Creates a base blueprint.
 
 **`.extend({ modules?, middlewares? })`** — Derives a child blueprint, inheriting all modules and middlewares.
 
@@ -91,7 +91,7 @@ factory(r, ctx) => Record<string, RouteEndpoint>
 import { z } from "zod";
 
 // Base blueprint
-export const appRouter = defineRoutes({
+export const appRouter = defineRouter({
   modules: [dbModule, emailModule],
   middlewares: [
     defineMiddleware<BaseCtx>()(async (ctx, next) =>

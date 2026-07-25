@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineModule } from "tsdkarc";
-import { defineMiddleware, defineRoutes } from "../../src/server";
+import { defineMiddleware, defineRouter } from "../../src/server";
 import { Request } from "express";
 import { ContextOf } from "tsdkarc";
 import { DeepFlat } from "../../src/types";
@@ -61,7 +61,7 @@ export const loggerMw = defineMiddleware<{ ip: string | null }>()(
   }
 );
 
-export const appRouter = defineRoutes({
+export const appRouter = defineRouter({
   modules: [dbModule, emailModule],
   middlewares: [authMw, loggerMw],
 });

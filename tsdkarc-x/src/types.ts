@@ -318,7 +318,7 @@ export type RuntimeRouteTree = {
 // ─────────────────────────────────────────────────────────────────────────────
 // 7. RouteTreeModule — replaces the unsafe ___isRouteTreeModule: true pattern
 //
-// Previously, defineRoutes used `(routeMod as any).___isRouteTreeModule = true`
+// Previously, defineRouter used `(routeMod as any).___isRouteTreeModule = true`
 // to tag modules at runtime, then relied on `appCtx[val.name]` with an optional
 // name that could silently be undefined.
 //

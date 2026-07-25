@@ -474,11 +474,11 @@ export function createArcModule<const M extends readonly AnyModule[] = []>(
   }) as unknown as ArcModule<M>;
 }
 
-// ─── defineRoutes ─────────────────────────────────────────────────────────────
+// ─── defineRouter ─────────────────────────────────────────────────────────────
 
 let id = 0;
 
-export function _defineRoutes<
+export function _defineRouter<
   const M extends readonly AnyModule[] = [],
   const Extra extends readonly AnyModule[] = []
 >(

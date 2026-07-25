@@ -3,7 +3,7 @@
 // Mode:   both
 // Do not edit manually — regenerate with generateFromOpenApi()
 
-import { defineRoutes } from "../adapters/app.hono";
+import { defineRouter } from "../adapters/app.hono";
 import { z } from "zod";
 
 // ─── Proxy fetch helpers ──────────────────────────────────────────────────────
@@ -32,7 +32,7 @@ async function proxyPost(url: string, data: unknown): Promise<unknown> {
   return res.json();
 }
 
-export const xModule = defineRoutes()({
+export const xModule = defineRouter()({
   user: {
     /**
      * Get user by ID.
@@ -79,7 +79,7 @@ export const xModule = defineRoutes()({
   };
   }
 });
-export const xModuleProxy = defineRoutes()({
+export const xModuleProxy = defineRouter()({
   user: {
     /**
      * Get user by ID.

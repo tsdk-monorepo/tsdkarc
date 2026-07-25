@@ -2,7 +2,7 @@ import type { ReqMeta, Transport } from "../transport/interface";
 import { type AnyModule, type FullContext } from "tsdkarc";
 import { createArc } from "./create-arc";
 import {
-  _defineRoutes,
+  _defineRouter,
   _createApp,
   type Middleware,
   type RoutesMap,
@@ -54,7 +54,7 @@ export function createServer<
     modules: opts.modules ?? [],
   });
 
-  function defineRoutes<const M extends readonly AnyModule[] = []>(opts?: {
+  function defineRouter<const M extends readonly AnyModule[] = []>(opts?: {
     name?: string;
     middleware?: Middleware[];
     modules?: M;
@@ -62,7 +62,7 @@ export function createServer<
     type Ctx = FullContext<[typeof arc, ...M], ArcCtx>;
 
     return function <R extends RoutesMap<Ctx>>(routes: R) {
-      return _defineRoutes(arc, {
+      return _defineRouter(arc, {
         name: opts?.name,
         middleware: opts?.middleware,
         modules: opts?.modules ?? ([] as unknown as M),
@@ -85,7 +85,7 @@ export function createServer<
 
   return {
     arc,
-    defineRoutes,
+    defineRouter,
     transport,
     app: transport.app,
     start: transport.mount,
@@ -93,6 +93,6 @@ export function createServer<
   };
 }
 
-export type DefineRoutesFn = Awaited<
+export type defineRouterFn = Awaited<
   ReturnType<typeof createServer>
->["defineRoutes"];
+>["defineRouter"];

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { defineModule } from "tsdkarc";
 import { authMiddleware } from "./middleware";
 import { openApiRoute } from "./openapi/module";
-import { defineRoutes, createApp } from "./base";
+import { defineRouter, createApp } from "./base";
 
 // --- 1. Dependency Modules ---
 
@@ -27,7 +27,7 @@ const dbModule = defineModule()({
 // --- 2. Route Definitions ---
 
 /** Core API routes demonstrating queries, mutations, and namespaces. */
-export const apiRoutes = defineRoutes({
+export const apiRoutes = defineRouter({
   modules: [dbModule], // Injecting the DB module
 })({
   /** Basic query with Zod validation. */
@@ -64,7 +64,7 @@ export const apiRoutes = defineRoutes({
   },
 });
 
-const userRoutes = defineRoutes()({
+const userRoutes = defineRouter()({
   /** Namespace to group related routes. */
   users: {
     /** Fetch a user by ID. */
@@ -78,7 +78,7 @@ const userRoutes = defineRoutes()({
 });
 
 /** Routes requiring authentication middleware. */
-export const secureRoutes = defineRoutes({ middleware: [authMiddleware] })({
+export const secureRoutes = defineRouter({ middleware: [authMiddleware] })({
   /** Returns sensitive data only if authMiddleware passes. */
   secret(ctx) {
     return { data: "eyes only" };
@@ -86,7 +86,7 @@ export const secureRoutes = defineRoutes({ middleware: [authMiddleware] })({
 });
 
 // /** Streaming specific routes. */
-export const streamRoutes = defineRoutes()({
+export const streamRoutes = defineRouter()({
   /** * Yields data chunks over time.
    * Useful for LLM responses or long-running tasks.
    */
@@ -129,7 +129,7 @@ const app = createApp(
         info: { title: "My Clean API", version: "1.0.0" },
         servers: [{ url: "http://localhost:5001/x" }],
       },
-      defineRoutes
+      defineRouter
     ),
   ],
   {

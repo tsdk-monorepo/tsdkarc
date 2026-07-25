@@ -160,7 +160,7 @@ export function defineMiddleware<TInCtx extends object = {}>() {
 }
 
 // Internal counter for generating unique DI module names.
-// Each defineRoutes().init() call gets its own stable name so
+// Each defineRouter().init() call gets its own stable name so
 // buildRuntimeTree can safely index into appCtx.
 let _routeModuleCounter = 0;
 
@@ -176,7 +176,7 @@ let _routeModuleCounter = 0;
  *  3. Returns a typed RouteTreeModule wrapper instead of using `as any` to
  *     staple ___isRouteTreeModule onto the module object.
  */
-export function defineRoutes<
+export function defineRouter<
   const TModules extends AnyModule[] = [],
   const TMiddlewares extends Middleware<any, any>[] = []
 >(options: { modules?: TModules; middlewares?: TMiddlewares }) {
@@ -195,7 +195,7 @@ export function defineRoutes<
       modules?: TExtraModules;
       middlewares?: TExtraMiddlewares;
     }) => {
-      return defineRoutes<
+      return defineRouter<
         [...TModules, ...TExtraModules],
         [...TMiddlewares, ...TExtraMiddlewares]
       >({

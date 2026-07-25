@@ -2,7 +2,7 @@
 
 import ts from "typescript";
 import { defineUnit } from "tsdkarc";
-import { DefineRoutesFn } from "../server/create-server";
+import { defineRouterFn } from "../server/create-server";
 
 // ─── Module ───────────────────────────────────────────────────────────────────
 
@@ -42,9 +42,9 @@ export function openApiModule(opts: OpenApiOptions) {
  */
 export const openApiRoute = (
   options: OpenApiOptions,
-  defineRoutes: DefineRoutesFn
+  defineRouter: defineRouterFn
 ) =>
-  defineRoutes({
+  defineRouter({
     modules: [openApiModule(options)],
   })({
     openapi(ctx) {

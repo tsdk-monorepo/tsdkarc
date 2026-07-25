@@ -546,7 +546,7 @@ function generateModule(
 
   const exportName = mode === "proxy" ? `${moduleName}Proxy` : moduleName;
 
-  return `export const ${exportName} = defineRoutes()({
+  return `export const ${exportName} = defineRouter()({
 ${routeEntries}
 });`;
 }
@@ -607,7 +607,7 @@ export function generateFromOpenApi(
   const needsProxy = opts.mode === "proxy" || opts.mode === "both";
 
   const imports = [
-    `import { defineRoutes } from ${JSON.stringify(adapterImport)};`,
+    `import { defineRouter } from ${JSON.stringify(adapterImport)};`,
     needsZod ? `import { z } from "zod";` : null,
   ]
     .filter(Boolean)
