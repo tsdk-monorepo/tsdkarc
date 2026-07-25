@@ -55,10 +55,6 @@ import {
 } from "../src/types";
 import { createClient, isRpcError } from "../src/client";
 
-process.on("unhandledRejection", (reason, promise) => {
-  // Ignoring the error completely
-});
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Test harness helpers
 // ─────────────────────────────────────────────────────────────────────────────
@@ -152,7 +148,7 @@ describe("0. Type-level checks", () => {
     });
 
     // @ts-expect-error: includeHistory must be boolean, not string
-    client.getProfile.query({ includeHistory: "yes" });
+    client.getProfile.query({ includeHistory: "yes" }).catch((e) => e);
   });
 
   it("query with schema: input type comes from the Zod schema, not the handler", () => {
@@ -167,7 +163,7 @@ describe("0. Type-level checks", () => {
     });
 
     // @ts-expect-error: unknown field not present in schema
-    client.getProfile.query({ includeHistory: true, extra: 1 });
+    client.getProfile.query({ includeHistory: true, extra: 1 }).catch((e) => e);
   });
 
   it("env.ctx only exposes modules declared on defineRouter", () => {
@@ -243,7 +239,7 @@ describe("0. Type-level checks", () => {
       baseURL: "http://x",
     });
 
-    client.settings.getTheme.query();
+    client.settings.getTheme.query().catch((e) => e);
 
     // @ts-expect-error: route was declared under `settings`, not the root
     client.getTheme;
@@ -271,7 +267,9 @@ describe("0. Type-level checks", () => {
     });
 
     // @ts-expect-error: `file` must be a File instance
-    client.uploadAvatar.upload({ file: "not-a-file", cropSize: 100 });
+    client.uploadAvatar
+      .upload({ file: "not-a-file", cropSize: 100 })
+      .catch((e) => e);
   });
 
   it("RpcError code is restricted to the known error-code union", () => {
