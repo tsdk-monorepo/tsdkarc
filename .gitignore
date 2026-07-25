@@ -39,4 +39,3 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .DS_Store
 
 tsdkarc-x/scripts/routes
-*.d.ts
