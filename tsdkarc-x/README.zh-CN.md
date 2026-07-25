@@ -146,7 +146,7 @@ const userRoutes = appRouter.init((r) => ({
 }));
 ```
 
-模块本身不知道自己会被哪个路由使用，因此可以独立发布、跨项目复用——这部分完整的组合规则见 `tsdkarc` 文档。
+模块本身不知道自己会被哪个路由使用，因此可以独立发布、跨项目复用——这部分完整的组合规则见 [`tsdkarc` 文档](../tsdkarc/README.zh-CN.md)。
 
 ---
 
@@ -490,18 +490,6 @@ Multipart FormData 的字段在网络层始终以字符串形式传输，`z.coer
 **Q: 换成 Hono 需要改业务路由代码吗？**
 
 不需要。`launchApp` 的 `transport` 字段是唯一需要替换的地方，路由定义、中间件、Client 侧代码均不受影响。
-
----
-
-## 仓库结构
-
-```text
-tsdkarc-x/         # RPC 路由层核心库（server / client / adapters）
-tsdkarc/           # 底层模块化 DI 库
-scripts/
-  extract-types/   # 客户端类型 / SWR / React Query 类型生成脚本
-  openapi/         # OpenAPI 文档提取脚本
-```
 
 ---
 

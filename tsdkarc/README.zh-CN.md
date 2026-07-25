@@ -177,16 +177,6 @@ console.log(app.graph().formatted);
 
 仅当两边都是**纯对象**（Plain Object，排除数组/`Date`/`Map`/实例对象等）时才会递归合并。非纯对象时，后者整体覆盖前者，数组不会被拼接。安全起见，引擎会始终跳过对 `__proto__` 和 `prototype` 的合并。
 
----
-
-## 仓库结构
-
-```text
-tsdkarc/       # 核心库
-tsdkarc-x/     # 官方扩充生态
-tsdkbundle/    # 监测与打包工具
-website/       # 文档网站
-```
 
 ---
 
