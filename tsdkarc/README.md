@@ -4,6 +4,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
+
 🇺🇸 English · [🇨🇳 中文](./README.zh-CN.md)
 
 No decorators, no `reflect-metadata`. `ctx` is fully inferred at compile time from each module's `init()` return value.
@@ -188,4 +189,6 @@ website/       # documentation site
 
 ## License
 
-[MIT](./LICENSE) · [CHANGELOG.md](./CHANGELOG.md)
+[MIT](./LICENSE)
+
+[CHANGELOG.md](./CHANGELOG.md)

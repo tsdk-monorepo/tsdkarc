@@ -4,6 +4,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
+
 🇨🇳 中文 · [🇺🇸 English](./README.md)
 
 不用装饰器，不用 `reflect-metadata`。`ctx` 类型完全由每个模块 `init()` 的返回值在编译期自动推导。
@@ -189,6 +190,8 @@ website/       # 文档网站
 
 ---
 
-## 协议
+## 其他
 
-[MIT](./LICENSE) · [CHANGELOG.md](./CHANGELOG.md)
+[MIT](./LICENSE)
+
+[CHANGELOG.md](./CHANGELOG.md)
