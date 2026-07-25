@@ -65,6 +65,7 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/express": "^5.0.6",
+    "@types/ws": "^8.18.1",
     "drizzle-kit": "^0.31.10",
     "typescript": "^6.0.3",
     "@types/koa": "^3.0.2",
