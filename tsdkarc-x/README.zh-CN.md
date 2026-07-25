@@ -61,6 +61,8 @@ export const app = launchApp({
 import { type RoutesOf } from "tsdkarc-x";
 
 export type AppRoutes = RoutesOf<typeof app>;
+// const appRouter = defineRouter({}).init(() => ({})); // 先不接模块、不接中间件
+// 注意，我们不能使用 `RoutesOf<typeof appRouter>` 获取 routes tree 类型
 ```
 
 前端用 `createClient<AppRoutes>` 创建客户端，调用路径和后端定义的路由结构完全一致（`users.health` 对应后端 `{ users: userRoutes }` 里的 `health`）：
@@ -157,20 +159,34 @@ const userRoutes = appRouter.init((r) => ({
 **`createContext`**：每次请求执行一次，从原始 `Request` 提取轻量信息（建议用 getter，避免没用到时也解析 header）：
 
 ```ts
+import { Request } from "express";
+import { DeepFlat } from 'tsdkarc-x';
+
 export const createContext = async (c: Request) => ({
   get token() {
     return c.header("Authorization") || null;
   },
 });
+
+export type BaseCtx = DeepFlat<
+  Awaited<ReturnType<typeof createContext>> & ContextOf<typeof dbModule>
+>;
+
 ```
 
 **中间件**：用 `defineMiddleware<InputCtx>()(async (ctx, next) => next(patch))` 定义，`next` 传入的字段会合并进后续中间件和 handler 的 `env.meta`：
 
 ```ts
-export const authMw = defineMiddleware<{ token: string | null }>()(
+export const authMw = defineMiddleware<BaseCtx>()(
   async (ctx, next) => {
     // 这里校验 ctx.token，拿到用户信息
     return next({ user: { id: "u_1", role: "admin" } });
+  }
+);
+
+export const verifyMfaMw = defineMiddleware<{ user: { id: string } }>()(
+  async (ctx, next) => {
+    return next({ mfaPassed: true });
   }
 );
 

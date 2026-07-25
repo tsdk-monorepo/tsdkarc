@@ -235,10 +235,10 @@ export interface RouteBuilder<AppCtx extends object, Meta extends object> {
   query<TSchema extends ZodType, TOutput>(
     schema: TSchema,
     handler: (
-      input: Flat<z.infer<TSchema>>,
+      input: Flat<z.infer<TSchema>>, // Handler receives the parsed output
       env: HandlerEnv<AppCtx, Meta>
     ) => MaybePromise<TOutput>
-  ): QueryRoute<TSchema, Flat<z.infer<TSchema>>, TOutput, AppCtx, Meta>;
+  ): QueryRoute<TSchema, Flat<z.input<TSchema>>, TOutput, AppCtx, Meta>; // Client uses the input type
 
   // --- MUTATION ---
   mutate<TInput, TOutput>(
@@ -254,7 +254,7 @@ export interface RouteBuilder<AppCtx extends object, Meta extends object> {
       input: Flat<z.infer<TSchema>>,
       env: HandlerEnv<AppCtx, Meta>
     ) => MaybePromise<TOutput>
-  ): MutationRoute<TSchema, Flat<z.infer<TSchema>>, TOutput, AppCtx, Meta>;
+  ): MutationRoute<TSchema, Flat<z.input<TSchema>>, TOutput, AppCtx, Meta>;
 
   // --- STREAM ---
   stream<TInput, TChunk>(
@@ -270,7 +270,7 @@ export interface RouteBuilder<AppCtx extends object, Meta extends object> {
       input: Flat<z.infer<TSchema>>,
       env: HandlerEnv<AppCtx, Meta>
     ) => AsyncGenerator<TChunk, void, unknown>
-  ): StreamRoute<TSchema, Flat<z.infer<TSchema>>, TChunk, AppCtx, Meta>;
+  ): StreamRoute<TSchema, Flat<z.input<TSchema>>, TChunk, AppCtx, Meta>;
 
   // --- UPLOAD ---
   upload<TInput, TOutput>(
@@ -286,7 +286,7 @@ export interface RouteBuilder<AppCtx extends object, Meta extends object> {
       input: Flat<z.infer<TSchema>>,
       env: HandlerEnv<AppCtx, Meta>
     ) => MaybePromise<TOutput>
-  ): UploadRoute<TSchema, Flat<z.infer<TSchema>>, TOutput, AppCtx, Meta>;
+  ): UploadRoute<TSchema, Flat<z.input<TSchema>>, TOutput, AppCtx, Meta>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

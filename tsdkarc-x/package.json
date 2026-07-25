@@ -54,7 +54,7 @@
     "build:cjs": "rm -rf lib && tsc --project tsconfig.cjs.json && rm -rf lib/tests",
     "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests",
     "checktype": "bun run scripts/gen-routes.ts && tsc --noEmit --project tsconfig.json",
-    "test": "echo TODO",
+    "test": "vitest --run --testTimeout=120000 --hookTimeout=60000 ./tests",
     "perf": "echo Perf1 && tsc -p tsconfig.perf1.json && echo '\nPerf0' &&  tsc -p tsconfig.perf0.json",
     "bundev": "bb dev api"
   },
@@ -93,7 +93,8 @@
     "@scalar/hono-api-reference": "^0.11.11",
     "@scalar/express-api-reference": "^0.10.11",
     "concurrently": "^10.0.3",
-    "@tsconfig/recommended": "^1.0.13"
+    "@tsconfig/recommended": "^1.0.13",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "swr": "^2.4.2",

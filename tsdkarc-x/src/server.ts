@@ -136,8 +136,27 @@ async function invokeRoute(
   env: HandlerEnv<any, any>
 ): Promise<unknown> {
   if (route._kind === "plain") return route.handler(rawInput, env);
-  const schema = (route as any).schema as ZodType | undefined;
-  const input = schema ? schema.parse(rawInput) : rawInput;
+
+  const schema =
+    "schema" in route ? (route.schema as ZodType | undefined) : undefined;
+
+  // 1. Normalize the input.
+  // If the HTTP transport dropped the empty object and yielded undefined, default to {}.
+  let safeInput = rawInput === undefined ? {} : rawInput;
+
+  // (Optional) If your GET requests send JSON in a query string like `?input=%7B%7D`,
+  // you might also need to parse it if your transport layer hasn't already:
+  if (typeof safeInput === "string" && route._kind === "query") {
+    try {
+      safeInput = safeInput ? JSON.parse(safeInput) : {};
+    } catch {
+      // If it fails to parse, just pass the string to Zod and let it fail validation
+    }
+  }
+
+  // 2. Parse using the normalized input
+  const input = schema ? await schema.parseAsync(safeInput) : safeInput;
+
   return route.handler(input as any, env);
 }
 
