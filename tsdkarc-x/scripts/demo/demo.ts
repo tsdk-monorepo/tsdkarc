@@ -12,6 +12,15 @@ import { extractAppRoutesTypesFull } from "../../src/scripts/extract-types";
 import fs from "fs/promises";
 import path from "path";
 
+import { HonoAdapter } from "tsdkarc-x";
+import type { Context } from "hono";
+
+export const createContext = async (c: Context) => ({
+  get token() {
+    return c.header("Authorization") || null;
+  },
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // 3. Route Modules (The Business Logic)
 // ─────────────────────────────────────────────────────────────────────────────

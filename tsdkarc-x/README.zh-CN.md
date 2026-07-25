@@ -160,7 +160,7 @@ const userRoutes = appRouter.init((r) => ({
 
 ```ts
 import { Request } from "express";
-import { DeepFlat } from 'tsdkarc-x';
+import { DeepFlat } from "tsdkarc-x";
 
 export const createContext = async (c: Request) => ({
   get token() {
@@ -171,18 +171,15 @@ export const createContext = async (c: Request) => ({
 export type BaseCtx = DeepFlat<
   Awaited<ReturnType<typeof createContext>> & ContextOf<typeof dbModule>
 >;
-
 ```
 
 **中间件**：用 `defineMiddleware<InputCtx>()(async (ctx, next) => next(patch))` 定义，`next` 传入的字段会合并进后续中间件和 handler 的 `env.meta`：
 
 ```ts
-export const authMw = defineMiddleware<BaseCtx>()(
-  async (ctx, next) => {
-    // 这里校验 ctx.token，拿到用户信息
-    return next({ user: { id: "u_1", role: "admin" } });
-  }
-);
+export const authMw = defineMiddleware<BaseCtx>()(async (ctx, next) => {
+  // 这里校验 ctx.token，拿到用户信息
+  return next({ user: { id: "u_1", role: "admin" } });
+});
 
 export const verifyMfaMw = defineMiddleware<{ user: { id: string } }>()(
   async (ctx, next) => {
@@ -368,10 +365,17 @@ registerDevice: r.mutate(z.object({ deviceId: z.string() }), async (input, env) 
 
 ## 第十一步：换一个 HTTP 框架
 
-到目前为止的所有路由代码都不感知具体用的是哪个 HTTP 框架。`launchApp` 的 `transport` 是唯一需要替换的地方：
+到目前为止的所有路由代码都不感知具体用的是哪个 HTTP 框架。`launchApp` 的 `transport`和`createContext` 是唯一需要替换的地方：
 
 ```ts
 import { HonoAdapter } from "tsdkarc-x";
+import type { Context } from "hono";
+
+export const createContext = async (c: Context) => ({
+  get token() {
+    return c.header("Authorization") || null;
+  },
+});
 
 export const app = launchApp({
   basePath: "/api",
@@ -505,7 +509,7 @@ Multipart FormData 的字段在网络层始终以字符串形式传输，`z.coer
 
 **Q: 换成 Hono 需要改业务路由代码吗？**
 
-不需要。`launchApp` 的 `transport` 字段是唯一需要替换的地方，路由定义、中间件、Client 侧代码均不受影响。
+不需要。`launchApp` 的 `transport`和`createContext` 字段是唯一需要替换的地方，路由定义、中间件、Client 侧代码均不受影响。
 
 ---
 

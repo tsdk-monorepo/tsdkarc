@@ -266,8 +266,8 @@ describe("0. Type-level checks", () => {
       baseURL: "http://x",
     });
 
-    // @ts-expect-error: `file` must be a File instance
     client.uploadAvatar
+      // @ts-expect-error: `file` must be a File instance
       .upload({ file: "not-a-file", cropSize: 100 })
       .catch((e) => e);
   });
