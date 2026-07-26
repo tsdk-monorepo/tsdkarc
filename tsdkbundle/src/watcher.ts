@@ -62,7 +62,7 @@ async function killProcess(proc: ReturnType<typeof Bun.spawn> | null) {
 function spawnDevProcess(state: WatchState) {
   const { project } = state;
 
-  if (project.type === "frontend") {
+  if (project.target === "browser") {
     if (!state.devServer) {
       state.devServer = startDevServer(project);
       logger.server(project.name, project.port ?? 3000);

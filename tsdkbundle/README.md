@@ -24,8 +24,7 @@ A tool that watches your files and builds your apps automatically.
 
 | Property    | Type                                           | Description                                                                                            |
 | :---------- | :--------------------------------------------- | :----------------------------------------------------------------------------------------------------- |
-| `type`      | `"backend" \| "frontend"`                      | Determines the default `target` and whether `dev` mode spawns a process or starts a static server.     |
-| `target`    | `"bun" \| "browser" \| "node"`                 | Compilation target. (Defaults: `backend` -> `bun`, `frontend` -> `browser`).                           |
+| `target`    | `"bun" \| "browser" \| "node"`                 | Compilation target. (Defaults: `backend` -> `node`, `frontend` -> `browser`).                           |
 | `entry`     | `string \| string[]`                           | Entry file(s) for compilation. Supports multiple entries.                                              |
 | `main`      | `string`                                       | _(Backend only)_ The process entry point for `dev` mode. Defaults to the compiled result of `entry`.   |
 | `outdir`    | `string`                                       | Output directory. Defaults to `dist/<projectName>`.                                                    |
@@ -52,16 +51,17 @@ export default {
   default: ["api", "web"],
   projects: {
     api: {
-      type: "backend",
+      target: "node",
       entry: "src/api/index.ts",
       envFile: ".env",
       port: 3000,
       external: ["pg", "bcrypt"], // Exclude C++ extensions
     },
-    web: {
-      type: "frontend",
-      entry: "src/web/index.tsx",
-      port: 8080, // Static server port in dev mode
+    extraEntry: {
+      target: "node",
+      entry: ["src/workers/task1.ts", "src/workers/task2.ts"],
+      envFile: ".env",
+      external: ["pg", "bcrypt"], // Exclude C++ extensions
     },
   },
 } satisfies BundleConfig;
@@ -81,7 +81,7 @@ export default (({ command }) => {
   return {
     projects: {
       worker: {
-        type: "backend",
+        target: "node",
         entry: ["src/worker.ts"],
         minify: isProd,
         sourcemap: isProd ? "none" : "linked",

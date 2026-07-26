@@ -8,7 +8,7 @@ export default (({ command }): BundleConfig => {
     default: ["api"],
     projects: {
       api: {
-        type: "backend",
+        target: "node",
         entry: ["demo/index.demo.ts"],
         tsconfig: "tsconfig.json",
         outdir: "dist",
@@ -21,7 +21,7 @@ export default (({ command }): BundleConfig => {
         port: 3001,
       },
       worker: {
-        type: "backend",
+        target: "node",
         entry: ["src/index.ts", "src/worker.ts"],
         main: "src/index.ts",
         outdir: "dist/worker",
@@ -29,12 +29,10 @@ export default (({ command }): BundleConfig => {
 
         sourcemap: isProd ? "none" : "linked",
         minify: isProd,
-
-        port: 3002,
       },
-       web: {
-        type: "frontend",
-        entry: './demo/index.html',
+      web: {
+        target: "browser",
+        entry: "./demo/index.html",
         main: "src/index.ts",
         outdir: "dist/worker",
         external: ["bullmq"],

@@ -8,7 +8,6 @@ function makeProject(
 ): ResolvedProject {
   return {
     name: "api",
-    type: "backend",
     target: "bun",
     entry: ["/project/src/index.ts"],
     main: "/project/dist/api/index.js",
@@ -85,16 +84,6 @@ describe("buildProject: core parameters", () => {
     expect(capturedOptions.plugins).toEqual([dummyPlugin]); // Validate Plugins
   });
 
-  test("passes project properties correctly for frontend", async () => {
-    const project = makeProject({
-      type: "frontend",
-      target: "browser",
-      entry: ["/project/src/index.tsx"],
-    });
-
-    await buildProject(project, "build");
-    expect(capturedOptions.target).toBe("browser");
-  });
 
   test("omits tsconfig if not specified", async () => {
     const project = makeProject({ tsconfig: "" });

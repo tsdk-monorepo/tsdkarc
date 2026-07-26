@@ -8,7 +8,7 @@ const config: BundleConfigFn = (({ command }) => {
     default: ["api"],
     projects: {
       api: {
-        type: "backend",
+        target: "bun",
         entry: ["scripts/demo/demo.ts"],
         tsconfig: "tsconfig.json",
         outdir: "dist",

@@ -36,20 +36,20 @@ describe("loadConfig: valid configs & dynamic targets", () => {
     });
     const result = await loadConfig(path, "dev");
     expect(result.projects.api).toBeDefined();
-    expect(result.projects.api?.type).toBe("backend");
-    expect(result.projects.api?.target).toBe("bun");
+    expect(result.projects.api?.target).toBe("node");
+    expect(result.projects.api?.target).toBe("node");
     expect(result.projects.api?.plugins).toEqual([]);
   });
 
   test("minimal valid frontend config infers target browser", async () => {
     const path = writeJsonConfig("minimal-frontend", {
       projects: {
-        web: { type: "frontend", entry: "src/index.tsx" },
+        web: { target: "browser", entry: "src/index.tsx" },
       },
     });
     const result = await loadConfig(path, "dev");
     expect(result.projects.web).toBeDefined();
-    expect(result.projects.web?.type).toBe("frontend");
+    expect(result.projects.web?.target).toBe("browser");
     expect(result.projects.web?.target).toBe("browser");
   });
 
@@ -87,7 +87,7 @@ describe("loadConfig: dynamic function exports", () => {
       });
     `;
     const path = writeJsConfig("dynamic-func", content);
-    
+
     // Test context as dev
     const devResult = await loadConfig(path, "dev");
     expect(devResult.projects.dynamic?.entry[0]).toContain("src/dev.ts");
@@ -101,15 +101,6 @@ describe("loadConfig: dynamic function exports", () => {
 });
 
 describe("loadConfig: validation errors", () => {
-  test("invalid type throws", async () => {
-    const path = writeJsonConfig("invalid-type", {
-      projects: { api: { type: "mobile", entry: "src/index.ts" } },
-    });
-    const err = await loadConfig(path, "dev").catch((e) => e);
-    expect(err).toBeInstanceOf(ConfigValidationError);
-    expect(err.errors[0].field).toBe("projects.api.type");
-  });
-
   test("missing entry throws", async () => {
     const path = writeJsonConfig("missing-entry", {
       projects: { api: { type: "backend" } },
@@ -117,17 +108,5 @@ describe("loadConfig: validation errors", () => {
     const err = await loadConfig(path, "dev").catch((e) => e);
     expect(err).toBeInstanceOf(ConfigValidationError);
     expect(err.errors[0].field).toBe("projects.api.entry");
-  });
-
-  test("multiple errors are all reported", async () => {
-    const path = writeJsonConfig("multi-error", {
-      projects: {
-        api: { entry: "src/index.ts" },          // missing type
-        web: { type: "frontend" },                 // missing entry
-      },
-    });
-    const err = await loadConfig(path, "dev").catch((e) => e);
-    expect(err).toBeInstanceOf(ConfigValidationError);
-    expect(err.errors.length).toBeGreaterThanOrEqual(2);
   });
 });

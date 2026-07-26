@@ -15,8 +15,6 @@ export interface ConfigContext {
 
 /** Per-project configuration block. */
 export interface ProjectConfig {
-  type: "backend" | "frontend";
-
   /** * Bun build target.
    * Defaults to "bun" for backend, "browser" for frontend.
    */
@@ -81,7 +79,6 @@ export type BundleConfigExport = BundleConfig | BundleConfigFn;
 /** Internal resolved project — all fields guaranteed after config load. */
 export interface ResolvedProject {
   name: string;
-  type: "backend" | "frontend";
   target: "bun" | "browser" | "node";
   entry: string[];
   main: string;

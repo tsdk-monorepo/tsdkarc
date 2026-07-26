@@ -15,28 +15,38 @@ export interface ConfigError {
 export class ConfigValidationError extends Error {
   constructor(public errors: ConfigError[]) {
     super(
-      `bundle.config validation failed:\n${errors.map((e) => `  [${e.field}] ${e.message}`).join("\n")}`
+      `bundle.config validation failed:\n${errors
+        .map((e) => `  [${e.field}] ${e.message}`)
+        .join("\n")}`
     );
     this.name = "ConfigValidationError";
   }
 }
 
 export function findConfigPath(cwd: string): string | null {
-  for (const name of ["bundle.config.ts", "bundle.config.js", "bundle.config.json"]) {
+  for (const name of [
+    "bundle.config.ts",
+    "bundle.config.js",
+    "bundle.config.json",
+  ]) {
     const full = join(cwd, name);
     if (existsSync(full)) return full;
   }
   return null;
 }
 
-function validateProject(name: string, proj: ProjectConfig, errors: ConfigError[]) {
+function validateProject(
+  name: string,
+  proj: ProjectConfig,
+  errors: ConfigError[]
+) {
   const prefix = `projects.${name}`;
 
-  if (proj.type !== "backend" && proj.type !== "frontend") {
-    errors.push({ field: `${prefix}.type`, message: 'Must be "backend" or "frontend"' });
-  }
   if (!proj.entry || (Array.isArray(proj.entry) && proj.entry.length === 0)) {
-    errors.push({ field: `${prefix}.entry`, message: "Must provide at least one entry file" });
+    errors.push({
+      field: `${prefix}.entry`,
+      message: "Must provide at least one entry file",
+    });
   }
 }
 
@@ -55,7 +65,7 @@ export async function loadConfig(
   } else {
     const mod = await import(`${abs}?t=${Date.now()}`);
     const configExport = mod.default ?? mod;
-    
+
     // Resolve dynamic config function if present
     if (typeof configExport === "function") {
       raw = await configExport({ command });
@@ -68,7 +78,10 @@ export async function loadConfig(
 
   const errors: ConfigError[] = [];
   if (!raw.projects || typeof raw.projects !== "object") {
-    errors.push({ field: "projects", message: "Must be an object mapping names to project configs" });
+    errors.push({
+      field: "projects",
+      message: "Must be an object mapping names to project configs",
+    });
     throw new ConfigValidationError(errors);
   }
 
@@ -82,13 +95,18 @@ export async function loadConfig(
   for (const [name, proj] of Object.entries(raw.projects)) {
     const entries = Array.isArray(proj.entry) ? proj.entry : [proj.entry];
     const outdir = resolve(configDir, proj.outdir ?? `dist/${name}`);
-    const mainEntry = proj.main ?? entries[0] as string;
-    const mainJs = resolve(outdir, mainEntry.split("/").pop()!.replace(/\.[tj]sx?$/, ".js"));
+    const mainEntry = proj.main ?? (entries[0] as string);
+    const mainJs = resolve(
+      outdir,
+      mainEntry
+        .split("/")
+        .pop()!
+        .replace(/\.[tj]sx?$/, ".js")
+    );
 
     projects[name] = {
       name,
-      type: proj.type,
-      target: proj.target ?? (proj.type === "frontend" ? "browser" : "bun"),
+      target: proj.target ?? "node",
       entry: entries.map((e) => resolve(configDir, e)),
       main: mainJs,
       tsconfig: resolve(configDir, proj.tsconfig ?? "tsconfig.json"),
@@ -99,7 +117,7 @@ export async function loadConfig(
       minify: proj.minify ?? false,
       port: proj.port ?? null,
       watchDirs: (proj.watchDirs ?? []).map((d) => resolve(configDir, d)),
-      ignore: (proj.ignore ?? []),
+      ignore: proj.ignore ?? [],
       plugins: proj.plugins ?? [], // Pass through the plugins
     };
   }

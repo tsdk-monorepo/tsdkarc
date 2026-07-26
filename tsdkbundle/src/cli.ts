@@ -165,7 +165,6 @@ async function main() {
 
         const inlineProj: ResolvedProject = {
           name: finalName,
-          type: isFrontend ? "frontend" : "backend",
           target: isFrontend ? "browser" : "bun",
           entry: [absPath],
           main: resolve(
