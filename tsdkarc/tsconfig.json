@@ -6,10 +6,10 @@
     "lib": ["ES2015", "DOM", "ES2019.Object", "ES2022", "dom.iterable"],
     "esModuleInterop": true,
     "declaration": true,
-    "outDir": "./lib",
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "outDir": "./lib"
   },
   "include": ["./src"],
   "exclude": ["node_modules"]

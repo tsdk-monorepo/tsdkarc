@@ -1,6 +1,6 @@
-import type { BundleConfigFn } from "./src/types";
+import type { BundleConfigFn, BundleConfig } from "./src/types";
 
-export default (({ command }) => {
+export default (({ command }): BundleConfig => {
   // command will be either "dev" or "build"
   const isProd = command === "build";
 
@@ -9,13 +9,12 @@ export default (({ command }) => {
     projects: {
       api: {
         type: "backend",
-        entry: ["src/index.demo.ts"],
+        entry: ["demo/index.demo.ts"],
         tsconfig: "tsconfig.json",
         outdir: "dist",
         envFile: ".env",
         external: ["pg", "bcrypt"],
 
-        // Dynamic config!
         sourcemap: isProd ? "none" : "linked",
         minify: isProd,
 
@@ -28,7 +27,18 @@ export default (({ command }) => {
         outdir: "dist/worker",
         external: ["bullmq"],
 
-        // Dynamic config!
+        sourcemap: isProd ? "none" : "linked",
+        minify: isProd,
+
+        port: 3002,
+      },
+       web: {
+        type: "frontend",
+        entry: './demo/index.html',
+        main: "src/index.ts",
+        outdir: "dist/worker",
+        external: ["bullmq"],
+
         sourcemap: isProd ? "none" : "linked",
         minify: isProd,
 

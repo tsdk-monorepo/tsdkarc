@@ -23,7 +23,7 @@
     "README.md"
   ],
   "scripts": {
-    "dev:test": "bun run src/cli.ts dev",
+    "dev:test": "bun run src/cli.ts dev api",
     "build:test": "bun run src/cli.ts build",
     "test": "bun test tests/",
     "checktype": "tsc --noEmit",
@@ -42,7 +42,9 @@
     "drizzle-orm": "^0.45.2",
     "dotenv": "^17.3.1",
     "concurrently": "^10.0.3",
-    "@tsconfig/recommended": "^1.0.10"
+    "@tsconfig/recommended": "^1.0.10",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
