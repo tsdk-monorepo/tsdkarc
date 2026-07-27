@@ -1,105 +1,159 @@
-# tsdkbundle (bb) 🚀
+# tsdkbundle
 
-A tool that watches your files and builds your apps automatically.
+A Bun-based ESM bundler and watcher for multi-entry projects.
 
----
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
 
-## 💡 Configuration Cheatsheet
+🇨🇳 中文 · [🇺🇸 English](./README.md)
 
-### Core Structures
+## 🚀 Quick Start
 
-- **`BundleConfig` (Static)**: A direct configuration object.
-- **`BundleConfigFn` (Dynamic)**: A callback function that receives `ctx: { command: "dev" | "build" }`, allowing you to adjust settings based on the environment.
+### 1. Install
 
-### Root Options
+> Ensure [Bun](https://bun.sh/) is installed on your system.
 
-| Property   | Type                            | Description                                                                                       |
-| :--------- | :------------------------------ | :------------------------------------------------------------------------------------------------ |
-| `default`  | `string[]`                      | _(Optional)_ The list of project names to launch when no specific projects are passed to the CLI. |
-| `projects` | `Record<string, ProjectConfig>` | A dictionary defining your individual project configurations.                                     |
-
----
-
-## 🛠 Project Configuration (`ProjectConfig`)
-
-| Property    | Type                                           | Description                                                                                            |
-| :---------- | :--------------------------------------------- | :----------------------------------------------------------------------------------------------------- |
-| `target`    | `"bun" \| "browser" \| "node"`                 | Compilation target. (Defaults: `backend` -> `node`, `frontend` -> `browser`).                           |
-| `entry`     | `string \| string[]`                           | Entry file(s) for compilation. Supports multiple entries.                                              |
-| `main`      | `string`                                       | _(Backend only)_ The process entry point for `dev` mode. Defaults to the compiled result of `entry`.   |
-| `outdir`    | `string`                                       | Output directory. Defaults to `dist/<projectName>`.                                                    |
-| `envFile`   | `string`                                       | Path to your `.env` file. Automatically merged into `process.env` (supports `export` syntax).          |
-| `port`      | `number`                                       | Injected as `process.env.PORT` for backends; used as the dev server port for frontends.                |
-| `external`  | `string[]`                                     | Third-party dependencies to exclude from bundling. **Native node modules are excluded automatically.** |
-| `sourcemap` | `"none" \| "inline" \| "linked" \| "external"` | Source map generation strategy.                                                                        |
-| `minify`    | `boolean`                                      | Whether to compress the output code.                                                                   |
-| `watchDirs` | `string[]`                                     | Additional directories to watch in `dev` mode (e.g., HTML templates, SQL files).                       |
-| `plugins`   | `BunPlugin[]`                                  | Array of native Bun plugins (e.g., YAML, CSS preprocessors).                                           |
-
----
-
-## 📖 Examples
-
-### 1. Basic Full-Stack Setup (Static Config)
-
-A common scenario featuring a Backend API and a React/Vue SPA.
-
-```typescript
-import type { BundleConfig } from "tsdkbundle";
-
-export default {
-  default: ["api", "web"],
-  projects: {
-    api: {
-      target: "node",
-      entry: "src/api/index.ts",
-      envFile: ".env",
-      port: 3000,
-      external: ["pg", "bcrypt"], // Exclude C++ extensions
-    },
-    extraEntry: {
-      target: "node",
-      entry: ["src/workers/task1.ts", "src/workers/task2.ts"],
-      envFile: ".env",
-      external: ["pg", "bcrypt"], // Exclude C++ extensions
-    },
-  },
-} satisfies BundleConfig;
+```bash
+npm install -g tsdkbundle
 ```
 
-### 2. Advanced Environment Logic (Dynamic Config)
+### 2. Setup
 
-Dynamically toggle minification and source maps based on the CLI command.
+Create a `bundle.config.ts` and an entry file in your project root:
 
-```typescript
-import type { BundleConfigFn } from "tsdkbundle";
-import yamlPlugin from "bun-plugin-yaml";
+```ts
+// src/index.ts
+console.log("Hello, tsdkbundle.");
+```
 
-export default (({ command }) => {
+```ts
+// bundle.config.ts
+import type { BundleConfigFn, BundleConfig } from "tsdkbundle";
+
+export default (({ command }): BundleConfig => {
   const isProd = command === "build";
 
   return {
+    default: ["backend"],
     projects: {
-      worker: {
+      backend: {
         target: "node",
-        entry: ["src/worker.ts"],
-        minify: isProd,
+        entry: ["src/index.ts"],
+        outdir: "dist",
+        envFile: ".env",
         sourcemap: isProd ? "none" : "linked",
-        plugins: [yamlPlugin()], // Use native Bun plugins
+        minify: isProd,
+        port: 3000,
       },
     },
   };
 }) satisfies BundleConfigFn;
 ```
 
----
+### 3. Run
 
-## 💻 CLI Command Reference
+```bash
+# Dev mode (auto-watch and restart)
+bundle dev             # Run default projects
+bundle dev backend     # Run only the 'backend' project
 
-| Command                    | Action                                                                                       |
-| :------------------------- | :------------------------------------------------------------------------------------------- |
-| **`bb dev`**               | Starts all projects in the `default` list (Conflict check -> Parallel build -> Watch & Run). |
-| **`bb dev api web`**       | Starts only the `api` and `web` projects.                                                    |
-| **`bb build all`**         | Triggers production builds for all projects defined in `bundle.config.ts`.                   |
-| **`bb dev src/script.ts`** | **Inline Mode**: Launches the file as a backend project with auto-watch, no config needed.   |
-| **`bb dev index.html`**    | **Inline Mode**: Infers a frontend project and starts a local static server.                 |
+# Production build
+bundle build           # Build default projects
+bundle build backend   # Build only the 'backend' project
+```
+
+_(Note: If the command conflicts with Ruby's bundler, use `bb dev` instead)_
+
+## 💡 Advanced Examples
+
+### Custom tsconfig and External Modules
+
+When building Node.js backends, native modules like `pg` and `bcrypt` usually shouldn't be bundled.
+
+```ts
+// bundle.config.ts
+export default (): BundleConfig => {
+  return {
+    projects: {
+      api: {
+        target: "node",
+        entry: ["src/api.ts"],
+        tsconfig: "./tsconfig.server.json", // Specify a custom tsconfig
+        external: ["pg", "bcrypt", "cors"], // Mark as external, do not bundle
+      },
+    },
+  };
+};
+```
+
+## ⚙️ `BundleConfig` Options
+
+```ts
+/** Configuration block for a single project. */
+export interface ProjectConfig {
+  /** Bun build target. Defaults to "node", use "browser" for frontend. */
+  target?: "bun" | "browser" | "node";
+
+  /** Entry file(s). String or array of strings. */
+  entry: string | string[];
+
+  /**
+   * The entry file to spawn as the main process in dev mode (backend only).
+   * Defaults to the first entry if not specified.
+   */
+  main?: string;
+
+  /** Path to tsconfig.json for this project. Defaults to "tsconfig.json". */
+  tsconfig?: string;
+
+  /** Output directory. Defaults to "dist/<projectName>". */
+  outdir?: string;
+
+  /** .env file to load before starting the process. */
+  envFile?: string;
+
+  /** Packages to mark as external (not bundled). */
+  external?: string[];
+
+  /** Sourcemap mode. Defaults to "linked" in dev, "none" in build. */
+  sourcemap?: SourcemapMode;
+
+  /** Minify output. Defaults to false. */
+  minify?: boolean;
+
+  /** Sets process.env.PORT when starting the dev process or frontend server. */
+  port?: number;
+
+  /** Additional directories to watch for changes. */
+  watchDirs?: string[];
+
+  /** Files or directories to ignore when watching. */
+  ignore?: string[];
+
+  /** Native Bun plugins to apply during the build step. e.g. [yamlPlugin()] */
+  plugins?: BunPlugin[];
+}
+
+/** Root config structure for bundle.config.ts */
+export interface BundleConfig {
+  projects: Record<string, ProjectConfig>;
+  /** Default projects to run/build. */
+  default?: string[];
+}
+```
+
+**1. Why create this project?**
+
+In TS-based backend development, independent bundling of sub-modules and multi-entry watch/run are essential. We used `nodemon`, then the CommonJS-only `nestjs/cli`. As ESM becomes the mainstream, we need a tool similar to `nestjs/cli` but with full ESM support. Bun is incredibly fast and provides a great experience, hence this tool.
+
+**2. Why wrap Bun instead of using it directly?**
+
+Bun already provides rich watch and bundle features out of the box. However, piecing together native commands for automated watching and batch bundling of **multi-entry projects** is tedious. This tool aims to solve this pain point in one step.
+
+**3. What's the difference from nestjs/cli?**
+
+`nestjs/cli` is an excellent tool, but its current ESM support is not ideal. This project natively embraces ESM.
+
+**4. Does it support frontend projects?**
+
+It supports bundling frontend code as an entry, but does not include heavy frontend dev features like HMR (Hot Module Replacement). For large frontend projects, Vite or Next.js is recommended. This tool currently focuses on backend TS projects.

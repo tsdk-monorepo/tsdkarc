@@ -56,7 +56,7 @@
     "checktype": "bun run scripts/gen-routes.ts && tsc --noEmit --project tsconfig.json",
     "test": "vitest --run --testTimeout=120000 --hookTimeout=60000 ./tests",
     "perf": "echo Perf1 && tsc -p tsconfig.perf1.json && echo '\nPerf0' &&  tsc -p tsconfig.perf0.json",
-    "bundev": "bb dev api"
+    "bundev": "bundle dev api"
   },
   "dependencies": {
     "zod": "^4.4.3",

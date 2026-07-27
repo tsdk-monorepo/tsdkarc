@@ -16,7 +16,7 @@ export interface ConfigContext {
 /** Per-project configuration block. */
 export interface ProjectConfig {
   /** * Bun build target.
-   * Defaults to "bun" for backend, "browser" for frontend.
+   * Defaults to "node" for backend, set "browser" for frontend.
    */
   target?: "bun" | "browser" | "node";
 
