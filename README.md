@@ -13,8 +13,9 @@ This repository is a Monorepo containing three independently published packages.
 
 - **[tsdkbundle](./tsdkbundle/README.md)**: A Bun-based ESM multi-entry development monitor and bundling tool. (Runtime: Bun)
 
+![banner of tsdkarc](./tsdkarc/assets/banner.jpg)
+
+
 ---
 
 _License: MIT_
-
-![banner of tsdkarc](./tsdkarc/assets/banner.jpg)

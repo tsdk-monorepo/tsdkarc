@@ -3,7 +3,6 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
 
-
 🇨🇳 中文 · [🇺🇸 English](./README.md)
 
 本仓库为 Monorepo 架构，包含以下三个独立发布的工具包，请按需点击查看详细文档：
@@ -14,9 +13,8 @@
 
 - **[tsdkbundle](./tsdkbundle/README.zh-CN.md)**：基于 Bun 的 ESM 多入口开发监测与打包工具。（运行环境：Bun）
 
+![banner of tsdkarc](./tsdkarc/assets/banner.jpg)
+
 ---
 
 _License: MIT_
-
-
-![banner of tsdkarc](./tsdkarc/assets/banner.jpg)
