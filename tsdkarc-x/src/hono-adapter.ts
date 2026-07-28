@@ -160,9 +160,9 @@ export class HonoAdapter implements TransportAdapter<Context> {
     }
   }
 
-  start(port: number, basePath: string): Promise<void> {
+  start(port: number | string, basePath: string): Promise<void> {
     return new Promise((resolve) => {
-      this.server = serve({ fetch: this.app.fetch, port }, (info) => {
+      this.server = serve({ fetch: this.app.fetch, port: +port }, (info) => {
         console.log(
           `🚀 Hono Server ready on http://localhost:${info.port}${basePath}`
         );

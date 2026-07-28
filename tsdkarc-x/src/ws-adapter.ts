@@ -155,7 +155,7 @@ export class WebSocketAdapter implements TransportAdapter<WsContext> {
     );
   }
 
-  start(port: number): Promise<void> {
+  start(port: number | string): Promise<void> {
     return new Promise((resolve) => {
       import("http").then(({ createServer }) => {
         this.httpServer = createServer();

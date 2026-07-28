@@ -75,7 +75,7 @@ export interface TransportAdapter<TRawReq = unknown> {
     routeTree: RuntimeRouteTree,
     createContext: CreateContextFn<TRawReq, any>
   ): void;
-  start(port: number, basePath: string): MaybePromise<void>;
+  start(port: number | string, basePath: string): MaybePromise<void>;
   stop(): MaybePromise<void>;
 }
 

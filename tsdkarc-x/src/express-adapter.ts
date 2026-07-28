@@ -176,7 +176,7 @@ export class ExpressAdapter implements TransportAdapter<Request> {
     }
   }
 
-  start(port: number, basePath: string): Promise<void> {
+  start(port: number | string, basePath: string): Promise<void> {
     return new Promise((resolve) => {
       this.server = this.app.listen(port, () => {
         console.log(
