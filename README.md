@@ -1,4 +1,4 @@
-# <img src="./tsdkarc/assets/logo.jpg" alt="tsdkarc logo" height="32" style="vertical-align:middle" /> tsdkarc monorepo
+# <img src="./tsdkarc/assets/logo.jpg" alt="tsdkarc logo" height="32" align="middle" /> tsdkarc monorepo
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
