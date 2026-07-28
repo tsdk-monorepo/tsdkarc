@@ -19,12 +19,7 @@ npm install -g tsdkbundle
 
 ### 2. 初始化配置
 
-在项目根目录创建入口文件和 `bundle.config.ts`：
-
-```ts
-// src/index.ts
-console.log("Hello, tsdkbundle.");
-```
+在 ts 项目根目录创建 `bundle.config.ts`：
 
 ```ts
 // bundle.config.ts
@@ -38,16 +33,48 @@ export default (({ command }): BundleConfig => {
     projects: {
       backend: {
         target: "node",
-        entry: ["src/index.ts"],
+
+        // 1. 定义需要独立编译的所有入口文件
+        entry: [
+          "src/index.ts", // HTTP API 入口
+          "src/worker.ts", // 异步任务 Worker 入口
+          "src/scripts/migrate.ts", // 数据库迁移脚本
+        ],
+
+        // 2. 指定在开发模式 (dev) 下，自动启动哪个文件作为主进程
+        // 若未指定，则默认 entry[0]
+        main: "src/index.ts",
+
         outdir: "dist",
-        envFile: ".env",
         sourcemap: isProd ? "none" : "linked",
         minify: isProd,
-        port: 3000,
       },
     },
   };
 }) satisfies BundleConfigFn;
+```
+
+```
+project-root/
+├── bundle.config.ts         # ★ 构建编排中心 (tsdkbundle)
+├── package.json
+├── tsconfig.json
+├── .env                     # 本地环境变量 (被 bundle.config 引用)
+├── dist/                    # 编译产出目录 (被 bundle.config 的 outdir 指定，由工具生成)
+│
+└── src/
+    ├── index.ts             # ★ 主入口 (被 bundle.config 的 entry 指定)
+    ├── app.ts               # Web 框架实例 (Express/Koa)，供 index.ts 调用
+    ├── config/              # 业务配置 (如读取 process.env 暴露给其他模块)
+    ├── middlewares/         # 全局中间件
+    ├── utils/               # 全局工具类
+    │
+    └── modules/             # 领域驱动的业务子模块
+        └── users/
+            ├── user.route.ts
+            ├── user.controller.ts
+            ├── user.service.ts
+            └── user.model.ts
 ```
 
 ### 3. 运行命令
@@ -121,9 +148,6 @@ export interface ProjectConfig {
   /** 是否压缩代码。默认为 false */
   minify?: boolean;
 
-  /** 启动开发进程或前端服务器时，设置 process.env.PORT */
-  port?: number;
-
   /** 额外需要监测变动的目录 */
   watchDirs?: string[];
 
@@ -132,6 +156,9 @@ export interface ProjectConfig {
 
   /** 在构建阶段应用的 Bun 原生插件。例如: [yamlPlugin()] */
   plugins?: BunPlugin[];
+
+  /** 启动开发进程或前端服务器时，设置 process.env.PORT */
+  port?: number | string;
 }
 
 /** bundle.config.ts 的根配置结构 */

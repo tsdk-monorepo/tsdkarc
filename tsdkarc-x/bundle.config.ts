@@ -1,6 +1,6 @@
 import type { BundleConfigFn } from "tsdkbundle";
 
-const config: BundleConfigFn = (({ command }) => {
+const config: BundleConfigFn = ({ command }) => {
   // command will be either "dev" or "build"
   const isProd = command === "build";
 
@@ -14,16 +14,14 @@ const config: BundleConfigFn = (({ command }) => {
         outdir: "dist",
         envFile: ".env",
         external: ["pg", "bcrypt"],
-        ignore: ['*.d.ts'],
+        ignore: ["*.d.ts"],
 
         // Dynamic config!
         sourcemap: isProd ? "none" : "linked",
         minify: isProd,
-
-        port: 3010,
       },
     },
   };
-});
+};
 
 export default config;

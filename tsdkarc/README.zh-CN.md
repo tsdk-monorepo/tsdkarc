@@ -1,106 +1,89 @@
 # tsdkarc
 
-> **无装饰器、类型安全的 TypeScript 模块组合与依赖注入库**
+🇨🇳 中文 · [🇺🇸 English](https://www.google.com/search?q=./README.md)
 
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
+> **无装饰器、完全类型安全的 TypeScript 模块组合与依赖注入库。**
 
-🇨🇳 中文 · [🇺🇸 English](./README.md)
-
-不用装饰器，不用 `reflect-metadata`。`ctx` 类型完全由每个模块 `init()` 的返回值在编译期自动推导。
-
-```ts
-import { defineModule, type ContextOf } from "tsdkarc";
-
-const LoggerModule = defineModule().init(() => {
-  console.log("[LOG] init LoggerModule"); // Only log once: [LOG] init LoggerModule
-  return {
-    logger: {
-      log: (message: string) => console.log(`[LOG] ${message}`),
-    },
-  };
-});
-type ILogger = ContextOf<typeof LoggerModule>["logger"];
-
-class UserService {
-  constructor(private logger: ILogger) {}
-  createUser(name: string) {
-    this.logger.log(`Creating user: ${name}`);
-  }
-}
-
-const UserServiceModule = defineModule({
-  name: "userService",
-  modules: [LoggerModule],
-}).init((ctx) => new UserService(ctx.logger));
-
-const app = await defineModule({ modules: [UserServiceModule, LoggerModule] })
-  .init((ctx) => {
-    ctx.logger.log("The application is running..."); // [LOG] The application is running...
-  })
-  .start();
-app.ctx.userService.createUser("Alice"); // [LOG] Creating user: Alice
-await app.stop();
-```
+摆脱 `reflect-metadata` 与侵入式装饰器。`ctx` 的类型完全由每个模块 `init()` 的返回值在编译期自动推导。
 
 ---
 
-## 核心理念：模块是可复用的积木
+## ✨ 核心特性
 
-DI 不是重点，**可组合性**才是。一个模块的契约完全由它声明：`modules` 是输入，`init()` 的返回值是输出。它不知道自己会被装进哪个 app，因此可以被跨项目复用、独立发布、整体替换、或嵌套组合成更大的模块。
-
-```ts
-// logger-module/index.ts —— 独立发布，不知道任何 app 的存在
-export const LoggerModule = defineModule({ name: "logger" }).init(() => ({
-  log: (message: string) => console.log(`[LOG] ${message}`),
-}));
-
-// 不同 app 复用同一个模块，ctx 类型依然完整
-const appA = await defineModule({ modules: [LoggerModule, OrderModule] })
-  .init()
-  .start();
-const appB = await defineModule({ modules: [LoggerModule, ReportModule] })
-  .init()
-  .start();
-```
+- **零装饰器**：无需 Token 或 `@Injectable`，纯原生 TypeScript 函数。
+- **极致类型推导**：按引用自动推导合并后的上下文（`ctx`）类型。
+- **编译期冲突检测**：模块命名或导出字段发生冲突时，TS 编译直接报错。
+- **安全依赖管理**：自动解决菱形依赖（单例启动），运行时精准阻断循环依赖。
+- **优雅降级回滚**：支持完整的生命周期，启动失败自动按依赖倒序回滚。
+- **原生 Tree Shaking**：无副作用设计，完美兼容各类打包器。
 
 ---
 
-## 特性
-
-- **零装饰器**，摆脱 `reflect-metadata`
-- **自动类型推导**：`ctx` 由 `init()` 返回值结构化推导，无需 token
-- **编译期冲突检测**：字段重名在类型检查阶段就会报错
-- **原生 Tree Shaking**：无副作用设计
-- **完整生命周期钩子**：模块级 + 全局级，启动失败自动按依赖倒序回滚
-- **依赖图可视化**：`graph()` + `formatModuleGraph()`
-- **菱形依赖安全**：按引用去重，共享模块只启动一次
-
----
-
-## 安装
+## 🚀 快速开始
 
 ```bash
 npm install tsdkarc
+
 ```
 
-无需 transformer、无需 `ts-patch`，纯 `tsc`/打包器即可运行。
+无需 transformer 或 `ts-patch`，直接在常规 TS 环境中使用：
+
+```ts
+import { defineModule } from "tsdkarc";
+
+// 1. 数据层 (模拟数据库，带生命周期)
+const DbModule = defineModule({ name: "db" }).init(
+  () => {
+    console.log("[DB] 已连接");
+    return { getUser: (id: number) => ({ id, name: "Alice" }) };
+  },
+  { shutdown: () => console.log("[DB] 已断开") } // 退出时自动调用
+);
+
+// 2. 业务层 (依赖数据层)
+const ServiceModule = defineModule({
+  name: "service",
+  modules: [DbModule],
+}).init((ctx) => ({
+  login: (id: number) => {
+    const user = ctx.db.getUser(id); // 完全类型推导
+    console.log(`[Service] 用户 ${user.name} 登录成功`);
+  },
+}));
+
+// 3. 组合启动与调用
+async function bootstrap() {
+  const app = await defineModule({ modules: [ServiceModule] }).start();
+  // 打印：[DB] 已连接
+
+  // 模拟接口请求
+  app.ctx.service.login(1001);
+  // 打印：[Service] 用户 Alice 登录成功
+
+  // 模拟程序退出
+  await app.stop();
+  // 打印：[DB] 已断开
+}
+
+bootstrap();
+```
 
 ---
 
-## 模块定义与组合
+## 🧩 模块化设计理念
 
-```ts
-// 匿名模块：返回值直接铺平进父级 ctx
-const hello = defineModule().init(() => ({ greet: "hello" }));
-type HelloCtx = ContextOf<typeof hello>; // { greet: string }
+DI（依赖注入）只是手段，**可组合性**才是目的。模块完全通过输入（`modules`）和输出（`init()` 返回值）进行声明，不绑定任何具体应用。
 
-// 命名模块：返回值挂载到 ctx[name] 下
-const example = defineModule({ name: "example" }).init(() => ({ test: "x" }));
-type ExampleCtx = ContextOf<typeof example>; // { example: { test: string } }
-```
+### 模块分类
 
-`init(ctx)` 收到的 `ctx` 只包含**依赖**的 context，不含自身 slice —— 这也是循环自引用在结构上不可能发生的原因。诸如环境变量、密钥等非模块值，直接在 `init()` 内闭包获取即可，无需额外的“显式映射”API：
+| 模块类型     | 定义方式                        | 上下文推导行为                              |
+| ------------ | ------------------------------- | ------------------------------------------- |
+| **匿名模块** | `defineModule()`                | 返回值直接**平铺**合并进父级 `ctx` 中。     |
+| **命名模块** | `defineModule({ name: 'api' })` | 返回值**挂载**到父级 `ctx.api` 命名空间下。 |
+
+### 依赖与环境变量
+
+`init(ctx)` 接收到的 `ctx` 仅包含当前模块所依赖的内容。诸如环境变量、密钥等外部依赖，直接利用闭包获取即可，无需繁琐的映射绑定：
 
 ```ts
 const ConfigModule = defineModule({ name: "config" }).init(() => ({
@@ -108,80 +91,81 @@ const ConfigModule = defineModule({ name: "config" }).init(() => ({
 }));
 ```
 
-**菱形依赖**：`LoggerModule` 若被多条路径依赖，tsdkarc 按模块引用（而非 `name`）去重，只启动一次，且排在所有依赖它的模块之前。
+---
+
+## ⚙️ 生命周期与钩子
+
+`tsdkarc` 提供细粒度的生命周期管理，支持异步操作与失败自动清理。
+
+| 作用域 | 支持的钩子 (Hooks) | 说明 |
+| ------ | ------------------ | ---- |
+
+| **模块级**<br>
+
+<br>`init(fn, hooks)` | `beforeBoot`, `afterBoot`, `beforeShutdown`, `shutdown`, `afterShutdown` | 仅影响当前模块自身。 |
+| **全局级**<br>
+
+<br>`start(hooks)` | `beforeBoot`, `afterBoot`, `beforeShutdown`, `afterShutdown`<br>
+
+<br>`*EachBoot`, `*EachShutdown` | 掌控整个组合应用。`Each` 类钩子可捕获每个子模块的状态。 |
 
 ---
 
-## 生命周期钩子
+## 🔍 依赖分析与调试
 
-**模块级**（`.init()` 第二参数，仅影响自身）：`beforeBoot` `afterBoot` `beforeShutdown` `shutdown` `afterShutdown`
-
-**全局级**（`.start()` 参数，管理整个组合）：`beforeBoot` `afterBoot` `beforeEachBoot` `afterEachBoot` `beforeShutdown` `afterShutdown` `beforeEachShutdown` `afterEachShutdown`
-
-`*Each*` 钩子额外接收 `meta: { name: string | null; kind: "named" | "anon" }`。启动失败时，已启动模块会按依赖倒序自动回滚 `shutdown`，无需手动清理。
-
----
-
-## 依赖图
+遇到 `Circular dependency detected` 报错时，可使用内置的图谱工具排查：
 
 ```ts
 console.log(app.graph().formatted);
+// 输出示例：
 // - app
 //   - userService
 //     - logger
 ```
 
-排查 `[tsdkarc] Circular dependency detected at module "<name>"` 的第一入口。
+---
+
+## 📖 API 参考
+
+### `defineModule(meta?)`
+
+核心工厂函数，返回 `ModuleDeclaration`。
+
+| 参数              | 类型          | 说明                                          |
+| ----------------- | ------------- | --------------------------------------------- |
+| `name`            | `string`      | (可选) 定义命名模块，作为导出对象的挂载键名。 |
+| `modules`         | `AnyModule[]` | (可选) 声明前置依赖的模块数组。               |
+| `ignoreConflicts` | `string[]`    | (可选) 允许同名字段并执行深合并的 Key 列表。  |
+
+### 模块实例方法
+
+- `.init(bootFn, hooks?)`：定义模块实现逻辑。
+- `.with(...modules)`：动态追加依赖模块。
+- `.start(options?)`：执行初始化，返回启动后的应用实例。
+- `.graph()`：输出当前模块的依赖树拓扑。
+
+### 核心类型工具
+
+- `ContextOf<M>`：提取模块最终暴露的完整类型。
+- `DepCtxOf<M>`：提取模块所依赖的上下文类型。
+- `OwnSliceOf<M>`：提取模块自身 `init()` 返回的类型。
 
 ---
 
-## API 参考
-
-**`defineModule(meta?)`** → `ModuleDeclaration`
-
-| 参数              | 类型          | 说明                         |
-| ----------------- | ------------- | ---------------------------- |
-| `name`            | `string`      | 可选，ctx 命名空间键         |
-| `modules`         | `AnyModule[]` | 可选，依赖的其他模块         |
-| `ignoreConflicts` | `string[]`    | 可选，允许冲突并深合并的 key |
-
-**模块实例方法**：`.init(bootFn?, hooks?)` `.with(...modules)` `.start(options?)` `.graph()`
-
-**类型工具**：`ContextOf<M>` 完整 ctx 类型 · `DepCtxOf<M>` 依赖 ctx 类型（不含自身） · `OwnSliceOf<M>` 自身 `init()` 返回类型
-
----
-
-## ❓ FAQ
-
-**Q: 与 NestJS / InversifyJS 等基于装饰器的 DI 库有何不同？**
-
-不需要引入 `reflect-metadata`，也没有 `@Injectable()` 等侵入式代码。`tsdkarc` 利用 TypeScript 强大的推导能力，仅通过普通函数就能让 `ctx` 类型做到全自动感知。
+## ❓ 常见问题 (FAQ)
 
 **Q: 遇到循环依赖会怎样？**
 
-会在 `.start()` 的排序阶段立刻抛出异常：`[tsdkarc] Circular dependency detected at module "<name>"`。可以配合打印 `.graph().formatted` 进行排查。
+启动时（`.start()` 阶段）会立即抛出异常并阻断执行。
 
-**Q: `init()` 返回字段和已注入的依赖 ctx 冲突了怎么办？**
+**Q: 同名字段冲突了怎么办？**
 
-编译期会触发 `FindSliceCollision` 错误。⚠️ 注意，这是纯 TypeScript 静态检查，如果使用 `@ts-ignore` 绕过，运行时则会发生静默覆盖。
+编译期会触发 `FindSliceCollision` TS 错误。若强行 `@ts-ignore`，运行时匿名模块会抛出异常，除非显式配置了 `ignoreConflicts`。
 
-**Q: 多模块依赖形成了“菱形依赖”（Diamond Dependency），会重复启动吗？**
+**Q: `ignoreConflicts` 的深合并规则是什么？**
 
-不会。`tsdkarc` 会对模块对象的引用进行拓扑排序并去重（不以 `name` 为基准）。同一模块即使被多条路径依赖，也**只会启动一次**，并确保排在所有依赖它的模块之前。
+仅对**纯对象**（Plain Object）进行递归合并。数组、实例对象等会直接覆盖。出于安全考虑，系统会严格跳过原型链（`__proto__` / `prototype`）的合并。
 
-**Q: 匿名模块字段冲突了会怎样？**
+**Q: 多路径依赖同一个模块（菱形依赖）会导致重复启动吗？**
 
-运行时会抛出 `[tsdkarc] Anonymous module slice collision` 异常，除非该字段被显式加入了 `ignoreConflicts`。
-
-**Q: `ignoreConflicts` 的深合并策略是怎样的？**
-
-仅当两边都是**纯对象**（Plain Object，排除数组/`Date`/`Map`/实例对象等）时才会递归合并。非纯对象时，后者整体覆盖前者，数组不会被拼接。安全起见，引擎会始终跳过对 `__proto__` 和 `prototype` 的合并。
-
-
----
-
-## 其他
-
-[MIT](./LICENSE)
-
-[CHANGELOG.md](./CHANGELOG.md)
+不会。系统根据模块对象的**引用**进行去重拓扑排序。共享模块全局仅启动一次，并确保在其所有依赖者之前就绪。

@@ -1,7 +1,9 @@
-# tsdkarc monorepo
+# <img src="./tsdkarc/assets/logo.jpg" alt="logo" height="22" /> tsdkarc monorepo
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
+
+![banner of tsdkarc](./tsdkarc/assets/banner.jpg)
 
 🇨🇳 中文 · [🇺🇸 English](./README.md)
 

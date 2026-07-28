@@ -19,12 +19,7 @@ npm install -g tsdkbundle
 
 ### 2. Setup
 
-Create a `bundle.config.ts` and an entry file in your project root:
-
-```ts
-// src/index.ts
-console.log("Hello, tsdkbundle.");
-```
+Create `bundle.config.ts` in TS project:
 
 ```ts
 // bundle.config.ts
@@ -38,12 +33,21 @@ export default (({ command }): BundleConfig => {
     projects: {
       backend: {
         target: "node",
-        entry: ["src/index.ts"],
+
+        // 1. Define all entry files to be compiled independently
+        entry: [
+          "src/index.ts", // HTTP API entry point
+          "src/worker.ts", // Async task worker entry point
+          "src/scripts/migrate.ts", // Database migration script
+        ],
+
+        // 2. Specify the file to spawn as the main process in dev mode
+        // Defaults to entry[0] if omitted
+        main: "src/index.ts",
+
         outdir: "dist",
-        envFile: ".env",
         sourcemap: isProd ? "none" : "linked",
         minify: isProd,
-        port: 3000,
       },
     },
   };
@@ -121,9 +125,6 @@ export interface ProjectConfig {
   /** Minify output. Defaults to false. */
   minify?: boolean;
 
-  /** Sets process.env.PORT when starting the dev process or frontend server. */
-  port?: number;
-
   /** Additional directories to watch for changes. */
   watchDirs?: string[];
 
@@ -132,6 +133,9 @@ export interface ProjectConfig {
 
   /** Native Bun plugins to apply during the build step. e.g. [yamlPlugin()] */
   plugins?: BunPlugin[];
+
+  /** Sets process.env.PORT when starting the dev process or frontend server. */
+  port?: number | string;
 }
 
 /** Root config structure for bundle.config.ts */

@@ -2,7 +2,8 @@
 #
 # Trigger: push a tag like  tsdkarc@1.2.3  or  tsdkarc-x@1.2.3-alpha.1
 # Packages live at:  <repo-root>/tsdkarc/  tsdkarc-x/  tsdkbundle/
-# tsdkarc-x and tsdkbundle depend on tsdkarc's built dist, so tsdkarc is built first for those.
+# tsdkarc-x depend on tsdkarc's built dist, so tsdkarc is built first for those.
+# tsdkbundle is independent
 # Bun is used throughout, mirroring the working single-package release.yml.
 
 name: Publish
@@ -162,10 +163,18 @@ jobs:
           fi
           echo "✅ Version verified: $PKG_VERSION"
 
+      # NOTE: upload names/paths must match what the publish job downloads
+      # (dist-${PACKAGE}-esm / dist-${PACKAGE}-lib), mirroring build-tsdkarc.
       - uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ env.PACKAGE }}
-          path: ${{ env.PACKAGE }}/dist
+          name: dist-${{ env.PACKAGE }}-esm
+          path: ${{ env.PACKAGE }}/esm
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ env.PACKAGE }}-lib
+          path: ${{ env.PACKAGE }}/lib
           retention-days: 1
 
   # ── 4. Publish ───────────────────────────────────────────────────────────────
@@ -199,11 +208,12 @@ jobs:
           name: dist-${{ env.PACKAGE }}-lib
           path: ${{ env.PACKAGE }}/lib
 
-      # Mirror purge-pkg-for-publish from release.yml — adjust path if the
-      # script lives at repo root or inside each package folder.
+      # purge-pkg-for-publish.mjs lives at repo root scripts/ and accepts
+      # the target package directory as an argument. Run from repo root
+      # (default working directory after checkout) rather than inside
+      # the package folder.
       - name: Prepare package for publish
-        run: node scripts/purge-pkg-for-publish.mjs
-        working-directory: ${{ env.PACKAGE }}
+        run: node scripts/purge-pkg-for-publish.mjs ./${{ env.PACKAGE }}
 
       - name: Verify package contents (dry run)
         run: npm pack --dry-run

@@ -27,8 +27,9 @@
   "files": [
     "lib/*",
     "esm/*",
-    "assets",
-    "README.md"
+    "assets/*",
+    "README.md",
+    "README.zh-CN.md"
   ],
   "keywords": [
     "typesafe",

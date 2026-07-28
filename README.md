@@ -1,9 +1,11 @@
-# tsdkarc monorepo
+# <img src="./tsdkarc/assets/logo.jpg" alt="logo" height="22" /> tsdkarc monorepo
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
 
 🇺🇸 English · [🇨🇳 中文](./README.zh-CN.md)
+
+![banner of tsdkarc](./tsdkarc/assets/banner.jpg)
 
 This repository is a Monorepo containing three independently published packages. Click the links below for detailed documentation:
 

@@ -16,7 +16,7 @@ import type { Context } from "hono";
 
 const createContext2 = async (c: Context) => ({
   get token() {
-    return c.req.header('Authorization') ?? null;
+    return c.req.header("Authorization") ?? null;
   },
 });
 
@@ -166,7 +166,7 @@ const routes = {
   mock: mockRoutes,
 };
 
-const port = 3011;
+const port = process.env.PORT || 3000;
 const basePath = "/api";
 export const app = launchApp({
   basePath,

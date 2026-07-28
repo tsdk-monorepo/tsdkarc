@@ -350,7 +350,7 @@ export async function launchApp<
   createContext?: CreateContextFn<TRawReq, TReqCtx>;
   routes: TRoutes;
   basePath: string;
-  port?: number;
+  port?: number | string;
 }) {
   const { transport, createContext, routes, port = 3000, basePath } = options;
   const routeModules = extractRouteModules(routes);
