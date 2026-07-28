@@ -5,8 +5,6 @@
 
 🇺🇸 English · [🇨🇳 中文](./README.zh-CN.md)
 
-![banner of tsdkarc](./tsdkarc/assets/banner.jpg)
-
 This repository is a Monorepo containing three independently published packages. Click the links below for detailed documentation:
 
 - **[tsdkarc](./tsdkarc/README.md)**: A decorator-free, minimalist, and type-safe Dependency Injection (DI) and module composition library.
@@ -18,3 +16,5 @@ This repository is a Monorepo containing three independently published packages.
 ---
 
 _License: MIT_
+
+![banner of tsdkarc](./tsdkarc/assets/banner.jpg)
