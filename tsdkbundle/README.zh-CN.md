@@ -1,10 +1,11 @@
 # tsdkbundle
 
-一个基于 Bun 构建的 ESM 多入口开发监测与打包工具。
-
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
+
 🇨🇳 中文 · [🇺🇸 English](./README.md)
+
+一个基于 Bun 构建的 ESM 多入口开发监测与打包工具。
 
 ## 🚀 快速开始
 
@@ -18,7 +19,7 @@ npm install -g tsdkbundle
 
 ### 2. 初始化配置
 
-在项目根目录创建 `bundle.config.ts` 和入口文件：
+在项目根目录创建入口文件和 `bundle.config.ts`：
 
 ```ts
 // src/index.ts
@@ -140,6 +141,8 @@ export interface BundleConfig {
   default?: string[];
 }
 ```
+
+## 常见问题 FAQ
 
 **1. 为什么创建这个项目？**
 

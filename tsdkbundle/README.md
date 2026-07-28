@@ -5,7 +5,7 @@ A Bun-based ESM bundler and watcher for multi-entry projects.
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
 
-🇨🇳 中文 · [🇺🇸 English](./README.md)
+🇺🇸 English · [🇨🇳 中文](./README.zh-CN.md)
 
 ## 🚀 Quick Start
 
@@ -141,6 +141,8 @@ export interface BundleConfig {
   default?: string[];
 }
 ```
+
+## FAQ
 
 **1. Why create this project?**
 

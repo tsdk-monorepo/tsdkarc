@@ -1,0 +1,108 @@
+# .github/workflows/tsdkbundle.yml
+#
+# Runs on push to expirements and on all pull requests. No publish — releases are tag-driven via publish.yml.
+# Tags are explicitly excluded so CI does not double-run alongside publish.yml on release.
+#
+# Split out from ci.yml so tsdkbundle can be built, triggered, and regenerated
+# independently. Artifacts are not shared across workflow files, so tsdkarc
+# is rebuilt here rather than depending on ci.yml's run — this keeps the
+# dependency explicit and avoids hidden cross-workflow state.
+#
+# Dependency graph:
+#   tsdkarc
+#   └── tsdkbundle
+
+name: tsdkbundle
+
+on:
+  push:
+    branches:
+      - expirements
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+
+permissions:
+  contents: read
+
+jobs:
+  # ── 1. tsdkarc ──────────────────────────────────────────────────────────────
+  build-tsdkarc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: tsdkarc
+
+      - name: Typecheck
+        run: bun run checktype
+        working-directory: tsdkarc
+
+      - name: Build
+        run: bun run build
+        working-directory: tsdkarc
+
+      - name: Test
+        run: bun run test
+        working-directory: tsdkarc
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-tsdkarc-esm-bundle
+          path: tsdkarc/esm
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-tsdkarc-lib-bundle
+          path: tsdkarc/lib
+          retention-days: 1
+
+  # ── 2. tsdkbundle (depends on tsdkarc) ─────────────────────────────────────
+  build-tsdkbundle:
+    needs: build-tsdkarc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkarc-esm-bundle
+          path: tsdkarc/esm
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkarc-lib-bundle
+          path: tsdkarc/lib
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: tsdkbundle
+
+      - name: Typecheck
+        run: bun run checktype
+        working-directory: tsdkbundle
+
+      - name: Build
+        run: bun run build
+        working-directory: tsdkbundle
+
+      - name: Test
+        run: bun run test
+        working-directory: tsdkbundle
