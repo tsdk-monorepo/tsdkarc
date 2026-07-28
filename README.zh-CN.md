@@ -1,11 +1,9 @@
-# tsdkarc / tsdkarc-x / tsdkbundle
+# tsdkarc monorepo
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
 
 🇨🇳 中文 · [🇺🇸 English](./README.md)
-
-一个轻量、无魔法且端到端类型安全的 TypeScript 后端开发工具链。
 
 本仓库为 Monorepo 架构，包含以下三个独立发布的工具包，请按需点击查看详细文档：
 
