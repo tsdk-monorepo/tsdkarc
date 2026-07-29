@@ -21,8 +21,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://arc.tsdk.dev"), // Replace with your actual domain
 
   title: {
-    default:
-      "TsdkArc | The Fully Type-safe Module Composable Library",
+    default: "TsdkArc | The Fully Type-safe Module Composable Library",
     template: "%s | TsdkArc", // Useful for sub-pages like "Docs | tsdk"
   },
   description:
@@ -38,6 +37,8 @@ export const metadata: Metadata = {
     "node",
     "di",
     "dependency injection",
+    "tsdkarc-x",
+    "tsdkbundle",
   ],
   authors: [{ name: "tsdk-monorepo", url: "https://github.com/tsdk-monorepo" }],
   creator: "tsdk-monorepo",
@@ -47,8 +48,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://arc.tsdk.dev",
-    title:
-      "TsdkArc | The Fully Type-safe Module Composable Library",
+    title: "TsdkArc | The Fully Type-safe Module Composable Library",
     description:
       "Compose modules like building blocks, nest them, and share them across projects. Clean, simple, type safe and scalable.",
     siteName: "TsdkArc",
@@ -65,8 +65,7 @@ export const metadata: Metadata = {
   // Twitter Cards (How it looks when tweeted)
   twitter: {
     card: "summary_large_image", // This gives you the big, beautiful image preview
-    title:
-      "TsdkArc | The Fully Type-safe Module Composable Library",
+    title: "TsdkArc | The Fully Type-safe Module Composable Library",
     description:
       "Compose modules like building blocks, nest them, and share them across projects. Clean, simple, type safe and scalable.",
     images: ["/og.jpg"],
@@ -95,16 +94,22 @@ const myAwesomeProjects = [
     url: "https://github.com/suhaotian/xior",
   },
   {
-    name: "tsdk",
-    emoji: "🛠️",
-    desc: "Type-safe API development CLI tool for TypeScript.",
-    url: "https://github.com/tsdk-monorepo/tsdk",
+    name: "tsdkarc-x",
+    emoji: "🛫",
+    desc: "Strongly-typed, High performance and Edge-compatible RPC for full-stack TypeScript. Type safety from backend middleware to frontend client — no API docs needed. Built-in OPENAPI support.",
+    url: "https://github.com/tsdk-monorepo/tsdkarc",
   },
   {
     name: "broad-infinite-list",
     emoji: "⚡",
     desc: "A high-performance, bidirectional infinite scroll list component for large list rendering, support React/Vue/Expo.",
     url: "https://github.com/suhaotian/broad-infinite-list",
+  },
+  {
+    name: "tsdkbundle",
+    emoji: "🐰",
+    desc: "A Bun-based ESM bundler and watcher for multi-entry projects.",
+    url: "https://github.com/tsdk-monorepo/tsdkarc",
   },
   {
     name: "littkk",

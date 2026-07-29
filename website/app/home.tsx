@@ -361,59 +361,6 @@ export default function HomeView({
           </div>
         </div>
       </section>
-
-      {/* Minimalist Lists (Use Cases & What it is NOT) */}
-      <section className="py-16 md:px-12 max-w-7xl mx-auto flex flex-col md:flex-row gap-20">
-        {/* Ideal Use Cases */}
-        <div className="flex-1">
-          <h2 className="px-6 md:px-0 text-2xl font-bold tracking-tight mb-8">
-            Ideal Use Cases
-          </h2>
-          <div className="space-y-2 px-3 md:px-0">
-            {useCases.map((uc, i) => (
-              <div
-                key={i}
-                className="flex gap-4 p-4 -ml-4 rounded-xl hover:bg-gray-50 transition-colors group cursor-crosshair active:scale-[0.98]">
-                <div className="text-2xl shrink-0 transition-transform duration-300 group-hover:scale-110">
-                  {uc.icon}
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg">{uc.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">
-                    {uc.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* What it is NOT */}
-        <div className="flex-1">
-          <h2 className="px-6 md:px-0 text-2xl font-bold tracking-tight mb-8 text-gray-400">
-            What it is NOT
-          </h2>
-          <div className="space-y-2 px-3 md:px-0">
-            {notCases.map((nc, i) => (
-              <div
-                key={i}
-                className="flex gap-4 p-4 -ml-4 rounded-xl hover:bg-gray-50 transition-colors group cursor-crosshair active:scale-[0.98]">
-                <div className="text-gray-300 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:text-red-500">
-                  <XIcon className="w-6 h-6 mt-1" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg text-gray-700 group-hover:text-black transition-colors">
-                    {nc.title}
-                  </h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">
-                    {nc.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

@@ -1,0 +1,149 @@
+{
+  "name": "tsdkarc-x",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": {
+      "require": "./lib/index.js",
+      "import": "./esm/index.js",
+      "types": "./lib/index.d.ts"
+    },
+    "./express": {
+      "require": "./lib/express-adapter.js",
+      "import": "./esm/express-adapter.js",
+      "types": "./lib/express-adapter.d.ts"
+    },
+    "./hono": {
+      "require": "./lib/hono-adapter.js",
+      "import": "./esm/hono-adapter.js",
+      "types": "./lib/hono-adapter.d.ts"
+    },
+    "./ws": {
+      "require": "./lib/ws-adapter.js",
+      "import": "./esm/ws-adapter.js",
+      "types": "./lib/ws-adapter.d.ts"
+    },
+    "./openapi": {
+      "require": "./lib/scripts/openapi.js",
+      "import": "./esm/scripts/openapi.js",
+      "types": "./lib/scripts/openapi.d.ts"
+    },
+    "./extract": {
+      "require": "./lib/scripts/extract-types.js",
+      "import": "./esm/scripts/extract-types.js",
+      "types": "./lib/scripts/extract-types.d.ts"
+    },
+    "./client": {
+      "require": "./lib/client.js",
+      "import": "./esm/client.js",
+      "types": "./lib/client.d.ts"
+    },
+    "./react/swr": {
+      "require": "./lib/react/swr.js",
+      "import": "./esm/react/swr.js",
+      "types": "./lib/react/swr.d.ts"
+    },
+    "./react/query": {
+      "require": "./lib/react/react-query.js",
+      "import": "./esm/react/react-query.js",
+      "types": "./lib/react/react-query.d.ts"
+    }
+  },
+  "files": [
+    "lib/*",
+    "esm/*",
+    "README.md",
+    "README.zh-CN.md"
+  ],
+  "scripts": {
+    "build": "concurrently \"npm run build:cjs\"  \"npm run build:esm\"",
+    "build:cjs": "rm -rf lib && tsc --project tsconfig.cjs.json && rm -rf lib/tests",
+    "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests",
+    "checktype": "bun run scripts/gen-routes.ts && tsc --noEmit --project tsconfig.json",
+    "test": "vitest --run --testTimeout=120000 --hookTimeout=60000 ./tests",
+    "perf": "echo Perf1 && tsc -p tsconfig.perf1.json && echo '\nPerf0' &&  tsc -p tsconfig.perf0.json",
+    "bundev": "bundle dev api"
+  },
+  "dependencies": {
+    "zod": "^4.4.3",
+    "xior": "^0.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/express": "^5.0.6",
+    "@types/ws": "^8.18.1",
+    "drizzle-kit": "^0.31.10",
+    "typescript": "^6.0.3",
+    "@types/koa": "^3.0.2",
+    "@types/koa__multer": "^2.0.8",
+    "@types/react": "^19.2.14",
+    "tsdkarc": "file:../tsdkarc",
+    "tsdkbundle": "file:../tsdkbundle",
+    "@hono/node-server": "^2.0.11",
+    "drizzle-orm": "^0.45.1",
+    "hono": "^4.12.32",
+    "pino": "^10.3.1",
+    "pino-pretty": "^13.1.3",
+    "postgres": "^3.4.8",
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "@types/multer": "^2.2.0",
+    "koa": "^3.1.2",
+    "@koa/router": "^15.4.0",
+    "@koa/bodyparser": "^6.1.0",
+    "@tanstack/react-query": "^5.101.4",
+    "swr": "^2.4.2",
+    "@koa/multer": "^4.0.0",
+    "react": "^19.2.4",
+    "@hono/swagger-ui": "^0.6.1",
+    "@scalar/hono-api-reference": "^0.11.11",
+    "@scalar/express-api-reference": "^0.10.11",
+    "concurrently": "^10.0.3",
+    "@tsconfig/recommended": "^1.0.13",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "swr": "^2.4.2",
+    "@tanstack/react-query": "^5.101.4",
+    "koa": "^3.1.2",
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "@hono/swagger-ui": "^0.6.1",
+    "@scalar/hono-api-reference": "^0.11.11",
+    "@scalar/express-api-reference": "^0.10.11",
+    "@hono/node-server": "^2.0.11",
+    "hono": "^4.12.32"
+  },
+  "peerDependenciesMeta": {
+    "swr": {
+      "optional": true
+    },
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "koa": {
+      "optional": true
+    },
+    "express": {
+      "optional": true
+    },
+    "multer": {
+      "optional": true
+    },
+    "@hono/swagger-ui": {
+      "optional": true
+    },
+    "@scalar/hono-api-reference": {
+      "optional": true
+    },
+    "@scalar/express-api-reference": {
+      "optional": true
+    },
+    "hono": {
+      "optional": true
+    },
+    "@hono/node-server": {
+      "optional": true
+    }
+  }
+}

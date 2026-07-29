@@ -1,0 +1,72 @@
+{
+  "name": "tsdkbundle",
+  "version": "0.0.1",
+  "description": "A Bun-based ESM bundler and watcher for multi-entry projects.",
+  "repository": "tsdk-monorepo/tsdkarc",
+  "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
+  "homepage": "https://github.com/tsdk-monorepo/tsdkarc/tree/expirements/tsdkbundle",
+  "type": "module",
+  "bin": {
+    "bb": "./lib/cli.js",
+    "bundle": "./lib/cli.js"
+  },
+  "main": "./lib/index.js",
+  "module": "./esm/index.js",
+  "types": "./lib/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./lib/index.js",
+      "import": "./esm/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "files": [
+    "lib/*",
+    "esm/*",
+    "README.md",
+    "README.zh-CN.md"
+  ],
+  "scripts": {
+    "dev:test": "bun run src/cli.ts dev api",
+    "build:test": "bun run src/cli.ts build",
+    "test": "bun test tests/",
+    "checktype": "tsc --noEmit",
+    "build": "concurrently \"npm run build:cjs\"  \"npm run build:esm\"",
+    "build:cjs": "rm -rf lib && tsc --project tsconfig.cjs.json && rm -rf lib/tests",
+    "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests"
+  },
+  "dependencies": {
+    "minimatch": "^10.2.5"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^25.5.0",
+    "typescript": "^7",
+    "pg": "^8.20.0",
+    "drizzle-orm": "^0.45.2",
+    "dotenv": "^17.3.1",
+    "concurrently": "^10.0.3",
+    "@tsconfig/recommended": "^1.0.10",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "keywords": [
+    "bun",
+    "bundler",
+    "typescript",
+    "esm",
+    "dev watch",
+    "build",
+    "multiple entries",
+    "nodemon alternatives",
+    "nestjs/cli alternatives"
+  ],
+  "author": "suhaotian",
+  "license": "MIT"
+}

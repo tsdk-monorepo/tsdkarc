@@ -2,12 +2,12 @@
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
     "strict": true,
-    "lib": ["ES2015", "DOM"],
+    "lib": ["ES2015", "DOM", "ES2019.Object"],
     "esModuleInterop": true,
     "declaration": true,
     "outDir": "./lib",
     "noImplicitAny": true
   },
-  "include": ["./src", "./typecheck"],
+  "include": ["./src"],
   "exclude": ["node_modules"]
 }

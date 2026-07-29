@@ -1,16 +1,19 @@
-import { defineModule } from "tsdkarc";
-import { Request, Response, NextFunction } from "express";
+import { defineModule, type ContextOf } from "tsdkarc";
+import type { Request, Response, NextFunction } from "express";
 
-interface AuthSlice {
-  authenticate: (req: Request, res: Response, next: NextFunction) => void;
-}
-
-export const authModule = defineModule<AuthSlice>()({
+export const authModule = defineModule({
   name: "auth",
-  boot(ctx) {
-    ctx.set("authenticate", (req, res, next) => {
-      if (!req.headers.authorization) return res.status(401).end();
+}).init(() => {
+  return {
+    authenticate: (req: Request, res: Response, next: NextFunction) => {
+      if (!req.headers.authorization) {
+        return res.status(401).end();
+      }
       next();
-    });
-  },
+    },
+  };
 });
+
+// Optional: If you need to export the inferred type for use elsewhere
+export type AuthModuleCtx = ContextOf<typeof authModule>;
+// Evaluates to: { auth: { authenticate: (req, res, next) => void } }

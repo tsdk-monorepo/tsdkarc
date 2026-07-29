@@ -1,0 +1,16 @@
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "es2020",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "outDir": "dist",
+    "incremental": true,
+    "skipLibCheck": true,
+    "declaration": false,
+    "noEmit": true,
+    "extendedDiagnostics": true
+  },
+  "files": ["scripts/demo/demo.client.perf0.ts"]
+}

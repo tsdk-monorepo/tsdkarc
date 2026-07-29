@@ -1,0 +1,144 @@
+# .github/workflows/ci.yml
+#
+# Runs on push to expirements and on all pull requests. No publish — releases are tag-driven via publish.yml.
+# Tags are explicitly excluded so CI does not double-run alongside publish.yml on release.
+#
+# Dependency graph:
+#   tsdkarc
+#   ├── tsdkarc-x  (parallel)
+#   └── tsdkbundle (parallel)
+
+name: CI
+
+on:
+  push:
+    branches:
+      - expirements
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+
+permissions:
+  contents: read
+
+jobs:
+  # ── 1. tsdkarc ──────────────────────────────────────────────────────────────
+  build-tsdkarc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: tsdkarc
+
+      - name: Typecheck
+        run: bun run checktype
+        working-directory: tsdkarc
+
+      - name: Build
+        run: bun run build
+        working-directory: tsdkarc
+
+      - name: Test
+        run: bun run test
+        working-directory: tsdkarc
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-tsdkarc-esm
+          path: tsdkarc/esm
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-tsdkarc-lib
+          path: tsdkarc/lib
+          retention-days: 1
+
+  # ── 2a. tsdkarc-x (depends on tsdkarc) ─────────────────────────────────────
+  build-tsdkarc-x:
+    needs: build-tsdkarc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: oven-sh/setup-bun@v2
+
+      # Restore tsdkarc dist before bun install — postinstall scripts may
+      # reference tsdkarc/dist and will fail if it does not exist yet.
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkarc-esm
+          path: tsdkarc/esm
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkarc-lib
+          path: tsdkarc/lib
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: tsdkarc-x
+
+      - name: Typecheck
+        run: bun run checktype
+        working-directory: tsdkarc-x
+
+      - name: Build
+        run: bun run build
+        working-directory: tsdkarc-x
+
+      - name: Test
+        run: bun run test
+        working-directory: tsdkarc-x
+
+  # ── 2b. tsdkbundle (depends on tsdkarc, parallel with tsdkarc-x) ────────────
+  build-tsdkbundle:
+    needs: build-tsdkarc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkarc-esm
+          path: tsdkarc/esm
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkarc-lib
+          path: tsdkarc/lib
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: tsdkbundle
+
+      - name: Typecheck
+        run: bun run checktype
+        working-directory: tsdkbundle
+
+      - name: Build
+        run: bun run build
+        working-directory: tsdkbundle
+
+      - name: Test
+        run: bun run test
+        working-directory: tsdkbundle
