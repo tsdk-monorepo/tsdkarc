@@ -1,0 +1,153 @@
+# .github/workflows/publish-tsdkarc.yml
+#
+# Trigger: push a tag like  tsdkarc@1.2.3  or  tsdkarc@1.2.3-alpha.1
+# Publishes ONLY the tsdkarc package at <repo-root>/tsdkarc/.
+# Flat, linear, no cross-package dependency logic — mirrors release.yml.
+
+name: Publish tsdkarc
+
+on:
+  push:
+    tags:
+      - "tsdkarc@*"
+
+permissions:
+  contents: write # create GitHub release
+  id-token: write # npm provenance
+
+jobs:
+  # ── 1. Parse tag ─────────────────────────────────────────────────────────
+  parse-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+      npm_tag: ${{ steps.parse.outputs.npm_tag }}
+      is_prerelease: ${{ steps.parse.outputs.is_prerelease }}
+    steps:
+      - id: parse
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#tsdkarc@}"
+
+          # Validate semver loosely (e.g. 1.2.3 or 1.2.3-alpha.1)
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]'; then
+            echo "ERROR: tag version '$VERSION' is not semver — got: $VERSION"
+            exit 1
+          fi
+
+          # Store patterns in variables — bash ERE does not support grouping inside [[ =~ ]]
+          # when the pattern is written inline with special chars like ( | ).
+          ALPHA_PAT="-alpha"
+          BETA_PAT="-beta"
+          if [[ "$VERSION" =~ $ALPHA_PAT ]] || [[ "$VERSION" =~ $BETA_PAT ]]; then
+            NPM_TAG="next"
+            IS_PRERELEASE="true"
+            echo "📦 Pre-release detected: $TAG (npm tag: next)"
+          else
+            NPM_TAG="latest"
+            IS_PRERELEASE="false"
+            echo "📦 Stable release detected: $TAG (npm tag: latest)"
+          fi
+
+          echo "version=$VERSION"             >> $GITHUB_OUTPUT
+          echo "npm_tag=$NPM_TAG"             >> $GITHUB_OUTPUT
+          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+
+  # ── 2. Build + verify ───────────────────────────────────────────────────
+  build:
+    needs: parse-tag
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.parse-tag.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Typecheck and build tsdkarc
+        run: |
+          cd tsdkarc
+          bun i
+          bun run checktype
+          bun run build
+
+      # Fail fast before touching npm if package.json wasn't bumped to match the tag.
+      - name: Verify package.json version matches tag
+        run: |
+          PKG_VERSION=$(node -p "require('./tsdkarc/package.json').version")
+          if [ "$PKG_VERSION" != "$VERSION" ]; then
+            echo "ERROR: tsdkarc/package.json has version $PKG_VERSION but tag says $VERSION"
+            exit 1
+          fi
+          echo "✅ Version verified: $PKG_VERSION"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-tsdkarc-esm
+          path: tsdkarc/esm
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-tsdkarc-lib
+          path: tsdkarc/lib
+          retention-days: 1
+
+  # ── 3. Publish ───────────────────────────────────────────────────────────
+  publish:
+    needs: [parse-tag, build]
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.parse-tag.outputs.version }}
+      NPM_TAG: ${{ needs.parse-tag.outputs.npm_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: "https://registry.npmjs.org"
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkarc-esm
+          path: tsdkarc/esm
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkarc-lib
+          path: tsdkarc/lib
+
+      # purge-pkg-for-publish.mjs lives at repo root scripts/ and accepts
+      # the target package directory as an argument. Run from repo root
+      # (default working directory after checkout).
+      - name: Prepare package for publish
+        run: node scripts/purge-pkg-for-publish.mjs ./tsdkarc
+
+      - name: Verify package contents (dry run)
+        run: npm pack --dry-run
+        working-directory: tsdkarc
+
+      - name: Publish to npm
+        run: npm publish --access public --no-git-checks --provenance --tag=${{ env.NPM_TAG }}
+        working-directory: tsdkarc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "tsdkarc v${{ env.VERSION }}"
+          prerelease: ${{ needs.parse-tag.outputs.is_prerelease == 'true' }}
+          generate_release_notes: true

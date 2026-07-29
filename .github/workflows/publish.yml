@@ -2,8 +2,9 @@
 #
 # Trigger: push a tag like  tsdkarc@1.2.3  or  tsdkarc-x@1.2.3-alpha.1
 # Packages live at:  <repo-root>/tsdkarc/  tsdkarc-x/  tsdkbundle/
-# tsdkarc-x depend on tsdkarc's built dist, so tsdkarc is built first for those.
-# tsdkbundle is independent
+# tsdkarc-x and tsdkbundle depend on tsdkarc's built dist, so tsdkarc is built first for those.
+# tsdkarc itself has no upstream dependency — build-tsdkarc is SKIPPED (not failed) in that case.
+# tsdkbundle is otherwise independent of tsdkarc-x.
 # Bun is used throughout, mirroring the working single-package release.yml.
 
 name: Publish
@@ -48,7 +49,9 @@ jobs:
             exit 1
           fi
 
-          # tsdkarc-x and tsdkbundle depend on tsdkarc's built dist
+          # tsdkarc-x and tsdkbundle depend on tsdkarc's built dist.
+          # tsdkarc itself does NOT — when PACKAGE=tsdkarc this stays "false" and the
+          # downstream build-tsdkarc job will legitimately SKIP (see that job's comment).
           NEEDS_TSDKARC="false"
           if [[ "$PACKAGE" == "tsdkarc-x" || "$PACKAGE" == "tsdkbundle" ]]; then
             NEEDS_TSDKARC="true"
@@ -69,13 +72,17 @@ jobs:
             echo "📦 Stable release detected: $TAG (npm tag: latest)"
           fi
 
-          echo "package=$PACKAGE"           >> $GITHUB_OUTPUT
-          echo "version=$VERSION"           >> $GITHUB_OUTPUT
-          echo "npm_tag=$NPM_TAG"           >> $GITHUB_OUTPUT
+          echo "package=$PACKAGE"             >> $GITHUB_OUTPUT
+          echo "version=$VERSION"             >> $GITHUB_OUTPUT
+          echo "npm_tag=$NPM_TAG"             >> $GITHUB_OUTPUT
           echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
-          echo "needs_tsdkarc=$NEEDS_TSDKARC"       >> $GITHUB_OUTPUT
+          echo "needs_tsdkarc=$NEEDS_TSDKARC" >> $GITHUB_OUTPUT
 
   # ── 2. Build tsdkarc (only when publishing tsdkarc-x or tsdkbundle) ──────────
+  # EXPECTED SKIP: for a `tsdkarc@*` tag, needs_tsdkarc is "false" and this job
+  # is skipped by design — tsdkarc is built directly in the `build` job below.
+  # This is not a failure and does not block `build` or `publish` (see their
+  # `if:` conditions, which explicitly tolerate this job's "skipped" result).
   build-tsdkarc:
     needs: parse-tag
     if: needs.parse-tag.outputs.needs_tsdkarc == 'true'
@@ -115,8 +122,10 @@ jobs:
   build:
     needs: [parse-tag, build-tsdkarc]
     # build-tsdkarc is 'skipped' when publishing tsdkarc itself (no dependency needed).
-    # Explicitly allow skipped so build still runs for tsdkarc,
-    # but block on any actual failure of either upstream job.
+    # `always()` is required here: without it, GitHub Actions would auto-skip this
+    # job too, solely because one of its `needs` (build-tsdkarc) was skipped.
+    # The explicit OR below allows this job to proceed on either a real upstream
+    # success OR an expected upstream skip, while still blocking on upstream failure.
     if: "always() && needs.parse-tag.result == 'success' && (needs.build-tsdkarc.result == 'success' || needs.build-tsdkarc.result == 'skipped')"
     runs-on: ubuntu-latest
     env:
@@ -155,7 +164,9 @@ jobs:
           bun run checktype
           bun run build
 
-      # Mirror the version-guard from publish.yml — fail fast before touching npm
+      # Mirror the version-guard from publish.yml — fail fast before touching npm.
+      # If this fails for tsdkarc, check that tsdkarc/package.json's "version"
+      # field exactly matches the tag's version string (e.g. 2.0.0-alpha.0).
       - name: Verify package.json version matches tag
         run: |
           PKG_VERSION=$(node -p "require('./$PACKAGE/package.json').version")
