@@ -1,35 +1,39 @@
-import start, { defineModule } from "tsdkarc";
+import { defineModule, type ContextOf } from "tsdkarc";
 
-interface ConfigSlice {
-  config: { port: number; dbUrl: string };
-}
-const configModule = defineModule<ConfigSlice>()({
-  name: "config",
-  boot: (ctx) => ctx.set("config", { port: 3000, dbUrl: "..." }),
-});
+// 1. Define Config (Returns namespace: ctx.config)
+const configModule = defineModule({ name: "config" }).init(() => ({
+  port: 3000,
+}));
 
-interface DbSlice {
-  db: Pool;
-}
-const dbModule = defineModule<DbSlice>()({
-  name: "db",
-  modules: [configModule], // ctx.config is typed here
-  async boot(ctx) {
-    const pool = new Pool({ connectionString: ctx.config.dbUrl });
-    ctx.set("db", pool);
-  },
-});
-
-interface ServerSlice {
-  server: http.Server;
-}
-const serverModule = defineModule<ServerSlice>()({
+// 2. Define Server (Depends on Config)
+const serverModule = defineModule({
   name: "server",
-  modules: [configModule, dbModule], // ctx.config + ctx.db typed
-  boot(ctx) {
-    ctx.set("server", http.createServer(myHandler));
-  },
-});
+  modules: [configModule],
+}).init((ctx) => ({
+  listen: () => console.log(`🚀 Server running on port ${ctx.config.port}`),
+}));
 
-const app = await start([serverModule]);
-app.ctx.server.listen(app.ctx.config.port);
+// Export inferred types for use elsewhere in your app
+export type AppCtx = ContextOf<typeof serverModule>;
+
+// 3. Compose and Launch
+async function bootstrap() {
+  try {
+    // Wrap top-level modules in an anonymous root module
+    const appModule = defineModule({ modules: [serverModule] }).init();
+
+    // Display the generated dependency graph
+    console.log("\nDependency Tree:\n" + appModule.graph().formatted);
+    const app = await appModule.start({
+      afterBoot: () => console.log("✅ All modules booted successfully!"),
+    });
+    // Run the app! (Fully type-safe)
+    app.ctx.server.listen();
+  } catch (error) {
+    // tsdkarc automatically rolls back already-booted modules if a failure occurs here
+    console.error("❌ Failed to boot application:", error);
+    process.exit(1);
+  }
+}
+
+bootstrap();

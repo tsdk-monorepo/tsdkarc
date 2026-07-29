@@ -296,8 +296,9 @@ export default function DocsView({
           {/* Pipeline diagram */}
           <div className="bg-gray-50 md:border border-gray-200 p-6 md:p-8 md:rounded-2xl font-mono text-sm overflow-x-auto whitespace-nowrap text-gray-500 font-bold mb-8 shadow-sm">
             beforeBoot <span className="text-gray-300 font-normal px-1">→</span>{" "}
-            boot <span className="text-gray-300 font-normal px-1">→</span>{" "}
-            afterBoot <span className="text-gray-300 font-normal px-1">→</span>{" "}
+            init / boot{" "}
+            <span className="text-gray-300 font-normal px-1">→</span> afterBoot{" "}
+            <span className="text-gray-300 font-normal px-1">→</span>{" "}
             <span className="text-black bg-white border border-gray-200 px-2 py-1 rounded shadow-sm">
               [running]
             </span>{" "}
@@ -353,7 +354,12 @@ export default function DocsView({
                   </td>
                   <td className="px-6 py-4 text-gray-400 text-xs">once</td>
                   <td className="px-6 py-4 text-gray-600">
-                    Before the first module begins shutting down
+                    Before the first module begins shutting down; receives an
+                    optional{" "}
+                    <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-black text-xs">
+                      reason
+                    </code>{" "}
+                    string
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50/50 transition-colors">
@@ -362,19 +368,12 @@ export default function DocsView({
                   </td>
                   <td className="px-6 py-4 text-gray-400 text-xs">once</td>
                   <td className="px-6 py-4 text-gray-600">
-                    After the last module has finished shutting down — final
-                    cleanup
-                  </td>
-                </tr>
-
-                <tr className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-6 py-4 font-bold text-black text-base">
-                    onError
-                  </td>
-                  <td className="px-6 py-4 text-gray-400 text-xs">Once</td>
-                  <td className="px-6 py-4 text-gray-600">
-                    When resolve modules and hooks error will call `onError`,
-                    default will throw
+                    After the last module has finished shutting down; receives
+                    an optional{" "}
+                    <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-black text-xs">
+                      reason
+                    </code>{" "}
+                    string
                   </td>
                 </tr>
 
@@ -383,7 +382,8 @@ export default function DocsView({
                   <td
                     colSpan={3}
                     className="px-6 py-2 text-xs font-semibold text-gray-400 uppercase tracking-widest">
-                    Per-module — fires once per module, in boot / shutdown order
+                    Global Per-Module — fires once per module during .start()
+                    execution
                   </td>
                 </tr>
 
@@ -395,8 +395,11 @@ export default function DocsView({
                     per module
                   </td>
                   <td className="px-6 py-4 text-gray-600">
-                    Before each individual module boots; receives the module as
-                    the second argument
+                    Before each individual module boots; receives the module's{" "}
+                    <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-black text-xs">
+                      meta
+                    </code>{" "}
+                    object as the second argument
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50/50 transition-colors">
@@ -408,7 +411,11 @@ export default function DocsView({
                   </td>
                   <td className="px-6 py-4 text-gray-600">
                     After each individual module finishes booting; receives the
-                    module as the second argument
+                    module's{" "}
+                    <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-black text-xs">
+                      meta
+                    </code>{" "}
+                    object as the second argument
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50/50 transition-colors">
@@ -419,8 +426,14 @@ export default function DocsView({
                     per module
                   </td>
                   <td className="px-6 py-4 text-gray-600">
-                    Before each individual module shuts down; receives the
-                    module as the second argument
+                    Before each individual module shuts down; receives{" "}
+                    <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-black text-xs">
+                      meta
+                    </code>{" "}
+                    and an optional{" "}
+                    <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-black text-xs">
+                      reason
+                    </code>
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50/50 transition-colors">
@@ -432,7 +445,14 @@ export default function DocsView({
                   </td>
                   <td className="px-6 py-4 text-gray-600">
                     After each individual module finishes shutting down;
-                    receives the module as the second argument
+                    receives{" "}
+                    <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-black text-xs">
+                      meta
+                    </code>{" "}
+                    and an optional{" "}
+                    <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-black text-xs">
+                      reason
+                    </code>
                   </td>
                 </tr>
               </tbody>

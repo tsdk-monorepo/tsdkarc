@@ -1,7 +1,7 @@
 {
   "name": "tsdkarc",
   "version": "2.0.0-alpha.0",
-  "description": "An elegant module composable library and it's type-safe",
+  "description": "Decorator-free, type-safe module composition & dependency injection for TypeScript",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
   "homepage": "https://arc.tsdk.dev",
