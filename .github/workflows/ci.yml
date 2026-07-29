@@ -13,7 +13,7 @@ name: CI
 on:
   push:
     branches:
-      - expirements
+      - main
     paths-ignore:
       - "**.md"
       - "docs/**"
