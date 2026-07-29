@@ -95,6 +95,7 @@ jobs:
       - name: Typecheck and build tsdkarc
         run: |
           cd tsdkarc
+          bun i
           bun run checktype
           bun run build
 
@@ -150,6 +151,7 @@ jobs:
       - name: Typecheck and build ${{ env.PACKAGE }}
         run: |
           cd $PACKAGE
+          bun i
           bun run checktype
           bun run build
 

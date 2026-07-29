@@ -1,11 +1,11 @@
 # tsdkbundle
 
-A Bun-based ESM bundler and watcher for multi-entry projects.
-
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
 
 🇺🇸 English · [🇨🇳 中文](./README.zh-CN.md)
+
+A Bun-based ESM bundler and watcher for multi-entry projects.
 
 ## 🚀 Quick Start
 
