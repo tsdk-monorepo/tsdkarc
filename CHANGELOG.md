@@ -1,5 +1,14 @@
 # TsdkArc Changelog
 
+## v2.0.0-alpha.0
+
+⚠️ Breaking change.
+
+The API has been completely redesigned. 🚀
+
+Please check the README before upgrading:
+https://github.com/tsdk-monorepo/tsdkarc/tree/expirements
+
 ## v1.3.0
 
 - Add `defineUnit` helper, `defineUnit` is a wrapper of `defineModule` but has more convenient API
