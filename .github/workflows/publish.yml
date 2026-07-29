@@ -1,10 +1,13 @@
 # .github/workflows/publish.yml
 #
-# Trigger: push a tag like  tsdkarc@1.2.3  or  tsdkarc-x@1.2.3-alpha.1
-# Packages live at:  <repo-root>/tsdkarc/  tsdkarc-x/  tsdkbundle/
-# tsdkarc-x and tsdkbundle depend on tsdkarc's built dist, so tsdkarc is built first for those.
-# tsdkarc itself has no upstream dependency — build-tsdkarc is SKIPPED (not failed) in that case.
-# tsdkbundle is otherwise independent of tsdkarc-x.
+# Trigger: push a tag like  tsdkarc-x@1.2.3  or  tsdkbundle@1.2.3-alpha.1
+# Packages live at:  <repo-root>/tsdkarc-x/  tsdkbundle/
+# NOTE: tsdkarc itself is published by the separate publish-tsdkarc.yml workflow
+# (trigger: tsdkarc@*). Do NOT add "tsdkarc@*" back here — both workflows would
+# fire on the same tag and race to publish/release simultaneously.
+# Both tsdkarc-x and tsdkbundle depend on tsdkarc's built dist, so tsdkarc is
+# always built first here (unconditionally — no per-package branching needed
+# now that this workflow only ever handles the two dependent packages).
 # Bun is used throughout, mirroring the working single-package release.yml.
 
 name: Publish
@@ -12,7 +15,6 @@ name: Publish
 on:
   push:
     tags:
-      - "tsdkarc@*"
       - "tsdkarc-x@*"
       - "tsdkbundle@*"
 
@@ -29,7 +31,6 @@ jobs:
       version: ${{ steps.parse.outputs.version }}
       npm_tag: ${{ steps.parse.outputs.npm_tag }}
       is_prerelease: ${{ steps.parse.outputs.is_prerelease }}
-      needs_tsdkarc: ${{ steps.parse.outputs.needs_tsdkarc }}
     steps:
       - id: parse
         run: |
@@ -43,18 +44,11 @@ jobs:
             exit 1
           fi
 
-          # Validate package name is one of the known packages
-          if [[ "$PACKAGE" != "tsdkarc" && "$PACKAGE" != "tsdkarc-x" && "$PACKAGE" != "tsdkbundle" ]]; then
-            echo "ERROR: unknown package '$PACKAGE'. Must be tsdkarc, tsdkarc-x, or tsdkbundle."
+          # Validate package name is one of the packages this workflow owns.
+          # tsdkarc is intentionally excluded — see publish-tsdkarc.yml.
+          if [[ "$PACKAGE" != "tsdkarc-x" && "$PACKAGE" != "tsdkbundle" ]]; then
+            echo "ERROR: unknown package '$PACKAGE'. This workflow only handles tsdkarc-x or tsdkbundle."
             exit 1
-          fi
-
-          # tsdkarc-x and tsdkbundle depend on tsdkarc's built dist.
-          # tsdkarc itself does NOT — when PACKAGE=tsdkarc this stays "false" and the
-          # downstream build-tsdkarc job will legitimately SKIP (see that job's comment).
-          NEEDS_TSDKARC="false"
-          if [[ "$PACKAGE" == "tsdkarc-x" || "$PACKAGE" == "tsdkbundle" ]]; then
-            NEEDS_TSDKARC="true"
           fi
 
           # Mirror the npm tag logic from release.yml.
@@ -76,16 +70,10 @@ jobs:
           echo "version=$VERSION"             >> $GITHUB_OUTPUT
           echo "npm_tag=$NPM_TAG"             >> $GITHUB_OUTPUT
           echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
-          echo "needs_tsdkarc=$NEEDS_TSDKARC" >> $GITHUB_OUTPUT
 
-  # ── 2. Build tsdkarc (only when publishing tsdkarc-x or tsdkbundle) ──────────
-  # EXPECTED SKIP: for a `tsdkarc@*` tag, needs_tsdkarc is "false" and this job
-  # is skipped by design — tsdkarc is built directly in the `build` job below.
-  # This is not a failure and does not block `build` or `publish` (see their
-  # `if:` conditions, which explicitly tolerate this job's "skipped" result).
+  # ── 2. Build tsdkarc (always — both packages this workflow handles need it) ──
   build-tsdkarc:
     needs: parse-tag
-    if: needs.parse-tag.outputs.needs_tsdkarc == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -121,12 +109,6 @@ jobs:
   # ── 3. Build + verify the target package ────────────────────────────────────
   build:
     needs: [parse-tag, build-tsdkarc]
-    # build-tsdkarc is 'skipped' when publishing tsdkarc itself (no dependency needed).
-    # `always()` is required here: without it, GitHub Actions would auto-skip this
-    # job too, solely because one of its `needs` (build-tsdkarc) was skipped.
-    # The explicit OR below allows this job to proceed on either a real upstream
-    # success OR an expected upstream skip, while still blocking on upstream failure.
-    if: "always() && needs.parse-tag.result == 'success' && (needs.build-tsdkarc.result == 'success' || needs.build-tsdkarc.result == 'skipped')"
     runs-on: ubuntu-latest
     env:
       PACKAGE: ${{ needs.parse-tag.outputs.package }}
@@ -143,16 +125,11 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      # Restore tsdkarc dist when it was built as a dependency.
-      # Step-level if: cannot access needs.* context — use the needs_tsdkarc output
-      # from parse-tag which was already resolved at job level.
       - uses: actions/download-artifact@v4
-        if: needs.parse-tag.outputs.needs_tsdkarc == 'true'
         with:
           name: dist-tsdkarc-esm
           path: tsdkarc/esm
       - uses: actions/download-artifact@v4
-        if: needs.parse-tag.outputs.needs_tsdkarc == 'true'
         with:
           name: dist-tsdkarc-lib
           path: tsdkarc/lib
@@ -164,9 +141,7 @@ jobs:
           bun run checktype
           bun run build
 
-      # Mirror the version-guard from publish.yml — fail fast before touching npm.
-      # If this fails for tsdkarc, check that tsdkarc/package.json's "version"
-      # field exactly matches the tag's version string (e.g. 2.0.0-alpha.0).
+      # Mirror the version-guard from publish.yml — fail fast before touching npm
       - name: Verify package.json version matches tag
         run: |
           PKG_VERSION=$(node -p "require('./$PACKAGE/package.json').version")
@@ -193,7 +168,6 @@ jobs:
   # ── 4. Publish ───────────────────────────────────────────────────────────────
   publish:
     needs: [parse-tag, build]
-    if: needs.build.result == 'success'
     runs-on: ubuntu-latest
     env:
       PACKAGE: ${{ needs.parse-tag.outputs.package }}
