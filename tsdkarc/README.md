@@ -82,7 +82,7 @@ const appB = await defineModule({ modules: [LoggerModule, ReportModule] })
 ## Install
 
 ```bash
-npm install tsdkarc
+npm install tsdkarc@next
 ```
 
 No transformer, no `ts-patch` — runs on plain `tsc`/bundler output.

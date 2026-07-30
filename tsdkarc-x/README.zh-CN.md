@@ -17,7 +17,7 @@
 ## 安装
 
 ```bash
-npm install tsdkarc-x tsdkarc zod
+npm install tsdkarc-x tsdkarc@next zod
 ```
 
 适配器按需安装对应的 HTTP 框架，例如 `express` 或 `hono`。

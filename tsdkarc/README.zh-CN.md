@@ -22,7 +22,7 @@
 ## 🚀 快速开始
 
 ```bash
-npm install tsdkarc
+npm install tsdkarc@next
 
 ```
 
