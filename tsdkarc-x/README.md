@@ -1,6 +1,6 @@
 # tsdkarc-x
 
-Strongly-typed, High performance and Edge-compatible RPC for full-stack TypeScript. Type safety from backend middleware to frontend client — no API docs needed. Built-in OPENAPI support.
+Fast, type-safe RPC for full-stack TypeScript.
 
 ---
 
@@ -70,13 +70,13 @@ factory(r, ctx) => Record<string, RouteEndpoint>
 
 #### Route Builder (`r`)
 
-| Method                         | Transport           | Notes                                                            |
-| ------------------------------ | ------------------- | ---------------------------------------------------------------- |
-| `r.query(schema?, handler)`    | GET                 | Read-only.                                                       |
-| `r.mutate(schema?, handler)` | POST / PUT          | State-mutating.                                                  |
-| `r.stream(schema?, handler)`   | SSE                 | Handler must be `async function*`.                               |
-| `r.upload(schema?, handler)`   | multipart/form-data | File uploads.                                                    |
-| `r.use(middleware)`            | —                   | Returns a new `r` — chain before `.query()`, `.mutate()`, etc. |
+| Method                       | Transport           | Notes                                                          |
+| ---------------------------- | ------------------- | -------------------------------------------------------------- |
+| `r.query(schema?, handler)`  | GET                 | Read-only.                                                     |
+| `r.mutate(schema?, handler)` | POST / PUT          | State-mutating.                                                |
+| `r.stream(schema?, handler)` | SSE                 | Handler must be `async function*`.                             |
+| `r.upload(schema?, handler)` | multipart/form-data | File uploads.                                                  |
+| `r.use(middleware)`          | —                   | Returns a new `r` — chain before `.query()`, `.mutate()`, etc. |
 
 #### Handler Signature: `(input, env)`
 
