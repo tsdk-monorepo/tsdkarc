@@ -1,130 +1,170 @@
 # tsdkarc-x
 
-> **基于 tsdkarc 的类型安全 RPC 框架：路由定义、中间件链、多协议适配器与全链路类型推导**
-
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
 [![Built on tsdkarc](https://img.shields.io/badge/built%20on-tsdkarc-orange.svg)](https://www.npmjs.com/package/tsdkarc)
 
 🇨🇳 中文 · [🇺🇸 English](./README.md)
 
-`tsdkarc-x` 是构建在 `tsdkarc` 之上的 RPC 框架：写一个后端路由，前端 `client` 自动拿到对应的类型和调用方法，中间不需要手写任何接口类型、不需要额外的代码生成步骤盯着看。
+## 介绍
 
-下面按从简单到复杂的顺序，逐步介绍它是怎么工作的。
+`tsdkarc-x` 是一个基于 `tsdkarc` 的端到端类型安全 RPC 框架。通过它，你在服务端编写路由后，前端客户端可以直接获取对应的请求类型，调用方法和 React/Vue hooks。
 
 ---
 
-## 安装
+## 为什么或者解决了什么痛点
+
+1. **前后端类型断层**：前端无需手动定义接口类型，也无需依赖额外的代码生成步骤。服务端的入参和返回值类型会自动推导到前端调用端。
+2. **校验与类型重复定义**：通过集成 Zod，在服务端实现运行时校验的同时，直接利用 Schema 推导出静态类型（可选），保持运行与静态类型一致。
+3. **上下文与依赖管理混乱**：基于 `tsdkarc` 的类型安全 DI 模块系统，自动推导数据库、全局中间件和请求级上下文的类型，避免到处传递 `any` 或手动断言。
+4. **框架强绑定**：路由与业务逻辑同底层 HTTP 框架（如 Express、Hono）解耦，切换框架时无需修改业务代码。
+
+---
+
+## 快速运行
+
+### 1. 安装依赖
 
 ```bash
 npm install tsdkarc-x tsdkarc@next zod
+# npm install express multer @types/multer @types/express @scalar/express-api-reference
+# npm install hono @hono/node-server @scalar/hono-api-reference
 ```
 
-适配器按需安装对应的 HTTP 框架，例如 `express` 或 `hono`。
+> 注：适配器所需的 HTTP 框架（如 `express` 或 `hono`）请按需安装。
 
----
-
-## 第一步：写一个最小的路由并启动服务
-
-一个路由就是一个函数（或字符串常量），挂在 `appRouter.init()` 返回的对象里：
+### 2. 服务端：定义路由并启动服务
 
 ```ts
 // server.ts
-import { defineRouter } from "tsdkarc-x";
-import { launchApp } from "tsdkarc-x";
-import { ExpressAdapter } from "tsdkarc-x";
+import { defineRouter, launchApp, type RoutesOf } from "tsdkarc-x";
+import { ExpressAdapter } from "tsdkarc-x/express";
+import { extractOpenApi } from "tsdkarc-x/openapi"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
+import { extractAppRoutesTypesFull } from "tsdkarc-x/extract"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
+import { apiReference } from "@scalar/express-api-reference";
+import fs from "fs/promises";
+import path from "path";
 
-const appRouter = defineRouter({}); // 先不接模块、不接中间件
+// 1. 创建路由实例
+const appRouter = defineRouter({});
 
+// 2. 定义具体路由
 const userRoutes = appRouter.init(() => ({
-  health: () => "OK", // 最简单的 handler：一个同步函数
+  health: () => "OK",
 }));
-
-export const app = launchApp({
+const routes = { users: userRoutes }; // routesExportName
+const transport = new ExpressAdapter();
+// 3. 启动服务
+export const app = await launchApp({
   basePath: "/api",
-  transport: new ExpressAdapter(),
-  routes: { users: userRoutes },
-  port: 3011,
+  transport,
+  routes,
+  port: 3000,
 });
-```
 
-`launchApp` 启动一个 HTTP 服务，把 `routes` 对象挂载到 `basePath` 下。这一步还没有任何类型魔法，就是一个普通的 Express 服务，`GET /api/users/health` 会返回 `"OK"`。
+// 生成 OpenAPI 配置
+const openapiResult = extractOpenApi(
+  app.routes,
+  {
+    info: { title: "API", version: "1.0.0" },
+  },
+  { entryFile: path.resolve("./server.ts") }
+);
+transport.app.get(`/api/openapi`, async (req, res) => {
+  res.json(openapiResult);
+});
+transport.app.use(
+  "/reference",
+  apiReference({
+    // Put your OpenAPI url here:
+    url: `http://localhost:3000/api/openapi`,
+  })
+);
 
----
-
-## 第二步：把类型接到前端
-
-`app` 是一个 Promise，resolve 之后可以用 `RoutesOf<typeof app>` 拿到整棵路由树的类型：
-
-```ts
-// server.ts（接第一步）
-import { type RoutesOf } from "tsdkarc-x";
-
+// 4. 导出路由类型供前端使用
 export type AppRoutes = RoutesOf<typeof app>;
-// const appRouter = defineRouter({}).init(() => ({})); // 先不接模块、不接中间件
-// 注意，我们不能使用 `RoutesOf<typeof appRouter>` 获取 routes tree 类型
+
+// 生成静态类型文件
+const { clientDts, swrDts, reactQueryDts } = await extractAppRoutesTypesFull(
+  app.routes,
+  {
+    entryFile: path.resolve("./server.ts"),
+    tsConfigFilePath: path.resolve("./tsconfig.json"),
+    routesExportName: "routes",
+    includeSourceLocation: false,
+  }
+);
+// 写入静态文件
+await Promise.all([
+  fs.writeFile("./client/api.d.ts", clientDts),
+  fs.writeFile("./client/api-swr.d.ts", swrDts),
+  fs.writeFile("./client/api-query.d.ts", reactQueryDts),
+]);
+
+await fetch("http://localhost:3000/api/users/health")
+  .then((res) => res.json())
+  .then((res) => {
+    console.log(res); // Output: OK
+  });
 ```
 
-前端用 `createClient<AppRoutes>` 创建客户端，调用路径和后端定义的路由结构完全一致（`users.health` 对应后端 `{ users: userRoutes }` 里的 `health`）：
+### 3. 前端：创建客户端并发起调用
+
+```bash
+npm install swr
+# npm install react @tanstack/react-query
+# npm install @tanstack/vue-query
+```
 
 ```ts
 // client.ts
-import { createClient } from "tsdkarc-x";
+import { createClient } from "tsdkarc-x/client";
+import { createSwrClient } from "tsdkarc-x/react/swr";
+import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/query";
+import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
+
 import type { AppRoutes } from "./server";
 
 const client = createClient<AppRoutes>({
-  baseURL: "http://localhost:3011/api",
+  baseURL: "http://localhost:3000/api",
 });
 
-const health = await client.users.health.query(); // "OK"，且有类型提示
-```
+const health = await client.users.health.query(); // "OK"，并且享有完整的自动补全和类型提示
 
-到这里，`tsdkarc-x` 最核心的价值就出现了：**服务端路由的类型，一路推导到了前端的调用点**。接下来的内容都是在这个基础上，逐个介绍怎么给路由加上更真实的能力。
+// const swrHooks = createSwrClient<AppRoutes>(client); // react swr hooks
+// swrHooks.users.health.useQuery()
+// const reactQueryHooks = createReactQueryClient<AppRoutes>(client); // react tanstack query hooks
+// const vueQueryHooks = createVueQueryClient<AppRoutes>(client); // vue tanstack query hooks
+```
 
 ---
 
-## 第三步：加上入参校验（Zod Schema）
+## 常用示例
 
-`r.query(schema, handler)` 的第一个参数是可选的 Zod Schema，会在服务端自动校验，并且 `input` 的类型由 Schema 推导出来：
+### 入参校验 (Zod Schema)
+
+使用 `r.query` 或 `r.mutate` 时，传入 Zod Schema 即可实现自动校验与类型推导。
 
 ```ts
 const userRoutes = appRouter.init((r) => ({
-  health: () => "OK",
-
+  // 查询操作
   getProfile: r.query(
-    z.object({
-      includeHistory: z.boolean().default(false),
-    }),
+    z.object({ includeHistory: z.boolean().default(false) }),
     async (input) => {
-      // input.includeHistory: boolean，已经过校验
       return { id: "u_1", history: input.includeHistory ? [] : null };
     }
+  ),
+  // 写操作
+  updateTheme: r.mutate(
+    z.object({ theme: z.enum(["dark_mode", "light_mode"]) }),
+    (input) => `Theme changed to ${input.theme}`
   ),
 }));
 ```
 
-前端调用时，`includeHistory` 的类型和默认值也会同步出现在补全里：
+### 依赖注入 (DI)
 
-```ts
-const profile = await client.users.getProfile.query({ includeHistory: true });
-```
-
-不传 Schema 也可以（如第一步的 `health`），此时不会有运行时校验，`input` 的类型由 handler 参数上手写的类型决定。
-
-写操作用 `r.mutate(schema, handler)`，用法与 `r.query` 一致，语义上表示会产生副作用：
-
-```ts
-updateTheme: r.mutate(
-  z.object({ theme: z.enum(["dark_mode", "light_mode"]) }),
-  (input) => `Theme changed to ${input.theme}`
-),
-```
-
----
-
-## 第四步：注入依赖（Context 与 DI）
-
-真实的 handler 通常需要访问数据库、邮件服务这类依赖。`tsdkarc-x` 直接复用 `tsdkarc` 的模块系统：先用 `defineModule` 声明一个模块，再把它塞进 `defineRouter({ modules: [...] })`，handler 的第二个参数 `env.ctx` 上就会出现对应的依赖，并且类型是自动推导出来的：
+复用 `tsdkarc` 模块系统，注入数据库等依赖，类型自动传递到 handler 中。
 
 ```ts
 import { defineModule } from "tsdkarc";
@@ -134,385 +174,245 @@ export const dbModule = defineModule({ name: "db" }).init(() => ({
 }));
 
 export const appRouter = defineRouter({
-  modules: [dbModule], // 声明依赖
+  modules: [dbModule], // 注册依赖
 });
 
 const userRoutes = appRouter.init((r) => ({
-  getProfile: r.query(
-    z.object({ includeHistory: z.boolean().default(false) }),
-    async (input, env) => {
-      const user = env.ctx.db.findUser("u_1"); // ✅ 类型自动来自 dbModule
-      return { ...user, history: input.includeHistory ? [] : null };
-    }
-  ),
+  getProfile: r.query(z.object({ id: z.string() }), async (input, env) => {
+    // env.ctx.db 类型自动推导
+    return env.ctx.db.findUser(input.id);
+  }),
 }));
 ```
 
-模块本身不知道自己会被哪个路由使用，因此可以独立发布、跨项目复用——这部分完整的组合规则见 [`tsdkarc` 文档](../tsdkarc/README.zh-CN.md)。
+### 中间件与请求上下文
 
----
-
-## 第五步：加上请求级上下文与中间件
-
-到目前为止 handler 还不知道"谁在发请求"。这一步引入两个概念：
-
-**`createContext`**：每次请求执行一次，从原始 `Request` 提取轻量信息（建议用 getter，避免没用到时也解析 header）：
+定义 `createContext` 处理请求级数据，并通过 `defineMiddleware` 修改上下文。
 
 ```ts
-import { Request } from "express";
-import { DeepFlat } from "tsdkarc-x";
+import { defineMiddleware } from "tsdkarc-x";
+import type { Request } from "express";
 
+// 1. 提取请求级别上下文
 export const createContext = async (c: Request) => ({
-  get token() {
-    return c.header("Authorization") || null;
-  },
+  get token() { return c.header("Authorization") || null; },
+});
+type BaseContext = Awaited<ReturnType<typeof createContext>>;
+
+// 2. 定义中间件
+export const authMw = defineMiddleware<BaseContext>()(async (ctx, next) => {
+  return next({ user: { id: "u_1" } }); // 注入 user 数据
 });
 
-export type BaseCtx = DeepFlat<
-  Awaited<ReturnType<typeof createContext>> & ContextOf<typeof dbModule>
->;
-```
-
-**中间件**：用 `defineMiddleware<InputCtx>()(async (ctx, next) => next(patch))` 定义，`next` 传入的字段会合并进后续中间件和 handler 的 `env.meta`：
-
-```ts
-export const authMw = defineMiddleware<BaseCtx>()(async (ctx, next) => {
-  // 这里校验 ctx.token，拿到用户信息
-  return next({ user: { id: "u_1", role: "admin" } });
-});
-
-export const verifyMfaMw = defineMiddleware<{ user: { id: string } }>()(
-  async (ctx, next) => {
-    return next({ mfaPassed: true });
-  }
-);
-
-export const loggerMw = defineMiddleware<{ ip: string | null }>()(
-  async (ctx, next) => {
-    console.log(`[Access Log] IP: ${ctx.ip}`);
-    return next({ traceId: `req_${Date.now()}` });
-  }
-);
-```
-
-把 `createContext` 和全局中间件一起接到 `launchApp` / `defineRouter`：
-
-```ts
-export const appRouter = defineRouter({
-  modules: [dbModule],
-  middlewares: [authMw, loggerMw], // 按顺序执行，产出依次合并
-});
-
-export const app = launchApp({
-  basePath: "/api",
-  transport: new ExpressAdapter(),
-  createContext, // 每个请求都会先跑这个
-  routes: { users: userRoutes },
-  port: 3011,
-});
-```
-
-现在 handler 里的 `env.meta` 就有了 `user` 和 `traceId`：
-
-```ts
-ping: r.query(async (_, env) => ({
-  message: "pong",
-  trace: env.meta.traceId,
-  user: env.meta.user.id,
-})),
-```
-
-**只想给某一个路由加中间件？** 用 `r.use(mw)`，只影响这一条路由，不会污染全局：
-
-```ts
+// 3. 应用于单条路由
 updatePassword: r
-  .use(verifyMfaMw) // 只有这个路由会多经过一次 MFA 校验
-  .mutate(z.object({ newPwd: z.string().min(8) }), async (input, env) => {
-    if (!env.meta.mfaPassed) throw new RpcError("FORBIDDEN", "MFA Failed");
-    return "Password updated securely";
+  .use(authMw)
+  .mutate(z.object({ newPwd: z.string() }), async (input, env) => {
+    return `User ${env.meta.user.id} updated password`;
   }),
+
 ```
 
----
+### 错误处理
 
-## 第六步：错误处理
-
-用 `RpcError(code, message)` 抛出结构化错误，适配器会自动映射成对应的 HTTP 状态码：
+抛出结构化的 `RpcError`，服务端会自动映射为 HTTP 状态码，前端可通过 `isRpcError` 收窄类型。
 
 ```ts
+// 服务端
 triggerError: r.query(() => {
   throw new RpcError("NOT_FOUND", "This resource has been deleted.");
-}),
-```
+});
 
-前端用 `isRpcError` 做类型收窄，Zod 校验失败时 `err.issues` 会带上具体的字段信息：
-
-```ts
+// 前端
 import { isRpcError } from "tsdkarc-x";
 
 try {
-  await client.users.updatePassword.mutate({ newPwd: "123" }); // 少于 8 位
+  await client.users.triggerError.query();
 } catch (err) {
   if (isRpcError(err)) {
-    console.log(err.code, err.issues); // "BAD_REQUEST", [...]
+    console.log(err.code, err.message); // "NOT_FOUND"
   }
 }
 ```
 
----
+### 路由嵌套
 
-## 第七步：命名空间嵌套
-
-路由树可以直接嵌普通对象，不需要额外 API，前端调用路径与后端定义一一对应：
+直接在对象中嵌套即可构建命名空间，调用路径与结构严格一致。
 
 ```ts
+// 服务端
 const userRoutes = appRouter.init((r) => ({
   settings: {
     getTheme: r.query(() => "dark_mode"),
-    updateTheme: r.mutate(
-      z.object({ theme: z.enum(["dark_mode", "light_mode"]) }),
-      (input) => `Theme changed to ${input.theme}`
-    ),
   },
 }));
+
+// 前端
+await client.users.settings.getTheme.query();
 ```
 
-```ts
-await client.users.settings.updateTheme.mutate({ theme: "light_mode" });
-```
+### 流式响应 (SSE)
 
-多个业务模块也可以在 `launchApp` 的 `routes` 里按路径拼在一起：
+使用 `r.stream` 并结合 `async function*`，实现服务端向前端实时推送数据。
 
 ```ts
-routes: {
-  v1: { users: userRoutes }, // 挂载到 /api/v1/users/...
-  admin: adminRoutes,
-},
-```
-
----
-
-## 第八步：流式响应（SSE）
-
-`r.stream(schema, handler)` 的 `handler` 必须是 `async function*`，`yield` 出去的每一项都会实时推送到前端：
-
-```ts
+// 服务端
 downloadLogs: r.stream(
-  z.object({ lines: z.number().max(10) }),
-  async function* (input, env) {
+  z.object({ lines: z.number() }),
+  async function* (input) {
     for (let i = 0; i < input.lines; i++) {
-      await new Promise((res) => setTimeout(res, 300));
-      yield { index: i, text: `Log trace ${env.meta.traceId} - Line ${i}` };
+      yield { index: i, text: `Log - Line ${i}` };
     }
   }
-),
-```
+);
 
-前端用 `for await...of` 消费：
-
-```ts
+// 前端
 const stream = await client.users.downloadLogs.stream({ lines: 3 });
 for await (const chunk of stream) {
-  console.log(chunk.index, chunk.text);
+  console.log(chunk);
 }
 ```
 
----
+### 文件上传
 
-## 第九步：文件上传
-
-`r.upload(schema, handler)` 处理 Multipart 请求。FormData 里的字段在网络层始终是字符串，所以数值型字段要用 `z.coerce` 让 Schema 自动转换：
+使用 `r.upload` 处理 Multipart 请求，并利用 `z.coerce` 处理表单中的非字符串数据。
 
 ```ts
 uploadAvatar: r.upload(
   z.object({
     file: z.instanceof(File),
-    cropSize: z.coerce.number().min(100), // 表单传来的字符串会被自动转成 number
+    cropSize: z.coerce.number(), // 自动将 FormData 字符串转为 number
   }),
-  async (input) => ({
-    fileName: input.file.name,
-    size: input.file.size,
-    croppedTo: input.cropSize,
-  })
-),
+  async (input) => ({ fileName: input.file.name, size: input.file.size })
+);
 ```
 
-前端调用会自动构造 FormData：
+### 后台任务
+
+使用 `env.waitUntil` 注册任务，响应会立即返回，后台任务继续执行。
 
 ```ts
-const uploadRes = await client.users.uploadAvatar.upload({
-  file: new File(["..."], "avatar.png", { type: "image/png" }),
-  cropSize: 250,
-});
-```
-
----
-
-## 第十步：后台任务（不阻塞响应）
-
-`env.waitUntil(promise)` 注册一个后台任务：HTTP 响应立即返回，任务在响应之后继续跑完，Node 和 Edge 运行时都安全：
-
-```ts
-registerDevice: r.mutate(z.object({ deviceId: z.string() }), async (input, env) => {
-  env.waitUntil(
-    env.ctx.email.sendBackgroundAlert(`New device logged in: ${input.deviceId}`)
-  );
-  return { success: true }; // 不等邮件发送完成就返回
+register: r.mutate(z.object({ id: z.string() }), async (input, env) => {
+  env.waitUntil(sendEmail(input.id)); // 不阻塞响应
+  return { success: true };
 }),
+
 ```
 
----
+### 切换底层 HTTP 框架
 
-## 第十一步：换一个 HTTP 框架
-
-到目前为止的所有路由代码都不感知具体用的是哪个 HTTP 框架。`launchApp` 的 `transport`和`createContext` 是唯一需要替换的地方：
+无需修改路由逻辑，只需在 `launchApp` 中替换 `transport` 适配器。
 
 ```ts
 import { HonoAdapter } from "tsdkarc-x";
-import type { Context } from "hono";
-
-export const createContext = async (c: Context) => ({
-  get token() {
-    return c.req.header("Authorization") || null;
-  },
-});
 
 export const app = launchApp({
   basePath: "/api",
-  transport: new HonoAdapter(basePath), // 换成 Hono，其余代码不变
+  transport: new HonoAdapter(), // 切换为 Hono
   createContext,
   routes: { users: userRoutes },
-  port: 3011,
+  port: 3000,
 });
 ```
 
----
+### 生成前端类型文件与 OpenAPI
 
-## 第十二步：SWR Hooks
-
-在已有的 `client` 上包一层，得到与路由树同构的 SWR Hooks，Hook 命名路径与 `client` 调用路径一致：
+支持将类型导出为 `.d.ts` 或生成 OpenAPI 文档，适用于前后端分仓库的场景。
 
 ```ts
-import { createSwrClient } from "tsdkarc-x";
+import { extractAppRoutesTypesFull, extractOpenApi } from "tsdkarc-x/scripts";
 
-const swrHooks = createSwrClient<AppRoutes>(client);
-// swrHooks.users.getProfile.useQuery(...)
-```
+// 生成 .d.ts
+const { clientDts } = await extractAppRoutesTypesFull(routes, {
+  entryFile: "./server.ts",
+});
 
----
-
-## 第十三步：生成客户端类型与 OpenAPI 文档
-
-前面所有例子里，前端类型都是通过 `RoutesOf<typeof app>` 在同一个项目里直接推导出来的。如果前后端分仓库，或者想要落地成 `.d.ts` 文件和 OpenAPI 文档，可以用下面两个脚本，它们基于静态 TS 类型分析，不依赖运行时反射：
-
-```ts
-import { extractAppRoutesTypesFull } from "tsdkarc-x/scripts";
-
-const { clientDts, swrDts, reactQueryDts } = await extractAppRoutesTypesFull(
-  res.routes,
-  {
-    entryFile: path.resolve("./server.ts"),
-    tsConfigFilePath: path.resolve("./tsconfig.json"),
-    routesExportName: "routes",
-  }
-);
-
-await fs.writeFile("./app-routes.d.ts", clientDts);
-```
-
-```ts
-import { extractOpenApi } from "tsdkarc-x/scripts";
-import { apiReference } from "@scalar/express-api-reference";
-
+// 生成 OpenAPI 配置
 const openapi = extractOpenApi(
-  res.routes,
+  routes,
   {
-    info: { title: "My API", version: "1.0.0" },
-    servers: [{ url: `http://localhost:${port}/api` }],
+    info: { title: "API", version: "1.0.0" },
   },
-  {
-    entryFile: path.resolve("./server.ts"),
-    routesExportName: "routes",
-    tsConfigFilePath: path.resolve("./tsconfig.json"),
-  }
-);
-
-adapter.app.get(`${basePath}/openapi`, (req, res) => res.json(openapi));
-adapter.app.use(
-  "/reference",
-  apiReference({ url: `http://localhost:${port}${basePath}/openapi` })
+  { entryFile: "./server.ts" }
 );
 ```
+
+---
+
+## FAQ
+
+**Q: `tsdkarc-x` 和 `tsdkarc` 是什么关系？**
+
+`tsdkarc` 负责模块化的依赖注入；`tsdkarc-x` 在此基础上构建 RPC 路由层。`defineRouter` 可直接接收 `tsdkarc` 的模块，两者的类型推导机制完全打通。
+
+**Q: `r.query` 不传 Schema 会怎样？**
+
+输入类型将退化为 handler 第一个参数的手写类型。此时仅有静态类型约束，没有运行时的入参校验。
+
+**Q: `stream` 的 handler 必须是 `async function*` 吗？**
+
+是的，`r.stream` 依赖 Generator 的 `yield` 将数据推送至前端。前端使用 `for await...of` 消费，原生支持增量语义。
+
+**Q: 上传接口里的 `z.coerce.number()` 是为什么？**
+
+Multipart FormData 的字段在网络传输中均为字符串形式，使用 `z.coerce` 可让 Zod 在校验时自动将其转换为目标类型（如 number），省去手动转换的步骤。
+
+**Q: 换成 Hono 需要改业务路由代码吗？**
+
+不需要。仅需替换 `launchApp` 里的 `transport` 和 `createContext`，具体的路由定义和中间件逻辑完全不受影响。
 
 ---
 
 ## API 参考
 
-**路由构造**
+### 路由构造
 
-| API                                                              | 说明                                                                              |
-| ---------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `defineRouter({ modules, middlewares })`                         | 创建 `appRouter`，`modules` 为 `tsdkarc` 模块列表，`middlewares` 为全局中间件列表 |
-| `appRouter.init((r, ctx) => routesObject)`                       | 声明一棵路由树，`r` 提供 `query` / `mutate` / `stream` / `upload` / `use`         |
-| `r.use(middleware)`                                              | 返回带路由级中间件的 `r`，链式调用后接 `.query` / `.mutate` 等                    |
-| `defineMiddleware<InputCtx>()(async (ctx, next) => next(patch))` | 定义可链式组合的中间件                                                            |
+| API                                        | 说明                                                       |
+| ------------------------------------------ | ---------------------------------------------------------- |
+| `defineRouter({ modules, middlewares })`   | 创建 `appRouter` 实例，接受模块与全局中间件配置            |
+| `appRouter.init((r, ctx) => routesObject)` | 定义路由树，`r` 包含 `query/mutate/stream/upload/use` 方法 |
+| `r.use(middleware)`                        | 为单条路由添加中间件                                       |
+| `defineMiddleware<InputCtx>()(...)`        | 定义请求中间件                                             |
 
-**服务端运行**
+### 服务端运行
 
-| API                                                               | 说明                                    |
-| ----------------------------------------------------------------- | --------------------------------------- |
-| `launchApp({ basePath, transport, createContext, routes, port })` | 启动 HTTP 服务，返回 `{ routes, stop }` |
-| `new ExpressAdapter()` / `new HonoAdapter(basePath)`              | 可替换的 HTTP 框架适配器                |
-| `RpcError(code, message)`                                         | 抛出结构化错误，自动映射 HTTP 状态码    |
+| API                                  | 说明            |
+| ------------------------------------ | --------------- |
+| `launchApp({ ...config })`           | 启动 HTTP 服务  |
+| `ExpressAdapter()` / `HonoAdapter()` | HTTP 框架适配器 |
+| `RpcError(code, message)`            | 抛出结构化异常  |
 
-**类型工具**
+### 类型工具
 
-| API                             | 说明                                            |
-| ------------------------------- | ----------------------------------------------- |
-| `RoutesOf<typeof app>`          | 从已启动的 `app` 推导出前端可用的路由类型       |
-| `InferRouteTree<typeof routes>` | 直接从路由树对象推导类型（无需等待 `app` 启动） |
+| API                             | 说明                                   |
+| ------------------------------- | -------------------------------------- |
+| `RoutesOf<typeof app>`          | 提取供客户端使用的完整路由类型         |
+| `InferRouteTree<typeof routes>` | 仅通过路由对象提取类型（无需启动服务） |
 
-**前端**
+### 前端调用
 
-| API                                  | 说明                                |
-| ------------------------------------ | ----------------------------------- |
-| `createClient<AppRoutes>(config)`    | 创建强类型 RPC 客户端               |
-| `isRpcError(err)`                    | 类型收窄，判断错误是否为 `RpcError` |
-| `createSwrClient<AppRoutes>(client)` | 在 `client` 上包装出 SWR Hooks      |
+```ts
+import { createSwrClient } from "tsdkarc-x/react/swr";
+import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/query";
+import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
+```
 
-**代码生成**
+| API                                         | 说明                           |
+| ------------------------------------------- | ------------------------------ |
+| `createClient<AppRoutes>(config)`           | 创建类型安全的客户端实例       |
+| `isRpcError(err)`                           | 验证并收窄 `RpcError` 错误类型 |
+| `createSwrClient<AppRoutes>(client)`        | 将基础 client 包装为 SWR Hooks |
+| `createReactQueryClient<AppRoutes>(client)` | 将基础 client 包装为 SWR Hooks |
+| `createVueQueryClient<AppRoutes>(client)`   | 将基础 client 包装为 SWR Hooks |
 
-| API                                            | 说明                                                       |
-| ---------------------------------------------- | ---------------------------------------------------------- |
-| `extractAppRoutesTypesFull(routes, options)`   | 产出 `clientDts` / `swrDts` / `reactQueryDts` 三份类型声明 |
-| `extractOpenApi(routes, openApiInfo, options)` | 从路由树生成 OpenAPI 文档对象                              |
+### 代码生成
 
----
+| API                              | 说明                                                         |
+| -------------------------------- | ------------------------------------------------------------ |
+| `extractAppRoutesTypesFull(...)` | 解析并生成客户端相关的类型声明文件（`.d.ts`），暂不支持 TS 7 |
+| `extractOpenApi(...)`            | 从路由结构生成 OpenAPI 规范文档对象 ，暂不支持 TS 7          |
 
-## ❓ FAQ
 
-**Q: `tsdkarc-x` 和 `tsdkarc` 是什么关系？**
+## 问题反馈
 
-`tsdkarc` 负责模块化依赖注入；`tsdkarc-x` 在其上构建 RPC 路由层，`defineRouter` 的 `modules` 参数直接接收 `tsdkarc` 的模块，两者的 `ctx` 推导机制完全打通。
-
-**Q: `r.query` 不传 Schema 会怎样？**
-
-输入类型退化为 handler 第一个参数手写的类型，不会有运行时校验，仅做类型层面的约束。
-
-**Q: `stream` 的 handler 必须是 `async function*` 吗？**
-
-是的，`r.stream` 通过 Generator 的 `yield` 将数据实时推送到前端，前端用 `for await...of` 消费，天然支持 SSE 的增量语义。
-
-**Q: 上传接口里的 `z.coerce.number()` 是为什么？**
-
-Multipart FormData 的字段在网络层始终以字符串形式传输，`z.coerce` 让 Schema 在校验阶段自动把字符串转换为目标类型，避免手动 `parseInt`。
-
-**Q: 换成 Hono 需要改业务路由代码吗？**
-
-不需要。`launchApp` 的 `transport`和`createContext` 字段是唯一需要替换的地方，路由定义、中间件、Client 侧代码均不受影响。
-
----
-
-## 其他
-
-[MIT](./LICENSE)
+若有任何疑问或者BUG反馈，请提交至 https://github.com/tsdk-monorepo/tsdkarc/issues

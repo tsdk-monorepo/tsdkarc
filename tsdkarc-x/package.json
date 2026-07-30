@@ -1,7 +1,7 @@
 {
   "name": "tsdkarc-x",
-  "version": "0.0.1",
-  "description": "Fast, type-safe RPC for full-stack TypeScript.",
+  "version": "0.0.2",
+  "description": "Fast, End-to-end type-safe RPC for full-stack TypeScript.",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
   "homepage": "https://github.com/tsdk-monorepo/tsdkarc/tree/main/tsdkarc-x",
@@ -51,6 +51,11 @@
       "require": "./lib/react/react-query.js",
       "import": "./esm/react/react-query.js",
       "types": "./lib/react/react-query.d.ts"
+    },
+    "./vue/query": {
+      "require": "./lib/vue/vue-query.js",
+      "import": "./esm/vue/vue-query.js",
+      "types": "./lib/vue/vue-query.d.ts"
     }
   },
   "files": [
@@ -104,7 +109,9 @@
     "@scalar/express-api-reference": "^0.10.11",
     "concurrently": "^10.0.3",
     "@tsconfig/recommended": "^1.0.13",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "vue": "^3.5.40",
+    "@tanstack/vue-query": "^5.101.4"
   },
   "peerDependencies": {
     "swr": "^2.4.2",
@@ -116,13 +123,18 @@
     "@scalar/hono-api-reference": "^0.11.11",
     "@scalar/express-api-reference": "^0.10.11",
     "@hono/node-server": "^2.0.11",
-    "hono": "^4.12.32"
+    "hono": "^4.12.32",
+    "vue": "^3.5.40",
+    "@tanstack/vue-query": "^5.101.4"
   },
   "peerDependenciesMeta": {
     "swr": {
       "optional": true
     },
-    "@tanstack/react-query": {
+    "vue": {
+      "optional": true
+    },
+    "@tanstack/vue-query": {
       "optional": true
     },
     "koa": {

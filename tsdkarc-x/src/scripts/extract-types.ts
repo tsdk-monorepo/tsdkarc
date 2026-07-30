@@ -1,13 +1,13 @@
 // extract-types.ts
 //
-// Generates static .d.ts files for the core Client, SWR, and React Query.
+// Generates static .d.ts files for the core Client, SWR, React Query, and Vue Query.
 // Completely eliminates generic mapped types for O(1) autocomplete speed.
 // Extracts original JSDoc comments and creates clickable source file links.
 //
 // Performance optimizations:
 //   1. WeakMap cache for zod schema → TS type conversion (avoids redundant z.toJSONSchema calls)
 //   2. ts.Program cache keyed by root files + tsconfig (avoids ~100-500ms re-creation on repeat calls)
-//   3. Single tree build shared across all three DTS flavors (3× traversal → 1×)
+//   3. Single tree build shared across all four DTS flavors (4× traversal → 1×)
 
 import ts from "typescript";
 import { z } from "zod";
@@ -31,6 +31,7 @@ export interface ExtractTypesResult {
   clientDts: string;
   swrDts: string;
   reactQueryDts: string;
+  vueQueryDts: string;
   paths: string[];
 }
 
@@ -869,7 +870,7 @@ export function extractReturnTypesFromSource(
 
 // ─── .d.ts emitters ──────────────────────────────────────────────────────────
 
-type TargetFlavor = "client" | "swr" | "react-query";
+type TargetFlavor = "client" | "swr" | "react-query" | "vue-query";
 
 /** Emitter for Core Client */
 function emitClientMethod(route: FlatRoute): string {
@@ -933,7 +934,29 @@ function emitReactQueryMethod(route: FlatRoute): string {
   return "";
 }
 
-// ─── Tree building — single pass for all three flavors ───────────────────────
+/** Emitter for TanStack Vue Query */
+function emitVueQueryMethod(route: FlatRoute): string {
+  const inputTs =
+    route.kind === "upload"
+      ? `${route.inputTs ?? "unknown"} | FormData | Record<string, any>`
+      : route.inputTs ?? "void";
+
+  const inputArg =
+    route.inputTs === null ? "input?: null | undefined" : `input: ${inputTs}`;
+
+  if (route.kind === "plain" || route.kind === "query") {
+    return `useQuery(${inputArg}, opts?: Omit<UseQueryOptions<${route.outputTs}, Error, ${route.outputTs}>, "queryKey" | "queryFn">): UseQueryReturnType<${route.outputTs}, Error>;`;
+  }
+  if (route.kind === "mutate" || route.kind === "upload") {
+    return `useMutation(opts?: Omit<UseMutationOptions<${route.outputTs}, Error, ${inputTs}>, "mutationFn">): UseMutationReturnType<${route.outputTs}, Error, ${inputTs}, unknown>;`;
+  }
+  if (route.kind === "stream") {
+    return `useStream(${inputArg}, opts?: { enabled?: boolean }): VQStreamState<${route.outputTs}>;`;
+  }
+  return "";
+}
+
+// ─── Tree building — single pass for all four flavors ────────────────────────
 
 interface TreeNode {
   __isNode: true;
@@ -945,9 +968,9 @@ interface TreeNode {
 }
 
 /**
- * Build the route tree once and store all three flavor signatures at each leaf.
- * This replaces three separate buildTree + emitInterfaceBody passes with one,
- * cutting O(routes × 3) traversal to O(routes × 1).
+ * Build the route tree once and store all four flavor signatures at each leaf.
+ * This replaces four separate buildTree + emitInterfaceBody passes with one,
+ * cutting O(routes × 4) traversal to O(routes × 1).
  */
 function buildTree(
   routes: FlatRoute[],
@@ -968,7 +991,12 @@ function buildTree(
         const meta = namespacesMeta.get(currentPath);
         current[seg] = {
           __isNode: true,
-          signatures: { client: "", swr: "", "react-query": "" },
+          signatures: {
+            client: "",
+            swr: "",
+            "react-query": "",
+            "vue-query": "",
+          },
           children: {},
           docs: meta?.docs,
           location: meta?.location,
@@ -984,6 +1012,7 @@ function buildTree(
         client: emitClientMethod(route),
         swr: emitSwrMethod(route),
         "react-query": emitReactQueryMethod(route),
+        "vue-query": emitVueQueryMethod(route),
       },
       docs: route.docs,
       location: route.location,
@@ -1058,6 +1087,11 @@ function assembleDts(
     header =
       `import type { UseQueryOptions, UseQueryResult, UseMutationOptions, UseMutationResult } from "@tanstack/react-query";\n` +
       `import type { RQStreamState } from "./react-query";\n`;
+  } else if (flavor === "vue-query") {
+    finalExportName = `${exportName}VueQuery`;
+    header =
+      `import type { UseQueryOptions, UseQueryReturnType, UseMutationOptions, UseMutationReturnType } from "@tanstack/vue-query";\n` +
+      `import type { VQStreamState } from "./vue-query";\n`;
   }
 
   return [
@@ -1084,22 +1118,42 @@ function buildAllDts(
   exportName: string,
   routes: FlatRoute[],
   namespacesMeta: Map<string, SourceMeta>
-): Pick<ExtractTypesResult, "clientDts" | "swrDts" | "reactQueryDts"> {
+): {
+  output: Pick<
+    ExtractTypesResult,
+    "clientDts" | "swrDts" | "reactQueryDts" | "vueQueryDts"
+  > & { paths: string[] };
+} {
   const tree = buildTree(routes, namespacesMeta);
 
-  return {
-    clientDts: assembleDts(
-      exportName,
-      emitInterfaceBody(tree, "client", 2),
-      "client"
-    ),
-    swrDts: assembleDts(exportName, emitInterfaceBody(tree, "swr", 2), "swr"),
-    reactQueryDts: assembleDts(
-      exportName,
-      emitInterfaceBody(tree, "react-query", 2),
-      "react-query"
-    ),
+  const output = {
+    get clientDts() {
+      return assembleDts(
+        exportName,
+        emitInterfaceBody(tree, "client", 2),
+        "client"
+      );
+    },
+    get swrDts() {
+      return assembleDts(exportName, emitInterfaceBody(tree, "swr", 2), "swr");
+    },
+    get reactQueryDts() {
+      return assembleDts(
+        exportName,
+        emitInterfaceBody(tree, "react-query", 2),
+        "react-query"
+      );
+    },
+    get vueQueryDts() {
+      return assembleDts(
+        exportName,
+        emitInterfaceBody(tree, "vue-query", 2),
+        "vue-query"
+      );
+    },
+    paths: [] as string[],
   };
+  return { output };
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -1111,11 +1165,9 @@ export function extractAppRoutesTypes(
   const exportName = options.exportName ?? "AppRoutes";
   const flatRoutes = collectRoutes(routes);
   const meta = new Map<string, SourceMeta>();
-
-  return {
-    ...buildAllDts(exportName, flatRoutes, meta),
-    paths: flatRoutes.map((r) => r.path),
-  };
+  const output = buildAllDts(exportName, flatRoutes, meta).output;
+  output.paths = flatRoutes.map((r) => r.path);
+  return output;
 }
 
 export function extractAppRoutesTypesFull(
@@ -1150,8 +1202,7 @@ export function extractAppRoutesTypesFull(
     }
   }
 
-  return {
-    ...buildAllDts(exportName, flatRoutes, namespaces),
-    paths: flatRoutes.map((r) => r.path),
-  };
+  const output = buildAllDts(exportName, flatRoutes, namespaces).output;
+  output.paths = flatRoutes.map((r) => r.path);
+  return output;
 }

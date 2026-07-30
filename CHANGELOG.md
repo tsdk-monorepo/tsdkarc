@@ -1,6 +1,12 @@
-# TsdkArc Changelog
+# TsdkArc Packages Changelog
 
-## v2.0.0-alpha.0
+## tsdkarc-x@0.0.2
+
+- Add @tanstack/vue-query generated support
+- Add examples(express / hono)
+- Update README
+
+## tsdkarc@v2.0.0-alpha.0
 
 ⚠️ Breaking change.
 

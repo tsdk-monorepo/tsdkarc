@@ -1,217 +1,422 @@
 # tsdkarc-x
 
-Fast, type-safe RPC for full-stack TypeScript.
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
+[![Built on tsdkarc](https://img.shields.io/badge/built%20on-tsdkarc-orange.svg)](https://www.npmjs.com/package/tsdkarc)
+
+🇺🇸 English · [🇨🇳 中文](./README.zh-CN.md)
+
+## Introduction
+
+`tsdkarc-x` is an end-to-end type-safe RPC framework based on `tsdkarc`. With it, after you write your routes on the server, the frontend client can directly get the corresponding request types, API methods, and React/Vue hooks.
 
 ---
 
-## Design
+## Why use it / Pain points solved
 
-- **No Side Effects** — Middlewares never mutate `ctx`. Data flows down via `next({ ... })`.
-- **Snowball Inference** — Each middleware widens the downstream type automatically.
-- **Transport-Agnostic** — Handlers program against a typed `ctx`, unaware of Hono, Express, or Edge runtimes.
+1. **No frontend-backend type gap**: Frontend doesn't need to manually define API types or rely on extra code generation steps. Server input and return types are automatically inferred to the frontend caller.
+2. **No duplicate types & validation**: By integrating Zod, you get runtime validation on the server while directly inferring static types from the Schema (optional). Keeps runtime and static types in sync.
+3. **Messy context & dependency management**: Based on `tsdkarc`'s type-safe DI module system, it automatically infers types for databases, global middlewares, and request-level context. No more passing `any` around or manual type casting.
+4. **Framework lock-in**: Routes and business logic are decoupled from the underlying HTTP framework (like Express or Hono). You don't need to rewrite business code when switching frameworks.
 
 ---
 
-## API Reference
+## Quick Start
 
-### 1. `defineMiddleware`
+### 1. Install Dependencies
 
-Curried factory that fixes the input contract in the first call and receives the handler in the second.
+```bash
+npm install tsdkarc-x tsdkarc@next zod
+# npm install express multer @types/multer @types/express @scalar/express-api-reference
+# npm install hono @hono/node-server @scalar/hono-api-reference
 
 ```
-defineMiddleware<TInCtx>()(handler)
-```
 
-| Parameter   | Description                                                                  |
-| ----------- | ---------------------------------------------------------------------------- |
-| `TInCtx`    | Input contract. The middleware can only mount where this shape is satisfied. |
-| `ctx`       | Accumulated context: `BaseCtx` + DI modules + upstream injections.           |
-| `next(ext)` | Passes control downstream, merging `ext` into the context.                   |
+> Note: Install the HTTP framework (like `express` or `hono`) needed for your adapter as you need.
 
-```typescript
-type BaseCtx = Awaited<ReturnType<typeof createContext>>;
+### 2. Server: Define routes and start the app
 
-// Basic auth
-const authMw = defineMiddleware<BaseCtx>()(async (ctx, next) => {
-  if (!ctx.token) throw new RpcError("UNAUTHORIZED", "Missing Bearer Token");
-  return next({ user: { id: "u_1", role: "admin" } });
+```ts
+// server.ts
+import { defineRouter, launchApp, type RoutesOf } from "tsdkarc-x";
+import { ExpressAdapter } from "tsdkarc-x/express";
+import { extractOpenApi } from "tsdkarc-x/openapi"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
+import { extractAppRoutesTypesFull } from "tsdkarc-x/extract"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
+import { apiReference } from "@scalar/express-api-reference";
+import fs from "fs/promises";
+import path from "path";
+
+// 1. Create router instance
+const appRouter = defineRouter({});
+
+// 2. Define specific routes
+const userRoutes = appRouter.init(() => ({
+  health: () => "OK",
+}));
+const routes = { users: userRoutes }; // routesExportName
+const transport = new ExpressAdapter();
+
+// 3. Start server
+export const app = await launchApp({
+  basePath: "/api",
+  transport,
+  routes,
+  port: 3000,
 });
 
-// Requires authMw to have already injected `user`
-const requireAdminMw = defineMiddleware<{ user: { role: string } }>()(
-  async (ctx, next) => {
-    if (ctx.user.role !== "admin")
-      throw new RpcError("FORBIDDEN", "Admin only.");
-    return next({ isAdmin: true });
+// Generate OpenAPI config
+const openapiResult = extractOpenApi(
+  app.routes,
+  {
+    info: { title: "API", version: "1.0.0" },
+  },
+  { entryFile: path.resolve("./server.ts") }
+);
+transport.app.get(`/api/openapi`, async (req, res) => {
+  res.json(openapiResult);
+});
+transport.app.use(
+  "/reference",
+  apiReference({
+    // Put your OpenAPI url here:
+    url: `http://localhost:3000/api/openapi`,
+  })
+);
+
+// 4. Export route types for frontend
+export type AppRoutes = RoutesOf<typeof app>;
+
+// Generate static type files
+const { clientDts, swrDts, reactQueryDts } = await extractAppRoutesTypesFull(
+  app.routes,
+  {
+    entryFile: path.resolve("./server.ts"),
+    tsConfigFilePath: path.resolve("./tsconfig.json"),
+    routesExportName: "routes",
+    includeSourceLocation: false,
   }
+);
+// Write static files
+await Promise.all([
+  fs.writeFile("./client/api.d.ts", clientDts),
+  fs.writeFile("./client/api-swr.d.ts", swrDts),
+  fs.writeFile("./client/api-query.d.ts", reactQueryDts),
+]);
+
+await fetch("http://localhost:3000/api/users/health")
+  .then((res) => res.json())
+  .then((res) => {
+    console.log(res); // Output: OK
+  });
+```
+
+### 3. Frontend: Create client and call APIs
+
+```bash
+npm install swr
+# npm install react @tanstack/react-query
+# npm install @tanstack/vue-query
+
+```
+
+```ts
+// client.ts
+import { createClient } from "tsdkarc-x/client";
+import { createSwrClient } from "tsdkarc-x/react/swr";
+import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/query";
+import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
+
+import type { AppRoutes } from "./server";
+
+const client = createClient<AppRoutes>({
+  baseURL: "http://localhost:3000/api",
+});
+
+const health = await client.users.health.query(); // "OK", with full autocomplete and type hints
+
+// const swrHooks = createSwrClient<AppRoutes>(client); // react swr hooks
+// swrHooks.users.health.useQuery()
+// const reactQueryHooks = createReactQueryClient<AppRoutes>(client); // react tanstack query hooks
+// const vueQueryHooks = createVueQueryClient<AppRoutes>(client); // vue tanstack query hooks
+```
+
+---
+
+## Common Examples
+
+### Input Validation (Zod Schema)
+
+Just pass a Zod Schema to `r.query` or `r.mutate` for automatic validation and type inference.
+
+```ts
+const userRoutes = appRouter.init((r) => ({
+  // Query
+  getProfile: r.query(
+    z.object({ includeHistory: z.boolean().default(false) }),
+    async (input) => {
+      return { id: "u_1", history: input.includeHistory ? [] : null };
+    }
+  ),
+  // Mutate
+  updateTheme: r.mutate(
+    z.object({ theme: z.enum(["dark_mode", "light_mode"]) }),
+    (input) => `Theme changed to ${input.theme}`
+  ),
+}));
+```
+
+### Dependency Injection (DI)
+
+Reuse the `tsdkarc` module system to inject dependencies like your DB. Types are automatically passed to handlers.
+
+```ts
+import { defineModule } from "tsdkarc";
+
+export const dbModule = defineModule({ name: "db" }).init(() => ({
+  findUser: (id: string) => ({ id, name: "Alice", role: "admin" }),
+}));
+
+export const appRouter = defineRouter({
+  modules: [dbModule], // Register dependencies
+});
+
+const userRoutes = appRouter.init((r) => ({
+  getProfile: r.query(z.object({ id: z.string() }), async (input, env) => {
+    // env.ctx.db type is auto-inferred
+    return env.ctx.db.findUser(input.id);
+  }),
+}));
+```
+
+### Middleware & Request Context
+
+Define `createContext` for request-level data, and use `defineMiddleware` to modify context.
+
+```ts
+import { defineMiddleware } from "tsdkarc-x";
+import type { Request } from "express";
+
+// 1. Extract request-level context
+export const createContext = async (c: Request) => ({
+  get token() { return c.header("Authorization") || null; },
+});
+type BaseContext = Awaited<ReturnType<typeof createContext>>;
+
+// 2. Define middleware
+export const authMw = defineMiddleware<BaseContext>()(async (ctx, next) => {
+  return next({ user: { id: "u_1" } }); // Inject user data
+});
+
+// 3. Apply to a single route
+updatePassword: r
+  .use(authMw)
+  .mutate(z.object({ newPwd: z.string() }), async (input, env) => {
+    return `User ${env.meta.user.id} updated password`;
+  }),
+
+
+```
+
+### Error Handling
+
+Throw a structured `RpcError`. The server automatically maps it to an HTTP status code, and the frontend can narrow the type via `isRpcError`.
+
+```ts
+// Server
+triggerError: r.query(() => {
+  throw new RpcError("NOT_FOUND", "This resource has been deleted.");
+});
+
+// Frontend
+import { isRpcError } from "tsdkarc-x";
+
+try {
+  await client.users.triggerError.query();
+} catch (err) {
+  if (isRpcError(err)) {
+    console.log(err.code, err.message); // "NOT_FOUND"
+  }
+}
+```
+
+### Route Nesting
+
+Just nest objects to build namespaces. The calling path matches the structure strictly.
+
+```ts
+// Server
+const userRoutes = appRouter.init((r) => ({
+  settings: {
+    getTheme: r.query(() => "dark_mode"),
+  },
+}));
+
+// Frontend
+await client.users.settings.getTheme.query();
+```
+
+### Streaming Response (SSE)
+
+Use `r.stream` combined with `async function*` to push real-time data to frontend.
+
+```ts
+// Server
+downloadLogs: r.stream(
+  z.object({ lines: z.number() }),
+  async function* (input) {
+    for (let i = 0; i < input.lines; i++) {
+      yield { index: i, text: `Log - Line ${i}` };
+    }
+  }
+);
+
+// Frontend
+const stream = await client.users.downloadLogs.stream({ lines: 3 });
+for await (const chunk of stream) {
+  console.log(chunk);
+}
+```
+
+### File Upload
+
+Use `r.upload` to handle Multipart requests, and `z.coerce` to handle non-string data in the form.
+
+```ts
+uploadAvatar: r.upload(
+  z.object({
+    file: z.instanceof(File),
+    cropSize: z.coerce.number(), // Automatically convert FormData string to number
+  }),
+  async (input) => ({ fileName: input.file.name, size: input.file.size })
+);
+```
+
+### Background Tasks
+
+Use `env.waitUntil` to register tasks. The response returns immediately while the task keeps running.
+
+```ts
+register: r.mutate(z.object({ id: z.string() }), async (input, env) => {
+  env.waitUntil(sendEmail(input.id)); // Won't block the response
+  return { success: true };
+}),
+
+
+```
+
+### Switching HTTP Frameworks
+
+No need to modify route logic. Just replace the `transport` adapter in `launchApp`.
+
+```ts
+import { HonoAdapter } from "tsdkarc-x";
+
+export const app = launchApp({
+  basePath: "/api",
+  transport: new HonoAdapter(), // Switch to Hono
+  createContext,
+  routes: { users: userRoutes },
+  port: 3000,
+});
+```
+
+### Generating Frontend Types and OpenAPI
+
+Supports exporting types as `.d.ts` or generating OpenAPI docs, perfect for separate frontend/backend repo setups.
+
+```ts
+import { extractAppRoutesTypesFull, extractOpenApi } from "tsdkarc-x/scripts";
+
+// Generate .d.ts
+const { clientDts } = await extractAppRoutesTypesFull(routes, {
+  entryFile: "./server.ts",
+});
+
+// Generate OpenAPI config
+const openapi = extractOpenApi(
+  routes,
+  {
+    info: { title: "API", version: "1.0.0" },
+  },
+  { entryFile: "./server.ts" }
 );
 ```
 
 ---
 
-### 2. `defineRouter`
+## FAQ
 
-Composes typed **Route Blueprints**. No side effects until `.init()` is called.
+**Q: What's the relationship between `tsdkarc-x` and `tsdkarc`?**
 
-**`defineRouter({ modules?, middlewares? })`** — Creates a base blueprint.
+`tsdkarc` handles modular dependency injection; `tsdkarc-x` builds the RPC routing layer on top of it. `defineRouter` directly accepts `tsdkarc` modules, and their type inference mechanisms are completely connected.
 
-**`.extend({ modules?, middlewares? })`** — Derives a child blueprint, inheriting all modules and middlewares.
+**Q: What happens if I don't pass a Schema to `r.query`?**
 
-**`.init(factory)`** — Instantiates the blueprint into a mountable `RouteFactoryTree`.
+The input type falls back to whatever manual type you set for the handler's first parameter. You'll only have static type checking without runtime input validation.
 
-```
-factory(r, ctx) => Record<string, RouteEndpoint>
-```
+**Q: Does the `stream` handler have to be an `async function*`?**
 
-| Param | Description                                                       |
-| ----- | ----------------------------------------------------------------- |
-| `r`   | Route builder (see methods below).                                |
-| `ctx` | Resolved DI dependencies, typed from the blueprint's module list. |
+Yes, `r.stream` relies on Generator's `yield` to push data to the frontend. The frontend uses `for await...of` to consume it, which natively supports incremental semantics.
 
-#### Route Builder (`r`)
+**Q: Why use `z.coerce.number()` in the upload API?**
 
-| Method                       | Transport           | Notes                                                          |
-| ---------------------------- | ------------------- | -------------------------------------------------------------- |
-| `r.query(schema?, handler)`  | GET                 | Read-only.                                                     |
-| `r.mutate(schema?, handler)` | POST / PUT          | State-mutating.                                                |
-| `r.stream(schema?, handler)` | SSE                 | Handler must be `async function*`.                             |
-| `r.upload(schema?, handler)` | multipart/form-data | File uploads.                                                  |
-| `r.use(middleware)`          | —                   | Returns a new `r` — chain before `.query()`, `.mutate()`, etc. |
+Multipart FormData fields are all strings during network transmission. `z.coerce` lets Zod automatically convert them to your target type (like number) during validation, saving you from manual conversions.
 
-#### Handler Signature: `(input, env)`
+**Q: Do I need to change my business route code if I switch to Hono?**
 
-| Param              | Description                              |
-| ------------------ | ---------------------------------------- |
-| `input`            | Validated input from `schema`.           |
-| `env.ctx`          | DI dependencies.                         |
-| `env.meta`         | All upstream middleware injections.      |
-| `env.waitUntil(p)` | Non-blocking background task, Edge-safe. |
-
-```typescript
-import { z } from "zod";
-
-// Base blueprint
-export const appRouter = defineRouter({
-  modules: [dbModule, emailModule],
-  middlewares: [
-    defineMiddleware<BaseCtx>()(async (ctx, next) =>
-      next({ traceId: `req_${Date.now()}` })
-    ),
-  ],
-});
-
-// Protected blueprint — inherits everything, adds auth
-export const protectedRouter = appRouter.extend({
-  middlewares: [
-    defineMiddleware<BaseCtx>()(async (ctx, next) => {
-      if (!ctx.token) throw new RpcError("UNAUTHORIZED", "Missing Token");
-      const user = await ctx.db.findUser(ctx.token);
-      return next({ user });
-    }),
-  ],
-});
-
-// Route handlers
-export const userRoutes = protectedRouter.init((r, ctx) => ({
-  updateProfile: r.mutate(
-    z.object({ name: z.string() }),
-    async (input, env) => {
-      await env.ctx.db.updateUser(env.meta.user.id, input.name);
-      env.waitUntil(env.ctx.email.sendAlert(`Profile updated: ${input.name}`));
-      return { success: true };
-    }
-  ),
-
-  deleteAccount: r.use(verifyMfaMw).mutate(z.void(), async (_, env) => {
-    if (!env.meta.mfaPassed) throw new RpcError("FORBIDDEN", "MFA Failed");
-    return "Deleted";
-  }),
-}));
-```
+No. You only need to replace `transport` and `createContext` inside `launchApp`. The specific route definitions and middleware logic are completely unaffected.
 
 ---
 
-### 3. `launchApp`
+## API Reference
 
-Binds the RPC engine to an HTTP transport and starts the server.
+### Router Construction
 
-```typescript
-launchApp({ basePath, transport, createContext, routes, port });
-```
+| API                                        | Description                                                                    |
+| ------------------------------------------ | ------------------------------------------------------------------------------ |
+| `defineRouter({ modules, middlewares })`   | Creates `appRouter` instance, accepts modules and global middleware config.    |
+| `appRouter.init((r, ctx) => routesObject)` | Defines the route tree, `r` contains `query/mutate/stream/upload/use` methods. |
+| `r.use(middleware)`                        | Adds a middleware to a single route.                                           |
+| `defineMiddleware<InputCtx>()(...)`        | Defines a request middleware.                                                  |
 
-| Option               | Description                                                                         |
-| -------------------- | ----------------------------------------------------------------------------------- |
-| `basePath`           | URL prefix (e.g. `"/api"`).                                                         |
-| `transport`          | Adapter instance — `new HonoAdapter()`, `new ExpressAdapter()`, etc.                |
-| `createContext(req)` | Converts the raw request into a clean `BaseCtx`. The only transport-aware boundary. |
-| `routes`             | `RouteFactoryTree` — supports arbitrary nesting.                                    |
-| `port`               | Defaults to `3000`.                                                                 |
+### Server Running
 
-**Returns:** `Promise<{ stop, routes }>`
+| API                                  | Description                    |
+| ------------------------------------ | ------------------------------ |
+| `launchApp({ ...config })`           | Starts the HTTP server.        |
+| `ExpressAdapter()` / `HonoAdapter()` | HTTP framework adapters.       |
+| `RpcError(code, message)`            | Throws a structured exception. |
 
-| Property | Description                                                                 |
-| -------- | --------------------------------------------------------------------------- |
-| `stop()` | Closes the server, then tears down DI modules in reverse topological order. |
-| `routes` | Used to extract `RoutesOf<typeof app>` for the frontend.                    |
+### Type Utilities
 
-**Boot sequence:** collect DI modules → topological sort & boot → bind transport → listen.
+| API                             | Description                                                            |
+| ------------------------------- | ---------------------------------------------------------------------- |
+| `RoutesOf<typeof app>`          | Extracts full route types for client usage.                            |
+| `InferRouteTree<typeof routes>` | Extracts types purely from the route object (no need to start server). |
 
-```typescript
-import { launchApp, type RoutesOf } from "tsdkarc-x";
-import { ExpressAdapter } from "tsdkarc-x/express-adapter";
+### Frontend Client
 
-const app = launchApp({
-  basePath: "/api",
-  transport: new ExpressAdapter(),
-  createContext: async (req) => ({
-    get token() {
-      return req.header("Authorization") || null;
-    },
-  }),
-  routes: { v1: { users: userRoutes, ai: aiRoutes } },
-  port: 8080,
-});
-
-export type AppRoutes = RoutesOf<typeof app>;
-
-app.then(({ stop }) => {
-  process.on("SIGINT", async () => {
-    await stop();
-    process.exit(0);
-  });
-});
-```
-
----
-
-### 4. Client
-
-```typescript
-import { createClient } from "tsdkarc-x/client";
+```ts
 import { createSwrClient } from "tsdkarc-x/react/swr";
-import { createQueryClient } from "tsdkarc-x/react/query";
-import type { AppRoutes } from "tsdkarc-x";
-
-const api = createClient<AppRoutes>({ url: "http://localhost:8080/api" });
-
-const profile = await api.v1.users.getProfile.query({ id: "123" });
-console.log(profile.name); // fully typed
-
-await api.v1.users.deleteAccount.mutate();
+import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/query";
+import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
 ```
 
----
+| API                                         | Description                                         |
+| ------------------------------------------- | --------------------------------------------------- |
+| `createClient<AppRoutes>(config)`           | Creates a type-safe client instance.                |
+| `isRpcError(err)`                           | Validates and narrows the `RpcError` error type.    |
+| `createSwrClient<AppRoutes>(client)`        | Wraps basic client into SWR Hooks.                  |
+| `createReactQueryClient<AppRoutes>(client)` | Wraps basic client into React Tanstack Query Hooks. |
+| `createVueQueryClient<AppRoutes>(client)`   | Wraps basic client into Vue Tanstack Query Hooks.   |
 
-## Error Handling
+### Code Generation
 
-Throw `RpcError` in any middleware or handler:
+| API                              | Description                                                                                    |
+| -------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `extractAppRoutesTypesFull(...)` | Parses and generates client type declaration files (`.d.ts`). TS 7 not currently supported.    |
+| `extractOpenApi(...)`            | Generates OpenAPI spec document object from the route structure. TS 7 not currently supported. |
 
-```typescript
-import { RpcError } from "tsdkarc";
+## Feedback & Issues
 
-throw new RpcError("UNAUTHORIZED", "Missing Bearer Token");
-throw new RpcError("FORBIDDEN", "Admin only.");
-throw new RpcError("NOT_FOUND", "User not found.");
-```
-
-The client receives the code and message as a structured error.
+If you have any questions or bug reports, please open an issue at: [https://github.com/tsdk-monorepo/tsdkarc/issues](https://github.com/tsdk-monorepo/tsdkarc/issues)

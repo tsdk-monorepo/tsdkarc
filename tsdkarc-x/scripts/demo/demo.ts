@@ -152,7 +152,7 @@ const routerA = appRouter.init((r, ctx) => ({
 // ─────────────────────────────────────────────────────────────────────────────
 
 const adapter = new ExpressAdapter();
-// const honoAdapter = new HonoAdapter(basePath);
+// const honoAdapter = new HonoAdapter();
 
 /*
 adapter.app.use('*', cors({ origin: 'http://localhost:5173' })); // 给前端 Vite 放行跨域
@@ -224,7 +224,7 @@ export const app = launchApp({
 
 // 🌟 THE HOLY GRAIL: Exporting the pristine, inferred type for the frontend
 export type AppRoutes = RoutesOf<typeof app>;
-// export type AppRoutes = InferRouteTree<typeof routes>;
+export type AppRoutes2 = InferRouteTree<typeof routes>;
 
 // Graceful shutdown
 app.then(({ stop }) => {

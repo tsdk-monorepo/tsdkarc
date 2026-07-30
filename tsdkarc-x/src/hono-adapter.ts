@@ -1,8 +1,9 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { serve } from "@hono/node-server";
 import { streamSSE } from "hono/streaming";
-import { ZodError } from "zod";
 import type { ServerType } from "@hono/node-server";
+import { ZodError } from "zod";
 import { HttpResponse, RpcError } from "./types";
 import type {
   TransportAdapter,
@@ -10,7 +11,6 @@ import type {
   CreateContextFn,
   AnyRoute,
 } from "./types";
-import type { Context } from "hono";
 
 function flattenTree(
   tree: RuntimeRouteTree,
