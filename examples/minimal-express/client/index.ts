@@ -1,7 +1,7 @@
 import { createClient } from "tsdkarc-x/client";
 import { createSwrClient } from "tsdkarc-x/react/swr";
-import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/query";
-import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
+import { createReactQueryClient } from "tsdkarc-x/react/query";
+import { createVueQueryClient } from "tsdkarc-x/vue/query";
 
 import type { AppRoutes } from "../server";
 const client = createClient<AppRoutes>({
