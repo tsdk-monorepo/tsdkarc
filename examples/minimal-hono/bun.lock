@@ -12,7 +12,7 @@
         "react": "^19.2.8",
         "swr": "^2.4.2",
         "tsdkarc": "^2.0.0-alpha.0",
-        "tsdkarc-x": "^0.0.1",
+        "tsdkarc-x": "^0.0.2",
         "zod": "^4.4.3",
       },
       "devDependencies": {
@@ -71,7 +71,7 @@
 
     "tsdkarc": ["tsdkarc@2.0.0-alpha.0", "", {}, "sha512-BjMB3ghmiFQMNigXP6RBms88pAzIPCA5U0G4G9PvnNwDiplmYLPoGbI6YD31xkkO/GgHoud/YgdohcCyz9iy3w=="],
 
-    "tsdkarc-x": ["tsdkarc-x@0.0.1", "", { "dependencies": { "xior": "^0.8.3", "zod": "^4.4.3" }, "peerDependencies": { "@hono/node-server": "^2.0.11", "@hono/swagger-ui": "^0.6.1", "@scalar/express-api-reference": "^0.10.11", "@scalar/hono-api-reference": "^0.11.11", "@tanstack/react-query": "^5.101.4", "express": "^5.2.1", "hono": "^4.12.32", "koa": "^3.1.2", "multer": "^2.2.0", "swr": "^2.4.2" }, "optionalPeers": ["@hono/node-server", "@hono/swagger-ui", "@scalar/express-api-reference", "@scalar/hono-api-reference", "@tanstack/react-query", "express", "hono", "koa", "multer", "swr"] }, "sha512-Xv99eWMqppcRRzGeQ90zGOGKMhNKY8QpXFq/j4DWQZBwWnt5ha2gZFUP4WdXI+FVt6rf6EBHJTl/hmA6K7ViuA=="],
+    "tsdkarc-x": ["tsdkarc-x@0.0.2", "", { "dependencies": { "xior": "^0.8.3", "zod": "^4.4.3" }, "peerDependencies": { "@hono/node-server": "^2.0.11", "@hono/swagger-ui": "^0.6.1", "@scalar/express-api-reference": "^0.10.11", "@scalar/hono-api-reference": "^0.11.11", "@tanstack/react-query": "^5.101.4", "@tanstack/vue-query": "^5.101.4", "express": "^5.2.1", "hono": "^4.12.32", "koa": "^3.1.2", "multer": "^2.2.0", "swr": "^2.4.2", "vue": "^3.5.40" }, "optionalPeers": ["@hono/node-server", "@hono/swagger-ui", "@scalar/express-api-reference", "@scalar/hono-api-reference", "@tanstack/vue-query", "express", "hono", "koa", "multer", "swr", "vue"] }, "sha512-96uljV1kOSs2uErN1wIcfrnjnSj4GRO6yVpHf6/i+qCDruSpjiJNf1dkDZDSbOevKwkccbQmQL5O5f7FvPtzhQ=="],
 
     "tsdkbundle": ["tsdkbundle@0.0.1", "", { "dependencies": { "minimatch": "^10.2.5" }, "peerDependencies": { "typescript": "^5.0.0" }, "bin": { "bb": "lib/cli.js", "bundle": "lib/cli.js" } }, "sha512-tfEeSVKP8jLoQpH4QI/nkB2kFWDydCaGQ8eWr1+V0S9klEEaLGrv3iweePlo+IHLoJ0r1CWUW4H7g9yok0JGhg=="],
 

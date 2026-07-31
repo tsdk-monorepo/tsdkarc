@@ -1,7 +1,7 @@
 import { createClient } from "tsdkarc-x/client";
 import { createSwrClient } from "tsdkarc-x/react/swr";
 import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/query";
-// import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
+import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
 
 import type { AppRoutes } from "../server";
 const client = createClient<AppRoutes>({
@@ -15,5 +15,5 @@ const swrHooks = createSwrClient<AppRoutes>(client); // react swr hooks
 // swrHooks.users.health.useQuery()
 const reactQueryHooks = createReactQueryClient<AppRoutes>(client); // react tanstack query hooks
 // reactQueryHooks.users.health.useQuery()
-// const vueQueryHooks = createVueQueryClient<AppRoutes>(client); // vue tanstack query hooks
+const vueQueryHooks = createVueQueryClient<AppRoutes>(client); // vue tanstack query hooks
 // vueQueryHooks.users.health.useQuery()

@@ -151,7 +151,7 @@ const routerA = appRouter.init((r, ctx) => ({
 // 4. Orchestration & Launch
 // ─────────────────────────────────────────────────────────────────────────────
 
-const adapter = new ExpressAdapter();
+const adapter = new ExpressAdapter({ log: true });
 // const honoAdapter = new HonoAdapter();
 
 /*

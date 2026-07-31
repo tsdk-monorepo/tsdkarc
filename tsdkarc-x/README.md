@@ -54,7 +54,7 @@ const userRoutes = appRouter.init(() => ({
   health: () => "OK",
 }));
 const routes = { users: userRoutes }; // routesExportName
-const transport = new ExpressAdapter();
+const transport = new ExpressAdapter({ log: true });
 
 // 3. Start server
 export const app = await launchApp({
@@ -314,7 +314,7 @@ import { HonoAdapter } from "tsdkarc-x";
 
 export const app = launchApp({
   basePath: "/api",
-  transport: new HonoAdapter(), // Switch to Hono
+  transport: new HonoAdapter({ log: true }), // Switch to Hono
   createContext,
   routes: { users: userRoutes },
   port: 3000,
@@ -382,11 +382,11 @@ No. You only need to replace `transport` and `createContext` inside `launchApp`.
 
 ### Server Running
 
-| API                                  | Description                    |
-| ------------------------------------ | ------------------------------ |
-| `launchApp({ ...config })`           | Starts the HTTP server.        |
-| `ExpressAdapter()` / `HonoAdapter()` | HTTP framework adapters.       |
-| `RpcError(code, message)`            | Throws a structured exception. |
+| API                                                                | Description                    |
+| ------------------------------------------------------------------ | ------------------------------ |
+| `launchApp({ ...config })`                                         | Starts the HTTP server.        |
+| `ExpressAdapter({log?: boolean})` / `HonoAdapter({log?: boolean})` | HTTP framework adapters.       |
+| `RpcError(code, message)`                                          | Throws a structured exception. |
 
 ### Type Utilities
 
@@ -422,4 +422,4 @@ import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
 
 ## Feedback & Issues
 
-If you have any questions or bug reports, please open an issue at: [https://github.com/tsdk-monorepo/tsdkarc/issues](https://github.com/tsdk-monorepo/tsdkarc/issues)
+If you have any questions or bug reports, Feel free to [open an issue](https://github.com/tsdk-monorepo/tsdkarc/issues)

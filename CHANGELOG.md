@@ -1,5 +1,10 @@
 # TsdkArc Packages Changelog
 
+## tsdkarc-x@0.0.3
+
+- Add `{log?: boolean}` option to `ExpressAdapter` and `HonoAdapter`
+- Add `license` to package.json
+
 ## tsdkarc-x@0.0.2
 
 - Add @tanstack/vue-query generated support
