@@ -5,6 +5,7 @@
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
   "homepage": "https://github.com/tsdk-monorepo/tsdkarc/tree/main/tsdkarc-x",
+  "type": "module",
   "exports": {
     ".": {
       "require": "./lib/index.js",
