@@ -14,7 +14,7 @@ const config: BundleConfigFn = ({ command }) => {
         outdir: "dist",
         envFile: ".env",
         external: [],
-        ignore: ["client/*.d.ts", "./dist"],
+        ignore: ["**/*.d.ts", "./dist"],
 
         // Dynamic config!
         sourcemap: isProd ? "none" : "linked",

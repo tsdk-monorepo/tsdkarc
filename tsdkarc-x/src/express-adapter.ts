@@ -30,8 +30,10 @@ export class ExpressAdapter implements TransportAdapter<Request> {
   public readonly app: express.Express;
   private server: Server | null = null;
   private upload = multer({ storage: multer.memoryStorage() });
+  private log = false;
 
-  constructor() {
+  constructor(props?: { log?: boolean }) {
+    this.log = props?.log || false;
     this.app = express();
     this.app.use(express.json());
   }
@@ -172,7 +174,8 @@ export class ExpressAdapter implements TransportAdapter<Request> {
           }
         }
       );
-      console.log(`[Express] Mapped: [${method.toUpperCase()}] ${path}`);
+      if (this.log)
+        console.log(`[Express] Mapped: [${method.toUpperCase()}] ${path}`);
     }
   }
 

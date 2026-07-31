@@ -40,7 +40,10 @@ export class WebSocketAdapter implements TransportAdapter<WsContext> {
   public readonly wss: WebSocketServer;
   private httpServer: Server | null = null;
 
-  constructor() {
+  private log = false;
+
+  constructor(props?: { log?: boolean }) {
+    this.log = props?.log || false;
     this.wss = new WebSocketServer({ noServer: true });
   }
 
@@ -150,9 +153,10 @@ export class WebSocketAdapter implements TransportAdapter<WsContext> {
       });
     });
 
-    console.log(
-      `[WebSocket] Mapped ${Object.keys(routeMap).length} RPC routes.`
-    );
+    if (this.log)
+      console.log(
+        `[WebSocket] Mapped ${Object.keys(routeMap).length} RPC routes.`
+      );
   }
 
   start(port: number | string): Promise<void> {

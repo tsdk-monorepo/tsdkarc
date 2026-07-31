@@ -31,7 +31,10 @@ export class HonoAdapter implements TransportAdapter<Context> {
   public readonly app: Hono;
   private server: ServerType | null = null;
 
-  constructor() {
+  private log = false;
+
+  constructor(props?: { log?: boolean }) {
+    this.log = props?.log || false;
     this.app = new Hono();
   }
 
@@ -156,7 +159,7 @@ export class HonoAdapter implements TransportAdapter<Context> {
           );
         }
       });
-      console.log(`[Hono] Mapped: [${method}] ${path}`);
+      if (this.log) console.log(`[Hono] Mapped: [${method}] ${path}`);
     }
   }
 
