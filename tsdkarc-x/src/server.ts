@@ -300,7 +300,7 @@ export function defineRouter<
  * Recursively collects all DI modules from a RouteFactoryTree.
  * Reads ._mod instead of treating the RouteTreeModule itself as a module.
  */
-function extractRouteModules(tree: RouteFactoryTree): AnyModule[] {
+export function extractRouteModules(tree: RouteFactoryTree): AnyModule[] {
   const mods: AnyModule[] = [];
   for (const val of Object.values(tree)) {
     if (isRouteTreeModule(val)) {

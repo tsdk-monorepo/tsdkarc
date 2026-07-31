@@ -1,11 +1,10 @@
 {
   "name": "tsdkarc-x",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Fast, End-to-end type-safe RPC for full-stack TypeScript.",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
   "homepage": "https://github.com/tsdk-monorepo/tsdkarc/tree/main/tsdkarc-x",
-  "type": "module",
   "exports": {
     ".": {
       "require": "./lib/index.js",
@@ -21,6 +20,11 @@
       "require": "./lib/hono-adapter.js",
       "import": "./esm/hono-adapter.js",
       "types": "./lib/hono-adapter.d.ts"
+    },
+    "./fetch": {
+      "require": "./lib/fetch-adapter.js",
+      "import": "./esm/fetch-adapter.js",
+      "types": "./lib/fetch-adapter.d.ts"
     },
     "./ws": {
       "require": "./lib/ws-adapter.js",

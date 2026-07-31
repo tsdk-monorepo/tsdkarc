@@ -1,5 +1,9 @@
 # TsdkArc Packages Changelog
 
+## tsdkarc-x@0.0.4
+
+- Add `fetch-adapter` to support Next.js
+
 ## tsdkarc@v2.0.0-alpha.1
 
 - Add `graph()` method to `module.start({})`'s return
