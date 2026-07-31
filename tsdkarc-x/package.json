@@ -125,9 +125,13 @@
     "@hono/node-server": "^2.0.11",
     "hono": "^4.12.32",
     "vue": "^3.5.40",
-    "@tanstack/vue-query": "^5.101.4"
+    "@tanstack/vue-query": "^5.101.4",
+    "tsdkarc": "2.0.0-alpha.1"
   },
   "peerDependenciesMeta": {
+    "tsdkarc": {
+      "optional": false
+    },
     "swr": {
       "optional": true
     },
