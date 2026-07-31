@@ -122,6 +122,7 @@ npm install swr
 ```ts
 // client.ts
 import { createClient } from "tsdkarc-x/client";
+
 import { createSwrClient } from "tsdkarc-x/react/swr";
 import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/query";
 import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
@@ -397,6 +398,8 @@ No. You only need to replace `transport` and `createContext` inside `launchApp`.
 ### Frontend Client
 
 ```ts
+import { createClient } from "tsdkarc-x/client";
+
 import { createSwrClient } from "tsdkarc-x/react/swr";
 import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/query";
 import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";

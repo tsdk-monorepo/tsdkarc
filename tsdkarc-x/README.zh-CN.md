@@ -119,6 +119,7 @@ npm install swr
 ```ts
 // client.ts
 import { createClient } from "tsdkarc-x/client";
+
 import { createSwrClient } from "tsdkarc-x/react/swr";
 import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/query";
 import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
@@ -392,6 +393,8 @@ Multipart FormData 的字段在网络传输中均为字符串形式，使用 `z.
 ### 前端调用
 
 ```ts
+import { createClient } from "tsdkarc-x/client";
+
 import { createSwrClient } from "tsdkarc-x/react/swr";
 import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/query";
 import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";

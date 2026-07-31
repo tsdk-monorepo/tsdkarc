@@ -161,5 +161,6 @@
     "@hono/node-server": {
       "optional": true
     }
-  }
+  },
+  "license": "MIT"
 }

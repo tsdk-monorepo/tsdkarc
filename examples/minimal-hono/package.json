@@ -3,11 +3,9 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
+  "scripts": {
+    "dev": "bb dev main",
+    "build": "bb build main"
   },
   "dependencies": {
     "tsdkarc": "^2.0.0-alpha.0",
@@ -19,5 +17,12 @@
     "react": "^19.2.8",
     "swr": "^2.4.2",
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "tsdkbundle": "^0.0.1",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
   }
 }
