@@ -300,6 +300,10 @@ export interface StartOptions<FinalCtx extends object, Reason = string> {
 export interface StartResult<FinalCtx extends object, Reason = string> {
   ctx: FinalCtx;
   stop: (reason?: Reason) => Promise<void>;
+  graph: () => {
+    nodes: ModuleGraphNode;
+    readonly formatted: string;
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

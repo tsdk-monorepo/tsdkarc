@@ -6,15 +6,39 @@
 
 🇺🇸 English · [🇨🇳 中文](./README.zh-CN.md)
 
-> **Decorator-free, type-safe module composition & dependency injection for TypeScript**
+## Introduction
 
-No decorators, no `reflect-metadata`. `ctx` is fully inferred at compile time from each module's `init()` return value.
+tsdkarc is a module composition and Dependency Injection (DI) library for TypeScript.
+
+Its core design uses no decorators and does not rely on `reflect-metadata`. The module context (`ctx`) is inferred entirely at compile time from the return value of each module's `init()` method. The output is pure JavaScript code, requiring no extra AST tools or special compile configs.
+
+## What Problems Does It Solve?
+
+1. **No runtime "black magic" or overhead**: Traditional DI relies heavily on decorators and reflection, causing large bundle sizes and breaking tree-shaking. **tsdkarc** uses pure function calls, making it completely transparent to modern build tools.
+2. **Catch dependency errors early**: Missing dependencies or typo errors usually crash the app at startup. **tsdkarc** moves dependency graph checks to the TS compile time. Any context type mismatch will fail the type check immediately.
+3. **Handles diamond dependencies automatically**: In complex projects, multiple business features might depend on the same base module (like logs or config). **tsdkarc** uses object references for topological sorting and deduplication, ensuring shared dependencies start in the right order and only once.
+4. **Reliable resource cleanup**: It includes global and module-level lifecycle management. If any module fails during startup, it automatically runs the cleanup logic for started modules in reverse order.
+
+## Quick Start
+
+**Installation**
+
+Install directly via npm. It works with standard `tsc` or any bundler:
+
+```bash
+npm install tsdkarc@next
+
+```
+
+**Basic Usage**
+
+Define modules and assemble them explicitly:
 
 ```ts
 import { defineModule, type ContextOf } from "tsdkarc";
 
+// 1. Define a base module
 const LoggerModule = defineModule().init(() => {
-  console.log("[LOG] init LoggerModule"); // Only log once: [LOG] init LoggerModule
   return {
     logger: {
       log: (message: string) => console.log(`[LOG] ${message}`),
@@ -22,6 +46,7 @@ const LoggerModule = defineModule().init(() => {
   };
 });
 
+// Extract the inferred type for external use
 type ILogger = ContextOf<typeof LoggerModule>["logger"];
 
 class UserService {
@@ -31,78 +56,41 @@ class UserService {
   }
 }
 
+// 2. Define a business module and declare dependencies
 const UserServiceModule = defineModule({
   name: "userService",
   modules: [LoggerModule],
 }).init((ctx) => new UserService(ctx.logger));
 
+// 3. Assemble and start the app
 const app = await defineModule({ modules: [UserServiceModule, LoggerModule] })
   .init((ctx) => {
-    ctx.logger.log("The application is running..."); // [LOG] The application is running...
+    ctx.logger.log("Application started");
   })
   .start();
-app.ctx.userService.createUser("Alice"); // [LOG] Creating user: Alice
+app.ctx.userService.createUser("Alice");
 await app.stop();
 ```
 
----
+## Common Examples
 
-## The Grand Idea: Modules as Reusable Building Blocks
+### Named vs Anonymous Modules
 
-DI isn't the point — **composability** is. A module's contract is fully declared by itself: `modules` is its input, `init()`'s return value is its output. It has no idea which app it will be mounted into, so it can be reused across projects, published standalone, swapped wholesale, or nested into larger modules.
-
-```ts
-// logger-module/index.ts — published independently, no app-specific knowledge
-export const LoggerModule = defineModule({ name: "logger" }).init(() => ({
-  log: (message: string) => console.log(`[LOG] ${message}`),
-}));
-
-// Different apps reuse the same module, ctx stays fully typed
-const appA = await defineModule({ modules: [LoggerModule, OrderModule] })
-  .init()
-  .start();
-const appB = await defineModule({ modules: [LoggerModule, ReportModule] })
-  .init()
-  .start();
-```
-
----
-
-## Features
-
-- **Zero decorators** — no `reflect-metadata`
-- **Automatic type inference** — `ctx` derived structurally from `init()` return values, no tokens
-- **Compile-time collision detection** — duplicate keys fail type-checking
-- **Native tree shaking** — no side effects by design
-- **Full lifecycle hooks** — module-level and global, automatic rollback in reverse dependency order on boot failure
-- **Dependency graph inspection** — `graph()`
-- **Diamond-dependency safe** — deduplicated by reference, shared modules boot exactly once
-
----
-
-## Install
-
-```bash
-npm install tsdkarc@next
-```
-
-No transformer, no `ts-patch` — runs on plain `tsc`/bundler output.
-
----
-
-## Defining & Composing Modules
+The return values of anonymous modules are flattened and merged into the parent. Named modules are mounted under a namespace using their `name` as the key.
 
 ```ts
-// Anonymous module: return value is spread directly into the parent ctx
+// Anonymous module
 const hello = defineModule().init(() => ({ greet: "hello" }));
-type HelloCtx = ContextOf<typeof hello>; // { greet: string }
+// ctx is inferred as: { greet: string }
 
-// Named module: return value is namespaced under ctx[name]
+// Named module
 const example = defineModule({ name: "example" }).init(() => ({ test: "x" }));
-type ExampleCtx = ContextOf<typeof example>; // { example: { test: string } }
+// ctx is inferred as: { example: { test: string } }
 ```
 
-`init(ctx)` only receives the **dependency** context, never its own slice — which is why circular self-reference is structurally impossible. For non-module values like env vars or secrets, just close over them inside `init()` — no separate "explicit map" API needed:
+### Injecting Non-Module Variables (e.g., Env Vars)
+
+No special injection API is needed. Just access them directly inside the `init` closure:
 
 ```ts
 const ConfigModule = defineModule({ name: "config" }).init(() => ({
@@ -110,86 +98,63 @@ const ConfigModule = defineModule({ name: "config" }).init(() => ({
 }));
 ```
 
-**Diamond dependencies**: if `LoggerModule` is depended on by multiple paths, tsdkarc deduplicates by module reference (not `name`), booting it exactly once, ordered before all of its dependents.
+### Viewing the Dependency Tree
 
----
-
-## Lifecycle Hooks
-
-**Module-level** (second argument to `.init()`, scoped to that module): `beforeBoot` `afterBoot` `beforeShutdown` `shutdown` `afterShutdown`
-
-**Global-level** (argument to `.start()`, scoped to the whole composition): `beforeBoot` `afterBoot` `beforeEachBoot` `afterEachBoot` `beforeShutdown` `afterShutdown` `beforeEachShutdown` `afterEachShutdown`
-
-`*Each*` hooks also receive `meta: { name: string | null; kind: "named" | "anon" }`. On boot failure, already-started modules automatically roll back their `shutdown` in reverse dependency order — no manual cleanup required.
-
----
-
-## Dependency Graph
+When debugging dependency issues, you can print the formatted dependency graph:
 
 ```ts
 console.log(app.graph().formatted);
-// - app
-//   - userService
-//     - logger
+/* 
+- app
+  - userService
+    - logger 
+*/
 ```
-
-The first place to check when debugging `[tsdkarc] Circular dependency detected at module "<name>"`.
-
----
-
-## API Reference
-
-**`defineModule(meta?)`** → `ModuleDeclaration`
-
-| Parameter         | Type          | Description                                      |
-| ----------------- | ------------- | ------------------------------------------------ |
-| `name`            | `string`      | optional, ctx namespace key                      |
-| `modules`         | `AnyModule[]` | optional, modules this one depends on            |
-| `ignoreConflicts` | `string[]`    | optional, keys allowed to collide and deep-merge |
-
-**Module instance methods**: `.init(bootFn?, hooks?)` · `.with(...modules)` · `.start(options?)` · `.graph()`
-
-**Type utilities**: `ContextOf<M>` full ctx type · `DepCtxOf<M>` dependency ctx type (excludes own slice) · `OwnSliceOf<M>` own `init()` return type
-
----
 
 ## FAQ
 
-**Q: What happens on a circular dependency?**
+**What happens if there is a circular dependency?**
 
-`.start()` throws immediately during the sort phase: `[tsdkarc] Circular dependency detected at module "<name>"`. Use `.graph()` + `formatModuleGraph()` to find it.
+`.start()` will throw an error during the sorting phase before startup: `[tsdkarc] Circular dependency detected at module "<name>"`. You can print `.graph()` to locate the circular loop.
 
-**Q: A module's `init()` return collides with an injected dependency key — what happens?**
+**What happens if a module's exposed field name conflicts with a dependency's field name?**
 
-A compile-time `FindSliceCollision` error. This is a static check only — bypassing it with `@ts-ignore` causes a silent runtime overwrite.
+It will trigger a `FindSliceCollision` type error at compile time. Note: if you force bypass it using `@ts-ignore`, the module loaded later will overwrite the earlier one at runtime.
 
-**Q: Do diamond dependencies boot twice?**
+**What if field names conflict between anonymous modules?**
 
-No. Modules are deduplicated by object reference (not by `name`) during topological sort, so a shared module boots exactly once, ordered before everything that depends on it.
+A `[tsdkarc] Anonymous module slice collision` error will be thrown at runtime. If you really need to merge fields with the same name, explicitly declare them using the `ignoreConflicts` array when defining the module.
 
-**Q: An anonymous module's fields collide with another module's — what happens?**
+**How are fields declared in ignoreConflicts merged?**
 
-Runtime throws `[tsdkarc] Anonymous module slice collision`, unless the field is explicitly listed in `ignoreConflicts`.
+Deep merging is only performed if both conflicting fields are plain objects. Arrays, `Date` objects, `Map`s, or class instances will be completely replaced.
 
-**Q: How does the `ignoreConflicts` merge work?**
+**What is the relationship between tsdkarc-x and tsdkarc?**
 
-Deep merge (later overrides earlier) only when both sides are plain objects — arrays, `Date`, `Map`, and class instances are replaced wholesale, never merged or concatenated. `__proto__` and `prototype` are always skipped for safety.
+tsdkarc-x depends on the core features of tsdkarc. Also, [`tsdkarc-x`](https://npmjs.com/package/tsdkarc-x) is an end-to-end (frontend to backend) type-safe development library built on top of tsdkarc.
 
----
+## API Reference
 
-## Repository Layout
+### `defineModule(meta?)`
 
-```text
-tsdkarc/       # core library
-tsdkarc-x/     # official extended ecosystem
-tsdkbundle/    # monitoring & bundling tooling
-website/       # documentation site
-```
+Used to declare a module. Returns a `ModuleDeclaration` object.
 
----
+| Parameter         | Type          | Description                                                                      |
+| ----------------- | ------------- | -------------------------------------------------------------------------------- |
+| `name`            | `string`      | Optional. The namespace key for this module in the context.                      |
+| `modules`         | `AnyModule[]` | Optional. Declares other modules that this module depends on.                    |
+| `ignoreConflicts` | `string[]`    | Optional. A list of keys that are allowed to conflict and will be deeply merged. |
 
-## License
+### Instance Methods
 
-[MIT](../LICENSE)
+- `.init(bootFn?, hooks?)`: Defines the module's initialization logic and lifecycle hooks (like `beforeBoot`, `shutdown`, etc.).
+- `.with(...modules)`: Dynamically adds dependency modules.
+- `.start(options?)`: Starts the entire module tree. You can pass global lifecycle hooks.
+- `.stop()`: Stops all modules in the reverse order of their dependencies.
+- `.graph()`: Returns the dependency tree data and its formatted output.
 
-[CHANGELOG.md](../CHANGELOG.md)
+### Type Helpers
+
+- `ContextOf<M>`: Extracts the full context type of a module.
+- `DepCtxOf<M>`: Extracts the context type the module depends on (excluding itself).
+- `OwnSliceOf<M>`: Extracts the type of the return value from the module's own `init()` method.

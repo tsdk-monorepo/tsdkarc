@@ -1,5 +1,9 @@
 # TsdkArc Packages Changelog
 
+## tsdkarc@v2.0.0-alpha.1
+
+- Add `graph()` method to `module.start({})`'s return
+
 ## tsdkarc-x@0.0.3
 
 - Add `{log?: boolean}` option to `ExpressAdapter` and `HonoAdapter`
@@ -17,8 +21,7 @@
 
 The API has been completely redesigned. 🚀
 
-Please check the README before upgrading:
-https://github.com/tsdk-monorepo/tsdkarc/tree/expirements
+Check the new README: https://github.com/tsdk-monorepo/tsdkarc/
 
 ## v1.3.0
 

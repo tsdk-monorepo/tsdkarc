@@ -24,7 +24,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { deepMerge, defineModule, formatModuleGraph } from "../src/core";
-import { ContextOf } from "../src/types";
+import { ContextOf, OwnSliceOf, DepCtxOf } from "../src/types";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 0. Type-level checks (compile-time only — no runtime assertions)
@@ -191,7 +191,12 @@ describe("0. Type-level checks", () => {
     const depMod = defineModule().init(() => ({ ready: true }));
     const extraMod = defineModule().init(() => ({ extra: 42 }));
 
-    const composed = defineModule({ modules: [depMod] }).with(extraMod);
+    const composed = defineModule({ modules: [depMod] })
+      .init(() => ({ a: 1, b: 2 }))
+      .with(extraMod);
+
+    type ModACtx = OwnSliceOf<typeof composed>;
+    type ModBCtx = DepCtxOf<typeof composed>;
 
     composed.start().then(({ ctx }) => {
       const _ready: boolean = ctx.ready;
@@ -383,15 +388,19 @@ describe("1. Basic usage walkthrough", () => {
     expect(ctx.example.test2).toBe("value2");
   });
 
-  it("prints a readable dependency graph via .graph()", () => {
+  it("prints a readable dependency graph via .graph()", async () => {
     const db = defineModule({ name: "db" }).init(() => ({ uri: "db" }));
     const cache = defineModule({ name: "cache" }).init(() => ({
       msg: "cache",
     }));
-    const app = defineModule({ name: "app", modules: [db, cache] }).init(
+    const appModule = defineModule({ name: "app", modules: [db, cache] }).init(
       () => ({})
     );
+    const app = await appModule.start();
 
+    expect(appModule.graph().formatted.trim()).toBe(`- app
+  - db
+  - cache`);
     expect(app.graph().formatted.trim()).toBe(`- app
   - db
   - cache`);

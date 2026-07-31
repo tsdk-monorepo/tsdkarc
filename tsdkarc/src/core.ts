@@ -153,6 +153,22 @@ function buildGraphNode(
 }
 
 /**
+ * Builds a module's dependency graph plus a lazily-formatted string view.
+ * Shared by ModuleHandle.graph() and start()'s return value so both stay
+ * in sync with a single implementation.
+ * @param node  ModuleNode
+ */
+function buildGraphResult(node: ModuleNode) {
+  const nodes = buildGraphNode(node, new Map());
+  return {
+    nodes,
+    get formatted() {
+      return formatModuleGraph(nodes);
+    },
+  };
+}
+
+/**
  * Renders a ModuleGraphNode tree as an indented, printable string.
  * @param graph  ModuleGraphNode
  * @param depth  current indentation depth (internal, defaults to 0)
@@ -322,13 +338,7 @@ function makeModuleHandle(
 
     /** Returns this module's dependency graph, rooted at itself. */
     graph() {
-      const nodes = buildGraphNode(node, new Map());
-      return {
-        nodes,
-        get formatted() {
-          return formatModuleGraph(nodes);
-        },
-      };
+      return buildGraphResult(node);
     },
 
     with(...args: any[]) {
@@ -381,7 +391,14 @@ function makeModuleHandle(
       const stop = async (reason?: any) => {
         await shutdownNodes(bootOrder, ctx, options, reason);
       };
-      return { ctx, stop } satisfies StartResult<any, any>;
+      const graph = buildGraphResult(node);
+      return {
+        ctx,
+        stop,
+        graph() {
+          return graph;
+        },
+      } satisfies StartResult<any, any>;
     },
   };
 
