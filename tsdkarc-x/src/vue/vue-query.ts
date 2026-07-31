@@ -341,5 +341,6 @@ export function createQueryClient<Router>(
   const cache: ProxyCache = new Map();
   return buildProxy(client, cache) as ResolveVueQueryTree<Router>;
 }
+export const createVueQueryClient = createQueryClient;
 
 export { useQueryClient };

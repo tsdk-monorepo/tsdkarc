@@ -271,5 +271,6 @@ export function createQueryClient<Router>(
   const cache: ProxyCache = new Map();
   return buildProxy(client, cache) as ResolveReactQueryTree<Router>;
 }
+export const createReactQueryClient = createQueryClient;
 
 export { useQueryClient };
