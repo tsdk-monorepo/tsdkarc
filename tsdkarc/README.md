@@ -190,6 +190,6 @@ website/       # documentation site
 
 ## License
 
-[MIT](./LICENSE)
+[MIT](../LICENSE)
 
-[CHANGELOG.md](./CHANGELOG.md)
+[CHANGELOG.md](../CHANGELOG.md)

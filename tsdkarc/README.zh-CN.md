@@ -1,6 +1,6 @@
 # tsdkarc
 
-🇨🇳 中文 · [🇺🇸 English](https://www.google.com/search?q=./README.md)
+🇨🇳 中文 · [🇺🇸 English](./README.md)
 
 > **无装饰器、完全类型安全的 TypeScript 模块组合与依赖注入库。**
 

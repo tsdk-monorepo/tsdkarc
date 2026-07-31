@@ -16,6 +16,9 @@ This repository is a Monorepo containing three independently published packages.
 
 ![banner of tsdkarc](./tsdkarc/assets/banner.jpg)
 
+## Feedback & Issues
+
+If you have any questions or bug reports, Feel free to [open an issue](https://github.com/tsdk-monorepo/tsdkarc/issues)
 
 ---
 
