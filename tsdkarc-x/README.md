@@ -341,7 +341,7 @@ export const transport = new FetchAdapter({
   log: true,
 });
 const app = await launchApp({
-  basePath: "/api/tsdkarc",
+  basePath: "/api/arcx",
   transport,
   routes,
   port: 0, // unused — FetchAdapter.start() is a no-op, doesn't bind a port
@@ -349,7 +349,7 @@ const app = await launchApp({
 
 export type AppRoutes = RoutesOf<typeof app>;
 
-// api/tsdkarc/[...path]/route.ts
+// api/arcx/[...paths]/route.ts
 export const { GET, POST } = toNextRouteHandlers(transport);
 ```
 
@@ -358,7 +358,8 @@ export const { GET, POST } = toNextRouteHandlers(transport);
 Supports exporting types as `.d.ts` or generating OpenAPI docs, perfect for separate frontend/backend repo setups.
 
 ```ts
-import { extractAppRoutesTypesFull, extractOpenApi } from "tsdkarc-x/scripts";
+import { extractOpenApi } from "tsdkarc-x/openapi";
+import { extractAppRoutesTypesFull } from "tsdkarc-x/extract";
 
 // Generate .d.ts
 const { clientDts } = await extractAppRoutesTypesFull(routes, {

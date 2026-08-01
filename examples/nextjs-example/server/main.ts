@@ -1,6 +1,8 @@
 // main.ts
 import { defineRouter, launchApp, RoutesOf } from "tsdkarc-x";
 import { FetchAdapter } from "tsdkarc-x/fetch";
+import { extractOpenApi } from "tsdkarc-x/openapi";
+import { extractAppRoutesTypesFull } from "tsdkarc-x/extract";
 
 // 1. Create router instance
 const appRouter = defineRouter({});

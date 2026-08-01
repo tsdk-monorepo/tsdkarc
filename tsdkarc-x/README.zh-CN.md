@@ -353,7 +353,8 @@ export const { GET, POST } = toNextRouteHandlers(transport);
 支持将类型导出为 `.d.ts` 或生成 OpenAPI 文档，适用于前后端分仓库的场景。
 
 ```ts
-import { extractAppRoutesTypesFull, extractOpenApi } from "tsdkarc-x/scripts";
+import { extractOpenApi } from "tsdkarc-x/openapi";
+import { extractAppRoutesTypesFull } from "tsdkarc-x/extract";
 
 // 生成 .d.ts
 const { clientDts } = await extractAppRoutesTypesFull(routes, {
@@ -430,7 +431,7 @@ export const transport = new FetchAdapter({
 });
 
 const app = await launchApp({
-  basePath: "/api/neat",
+  basePath: "/api/tsdkarc",
   transport,
   routes,
   port: 0, // unused — FetchAdapter.start() is a no-op, doesn't bind a port

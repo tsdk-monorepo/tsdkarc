@@ -32,6 +32,11 @@
       "import": "./esm/ws-adapter.js",
       "types": "./lib/ws-adapter.d.ts"
     },
+     "./scripts": {
+      "require": "./lib/scripts/index.js",
+      "import": "./esm/scripts/index.js",
+      "types": "./lib/scripts/index.d.ts"
+    },
     "./openapi": {
       "require": "./lib/scripts/openapi.js",
       "import": "./esm/scripts/openapi.js",
