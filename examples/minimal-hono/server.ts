@@ -1,22 +1,20 @@
 // server.ts
 import { defineRouter, launchApp, type RoutesOf } from "tsdkarc-x";
 import { HonoAdapter } from "tsdkarc-x/hono";
-import { extractOpenApi } from "tsdkarc-x/openapi"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
-import { extractAppRoutesTypesFull } from "tsdkarc-x/extract"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
+import { extractOpenApi } from "tsdkarc-x/openapi"; // TypeScript v7 is currently not supported.
+import { extractAppRoutesTypesFull } from "tsdkarc-x/extract"; // TypeScript v7 is currently not supported.
 import { Scalar } from "@scalar/hono-api-reference";
 import fs from "fs/promises";
 import path from "path";
 
-// 1. 创建路由实例
 const appRouter = defineRouter({});
 
-// 2. 定义具体路由
 const userRoutes = appRouter.init(() => ({
   health: () => "OK",
 }));
 const routes = { users: userRoutes }; // routesExportName
+
 const transport = new HonoAdapter();
-// 3. 启动服务
 export const app = await launchApp({
   basePath: "/api",
   transport,
@@ -24,7 +22,7 @@ export const app = await launchApp({
   port: 3015,
 });
 
-// 生成 OpenAPI 配置
+// Generate OpenAPI JSON
 const openapiResult = extractOpenApi(
   app.routes,
   {
@@ -47,20 +45,19 @@ transport.app.use(
 export type AppRoutes = RoutesOf<typeof app>;
 
 // 生成静态类型文件
-const { clientDts, swrDts, reactQueryDts } = await extractAppRoutesTypesFull(
-  app.routes,
-  {
+const { clientDts, swrDts, reactQueryDts, vueQueryDts } =
+  await extractAppRoutesTypesFull(app.routes, {
     entryFile: path.resolve("./server.ts"),
     tsConfigFilePath: path.resolve("./tsconfig.json"),
     routesExportName: "routes",
     includeSourceLocation: false,
-  }
-);
+  });
 
 await Promise.all([
   fs.writeFile("./client/api.d.ts", clientDts),
   fs.writeFile("./client/api-swr.d.ts", swrDts),
   fs.writeFile("./client/api-query.d.ts", reactQueryDts),
+  fs.writeFile("./client/api-vue-query.d.ts", vueQueryDts),
 ]);
 
 await fetch("http://localhost:3015/api/users/health")
