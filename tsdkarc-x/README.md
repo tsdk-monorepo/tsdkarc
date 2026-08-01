@@ -53,6 +53,7 @@ import { defineRouter, launchApp, type RoutesOf } from "tsdkarc-x";
 import { ExpressAdapter } from "tsdkarc-x/express";
 import { extractOpenApi } from "tsdkarc-x/openapi"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
 import { extractAppRoutesTypesFull } from "tsdkarc-x/extract"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
+// import { extractOpenApi, extractAppRoutesTypesFull } from "tsdkarc/scripts";
 import { apiReference } from "@scalar/express-api-reference";
 import fs from "fs/promises";
 import path from "path";
@@ -360,6 +361,7 @@ Supports exporting types as `.d.ts` or generating OpenAPI docs, perfect for sepa
 ```ts
 import { extractOpenApi } from "tsdkarc-x/openapi";
 import { extractAppRoutesTypesFull } from "tsdkarc-x/extract";
+// import { extractOpenApi, extractAppRoutesTypesFull } from "tsdkarc/scripts";
 
 // Generate .d.ts
 const { clientDts } = await extractAppRoutesTypesFull(app.routes, {

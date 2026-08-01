@@ -1,5 +1,13 @@
 # TsdkArc Packages Changelog
 
+## tsdkarc-x@0.0.5
+
+- Add `"tsdkarc/scripts"' exports
+
+```ts
+import { extractOpenApi, extractAppRoutesTypesFull } from "tsdkarc/scripts";
+```
+
 ## tsdkarc-x@0.0.4
 
 - Add `fetch-adapter` to support Next.js
