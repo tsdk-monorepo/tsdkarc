@@ -36,7 +36,7 @@
     "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests"
   },
   "dependencies": {
-    "minimatch": "^10.2.5"
+    "minimatch": "^10.2.6"
   },
   "devDependencies": {
     "@types/bun": "latest",

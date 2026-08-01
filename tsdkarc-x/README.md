@@ -126,7 +126,7 @@ await fetch("http://localhost:3000/api/users/health")
 
 ```bash
 npm install swr
-# npm install react @tanstack/react-query
+# npm install @tanstack/react-query
 # npm install @tanstack/vue-query
 
 ```
@@ -135,9 +135,9 @@ npm install swr
 // client.ts
 import { createClient } from "tsdkarc-x/client";
 
-import { createSwrClient } from "tsdkarc-x/react/swr";
-import { createReactQueryClient } from "tsdkarc-x/react/query";
-import { createVueQueryClient } from "tsdkarc-x/vue/query";
+import { createSwrClient } from "tsdkarc-x/react/swr"; // For react.js hooks
+import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/query"; // For react.js hooks
+import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query"; // For vue 3 hooks
 
 import type { AppRoutes } from "./server";
 
@@ -147,10 +147,10 @@ const client = createClient<AppRoutes>({
 
 const health = await client.users.health.query(); // "OK", with full autocomplete and type hints
 
-// const swrHooks = createSwrClient<AppRoutes>(client); // react swr hooks
+// const swrHooks = createSwrClient<AppRoutes>(client); // React swr hooks
 // swrHooks.users.health.useQuery()
-// const reactQueryHooks = createReactQueryClient<AppRoutes>(client); // react tanstack query hooks
-// const vueQueryHooks = createVueQueryClient<AppRoutes>(client); // vue tanstack query hooks
+// const reactQueryHooks = createReactQueryClient<AppRoutes>(client); // React tanstack query hooks
+// const vueQueryHooks = createVueQueryClient<AppRoutes>(client); // Vue 3 tanstack query hooks
 ```
 
 ---

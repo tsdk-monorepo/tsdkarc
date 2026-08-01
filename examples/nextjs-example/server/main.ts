@@ -26,7 +26,7 @@ const app = await launchApp({
 
 export type AppRoutes = RoutesOf<typeof app>;
 
-//  Generate OPENAPI JSON
+//  Generate openapi JSON
 export const openapi = extractOpenApi(
   app.routes,
   {
@@ -35,7 +35,7 @@ export const openapi = extractOpenApi(
   { entryFile: "./server/main.ts" }
 );
 
-// Generate static type of client.d.ts
+// Generate static type of routes
 /*
 const result =
   await extractAppRoutesTypesFull(app.routes, {
