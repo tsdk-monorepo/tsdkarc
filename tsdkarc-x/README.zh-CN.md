@@ -22,6 +22,16 @@
 
 ---
 
+## Examples
+
+- [Next.js Example](../examples/nextjs-example/)
+- [Minimal Express.js Example](../examples/minimal-express/)
+- [Minimal Hono.js Example](../examples/minimal-hono/)
+
+Want more examples? [Request one](https://github.com/tsdk-monorepo/tsdkarc/issues).
+
+---
+
 ## 快速运行
 
 ### 1. 安装依赖
@@ -317,6 +327,27 @@ export const app = launchApp({
 });
 ```
 
+or 或者在 Next.js 中使用 `FetchAdapter`:
+
+```ts
+import { FetchAdapter, toNextRouteHandlers } from "tsdkarc-x/fetch";
+
+export const transport = new FetchAdapter({
+  log: true,
+});
+const app = await launchApp({
+  basePath: "/api/tsdkarc",
+  transport,
+  routes,
+  port: 0, // unused — FetchAdapter.start() is a no-op, doesn't bind a port
+});
+
+export type AppRoutes = RoutesOf<typeof app>;
+
+// api/tsdkarc/[...path]/route.ts
+export const { GET, POST } = toNextRouteHandlers(transport);
+```
+
 ### 生成前端类型文件与 OpenAPI
 
 支持将类型导出为 `.d.ts` 或生成 OpenAPI 文档，适用于前后端分仓库的场景。
@@ -362,6 +393,53 @@ Multipart FormData 的字段在网络传输中均为字符串形式，使用 `z.
 **Q: 换成 Hono 需要改业务路由代码吗？**
 
 不需要。仅需替换 `launchApp` 里的 `transport` 和 `createContext`，具体的路由定义和中间件逻辑完全不受影响。
+
+**Q: 如何在 Next.js 中运行？**
+
+点击查看 [Next.js Example](../examples/nextjs-example/)
+
+或者按照下列步骤：
+
+1. 创建文件 `project/app/api/arcx/[...tsdkarc]/route.ts`:
+
+```ts
+import { toNextRouteHandlers } from "tsdkarc-x/fetch";
+import { transport } from "project/server/main";
+
+export const { GET, POST } = toNextRouteHandlers(transport);
+```
+
+2. `project/server/main.ts` 内容:
+
+```ts
+// main.ts
+import { defineRouter, launchApp, RoutesOf } from "tsdkarc-x";
+import { FetchAdapter } from "tsdkarc-x/fetch";
+
+// 1. Create router instance
+const appRouter = defineRouter({});
+
+// 2. Define specific routes
+const userRoutes = appRouter.init(() => ({
+  health: () => "OK",
+}));
+export const routes = { users: userRoutes }; // routesExportName
+
+export const transport = new FetchAdapter({
+  log: true,
+});
+
+const app = await launchApp({
+  basePath: "/api/neat",
+  transport,
+  routes,
+  port: 0, // unused — FetchAdapter.start() is a no-op, doesn't bind a port
+});
+
+export type AppRoutes = RoutesOf<typeof app>;
+```
+
+3. 访问 `http://localhost:3000/api/neat/users/health` 查看结果
 
 ---
 
@@ -416,7 +494,6 @@ import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
 | `extractAppRoutesTypesFull(...)` | 解析并生成客户端相关的类型声明文件（`.d.ts`），暂不支持 TS 7 |
 | `extractOpenApi(...)`            | 从路由结构生成 OpenAPI 规范文档对象 ，暂不支持 TS 7          |
 
-
 ## 问题反馈
 
-若有任何疑问或者BUG反馈，请提交至 https://github.com/tsdk-monorepo/tsdkarc/issues
+若有任何疑问或者 BUG 反馈，请提交至 https://github.com/tsdk-monorepo/tsdkarc/issues

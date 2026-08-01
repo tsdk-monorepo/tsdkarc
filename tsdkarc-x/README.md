@@ -22,6 +22,16 @@
 
 ---
 
+## Examples
+
+- [Next.js Example](../examples/nextjs-example/)
+- [Minimal Express.js Example](../examples/minimal-express/)
+- [Minimal Hono.js Example](../examples/minimal-hono/)
+
+Want more examples? [Request one](https://github.com/tsdk-monorepo/tsdkarc/issues).
+
+---
+
 ## Quick Start
 
 ### 1. Install Dependencies
@@ -322,6 +332,27 @@ export const app = launchApp({
 });
 ```
 
+or use fetch adapter for Next.js:
+
+```ts
+import { FetchAdapter, toNextRouteHandlers } from "tsdkarc-x/fetch";
+
+export const transport = new FetchAdapter({
+  log: true,
+});
+const app = await launchApp({
+  basePath: "/api/tsdkarc",
+  transport,
+  routes,
+  port: 0, // unused — FetchAdapter.start() is a no-op, doesn't bind a port
+});
+
+export type AppRoutes = RoutesOf<typeof app>;
+
+// api/tsdkarc/[...path]/route.ts
+export const { GET, POST } = toNextRouteHandlers(transport);
+```
+
 ### Generating Frontend Types and OpenAPI
 
 Supports exporting types as `.d.ts` or generating OpenAPI docs, perfect for separate frontend/backend repo setups.
@@ -368,6 +399,57 @@ Multipart FormData fields are all strings during network transmission. `z.coerce
 
 No. You only need to replace `transport` and `createContext` inside `launchApp`. The specific route definitions and middleware logic are completely unaffected.
 
+**Q: How do I run `tsdkarc-x` in Next.js?**
+
+See the [Next.js Example](../examples/nextjs-example/).
+
+Or follow these steps:
+
+1. Create `project/app/api/arcx/[...tsdkarc]/route.ts`:
+
+```ts
+import { toNextRouteHandlers } from "tsdkarc-x/fetch";
+import { transport } from "project/server/main";
+
+export const { GET, POST } = toNextRouteHandlers(transport);
+```
+
+2. Create `project/server/main.ts`:
+
+```ts
+// main.ts
+import { defineRouter, launchApp, RoutesOf } from "tsdkarc-x";
+import { FetchAdapter } from "tsdkarc-x/fetch";
+
+// 1. Create router instance
+const appRouter = defineRouter({});
+
+// 2. Define routes
+const userRoutes = appRouter.init(() => ({
+  health: () => "OK",
+}));
+export const routes = { users: userRoutes }; // routesExportName
+
+export const transport = new FetchAdapter({
+  log: true,
+});
+
+const app = await launchApp({
+  basePath: "/api/arcx",
+  transport,
+  routes,
+  port: 0, // unused — FetchAdapter.start() is a no-op and doesn't bind a port
+});
+
+export type AppRoutes = RoutesOf<typeof app>;
+```
+
+3. Visit `http://localhost:3000/api/arcx/users/health` in your browser. You should see:
+
+```
+OK
+```
+
 ---
 
 ## API Reference
@@ -383,11 +465,11 @@ No. You only need to replace `transport` and `createContext` inside `launchApp`.
 
 ### Server Running
 
-| API                                                                | Description                    |
-| ------------------------------------------------------------------ | ------------------------------ |
-| `launchApp({ ...config })`                                         | Starts the HTTP server.        |
-| `ExpressAdapter({log?: boolean})` / `HonoAdapter({log?: boolean})` | HTTP framework adapters.       |
-| `RpcError(code, message)`                                          | Throws a structured exception. |
+| API                                                                                                  | Description                    |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `launchApp({ ...config })`                                                                           | Starts the HTTP server.        |
+| `ExpressAdapter({log?: boolean})` / `HonoAdapter({log?: boolean})` / `FetchAdapter({log?: boolean})` | HTTP framework adapters.       |
+| `RpcError(code, message)`                                                                            | Throws a structured exception. |
 
 ### Type Utilities
 
@@ -402,8 +484,8 @@ No. You only need to replace `transport` and `createContext` inside `launchApp`.
 import { createClient } from "tsdkarc-x/client";
 
 import { createSwrClient } from "tsdkarc-x/react/swr";
-import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/query";
-import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
+import { createReactQueryClient } from "tsdkarc-x/react/query";
+import { createVueQueryClient } from "tsdkarc-x/vue/query";
 ```
 
 | API                                         | Description                                         |
