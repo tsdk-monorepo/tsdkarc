@@ -357,13 +357,13 @@ import { extractOpenApi } from "tsdkarc-x/openapi";
 import { extractAppRoutesTypesFull } from "tsdkarc-x/extract";
 
 // 生成 .d.ts
-const { clientDts } = await extractAppRoutesTypesFull(routes, {
+const { clientDts } = await extractAppRoutesTypesFull(app.routes, {
   entryFile: "./server.ts",
 });
 
 // 生成 OpenAPI 配置
 const openapi = extractOpenApi(
-  routes,
+  app.routes,
   {
     info: { title: "API", version: "1.0.0" },
   },

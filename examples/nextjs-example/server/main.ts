@@ -25,3 +25,24 @@ const app = await launchApp({
 });
 
 export type AppRoutes = RoutesOf<typeof app>;
+
+//  Generate OPENAPI JSON
+export const openapi = extractOpenApi(
+  app.routes,
+  {
+    info: { title: "Nextjs Example API", version: "0.0.5" },
+  },
+  { entryFile: "./server/main.ts" }
+);
+
+// Generate static type of client.d.ts
+/*
+const result =
+  await extractAppRoutesTypesFull(app.routes, {
+    entryFile: "./server/main.ts",
+  });
+fs.writeFile('./types/client.d.ts', result.clientDts, 'utf8');
+fs.writeFile('./types/swr-client.d.ts', result.swrDts, 'utf8');
+fs.writeFile('./types/react-query-client.d.ts', result.reactQueryDts, 'utf8');
+fs.writeFile('./types/vue-query-client.d.ts', result.vueQueryDts, 'utf8');
+*/

@@ -362,13 +362,13 @@ import { extractOpenApi } from "tsdkarc-x/openapi";
 import { extractAppRoutesTypesFull } from "tsdkarc-x/extract";
 
 // Generate .d.ts
-const { clientDts } = await extractAppRoutesTypesFull(routes, {
+const { clientDts } = await extractAppRoutesTypesFull(app.routes, {
   entryFile: "./server.ts",
 });
 
 // Generate OpenAPI config
 const openapi = extractOpenApi(
-  routes,
+  app.routes,
   {
     info: { title: "API", version: "1.0.0" },
   },
