@@ -74,7 +74,7 @@ export type RequestMeta = Awaited<ReturnType<typeof createContext>>;
  * Attaches a trace ID to every request for log correlation.
  * Adds: { traceId: string }
  */
-const tracingMw = defineMiddleware<AppCtx, {}>()(
+const tracingMw = defineMiddleware<AppCtx, RequestMeta>()(
   async ({ waitUntil }, next) => {
     const traceId = `req_${Date.now()}_${Math.random()
       .toString(36)
@@ -88,7 +88,7 @@ const tracingMw = defineMiddleware<AppCtx, {}>()(
  * Throws UNAUTHORIZED if the token is missing or invalid.
  * Adds: { user: { id, orgId, role, mfaEnabled } }
  */
-const authMw = defineMiddleware<AppCtx, RequestMeta>()(
+const authMw = defineMiddleware<AppCtx, MiddlewareNextMeta<typeof tracingMw>>()(
   async ({ ctx, meta }, next) => {
     if (!meta.token) {
       throw new RpcError("UNAUTHORIZED", "Missing Bearer token");
