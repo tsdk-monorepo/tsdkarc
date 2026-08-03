@@ -1,5 +1,6 @@
 import type { ZodType, z } from "zod";
 import type { Simplify, AnyModule } from "tsdkarc";
+export * from "./utils";
 
 export type MaybePromise<T> = T | Promise<T>;
 
@@ -18,7 +19,6 @@ export interface RpcErrorIssue {
   path: (string | number)[];
   message: string;
 }
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 2. Transport & HTTP Escapes
