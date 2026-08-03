@@ -1,9 +1,9 @@
 // client.ts
 import axios, { isAxiosError } from "xior";
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "xior";
-import { RpcError } from "./types";
+import { RpcError } from "./utils";
 
-export { RpcError, isRpcError } from "./types";
+export { RpcError, isRpcError } from "./utils";
 
 export interface RequestOptions
   extends Omit<

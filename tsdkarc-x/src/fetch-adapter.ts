@@ -1,6 +1,6 @@
 // fetch-adapter.ts
 import { ZodError } from "zod";
-import { HttpResponse, RpcError } from "./types";
+import { HttpResponse, RpcError } from "./utils";
 import type {
   TransportAdapter,
   RuntimeRouteTree,

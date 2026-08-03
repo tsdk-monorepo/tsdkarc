@@ -17,8 +17,8 @@
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3",
-    "tsdkarc": "file:../../tsdkarc",
-    "tsdkarc-x": "file:../../tsdkarc-x"
+    "tsdkarc": "next",
+    "tsdkarc-x": "^0.1.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.2",

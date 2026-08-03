@@ -2,7 +2,7 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { IncomingMessage, Server, createServer } from "http";
 import { ZodError } from "zod";
-import { HttpResponse, RpcError } from "./types";
+import { HttpResponse, RpcError } from "./utils";
 import type {
   TransportAdapter,
   RuntimeRouteTree,
