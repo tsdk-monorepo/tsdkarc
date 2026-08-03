@@ -48,7 +48,8 @@
     "concurrently": "^10.0.3",
     "@tsconfig/recommended": "^1.0.10",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "fast-glob": "^3.3.3"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
