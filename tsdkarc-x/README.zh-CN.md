@@ -74,17 +74,28 @@ export const app = await launchApp({
   port: 3000,
 });
 
-// 生成 OpenAPI 配置
-const openapiResult = extractOpenApi(
-  app.routes,
-  {
-    info: { title: "API", version: "1.0.0" },
-  },
-  { entryFile: path.resolve("./server.ts") }
-);
+// 4. 导出路由类型供前端使用
+export type AppRoutes = RoutesOf<typeof app>;
+
+// 测试
+await fetch("http://localhost:3000/api/users/health")
+  .then((res) => res.json())
+  .then((res) => {
+    console.log(res); // Output: OK
+  });
+```
+
+### 2.1 生成 opeanpi 接口文档
+
+```ts
+// ...previous code
+
+// Visit openapi.json: http://localhost:3000/api/openapi
 transport.app.get(`/api/openapi`, async (req, res) => {
   res.json(openapiResult);
 });
+
+// Visit openapi UI http://localhost:3000/reference
 transport.app.use(
   "/reference",
   apiReference({
@@ -92,9 +103,12 @@ transport.app.use(
     url: `http://localhost:3000/api/openapi`,
   })
 );
+```
 
-// 4. 导出路由类型供前端使用
-export type AppRoutes = RoutesOf<typeof app>;
+### 2.2 导出接口静态类型，方便分发
+
+```ts
+// ...previous code
 
 // 生成静态类型文件
 const { clientDts, swrDts, reactQueryDts } = await extractAppRoutesTypesFull(
@@ -112,12 +126,6 @@ await Promise.all([
   fs.writeFile("./client/api-swr.d.ts", swrDts),
   fs.writeFile("./client/api-query.d.ts", reactQueryDts),
 ]);
-
-await fetch("http://localhost:3000/api/users/health")
-  .then((res) => res.json())
-  .then((res) => {
-    console.log(res); // Output: OK
-  });
 ```
 
 ### 3. 前端：创建客户端并发起调用
@@ -503,7 +511,6 @@ export type AppRoutes = RoutesOf<typeof app>;
 `tsdkarc-x/scripts` 依赖 TypeScript 提供的 Compiler API，而截至目前，TS7 尚未提供兼容的接口，因此暂时不支持 TS7。
 
 不过，这一限制仅影响 `tsdkarc-x/scripts`，`tsdkarc-x` 的其他功能均可正常使用。
-
 
 **Q: `tsdkarc-x` 和 `tsdk` 是什么关系？**
 

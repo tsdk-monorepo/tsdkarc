@@ -77,29 +77,43 @@ export const app = await launchApp({
   port: 3000,
 });
 
-// Generate OpenAPI config
-const openapiResult = extractOpenApi(
-  app.routes,
-  {
-    info: { title: "API", version: "1.0.0" },
-  },
-  { entryFile: path.resolve("./server.ts") }
-);
-transport.app.get(`/api/openapi`, async (req, res) => {
-  res.json(openapiResult);
-});
-transport.app.use(
-  "/reference",
-  apiReference({
-    // Put your OpenAPI url here:
-    url: `http://localhost:3000/api/openapi`,
-  })
-);
-
 // 4. Export route types for frontend
 export type AppRoutes = RoutesOf<typeof app>;
 
-// Generate static type files
+// 5. test
+await fetch("http://localhost:3000/api/users/health")
+  .then((res) => res.json())
+  .then((res) => {
+    console.log(res); // Output: OK
+  });
+```
+
+### 2.1 Generate OpenAPI Documentation
+
+```ts
+// ...previous code
+
+// Visit openapi.json: http://localhost:3000/api/openapi
+transport.app.get(`/api/openapi`, async (req, res) => {
+  res.json(openapiResult);
+});
+
+// Visit openapi UI http://localhost:3000/reference
+transport.app.use(
+  "/reference",
+  apiReference({
+    // Put your OpenAPI URL here:
+    url: `http://localhost:3000/api/openapi`,
+  })
+);
+```
+
+### 2.2 Export Static API Types for Easy Distribution
+
+```ts
+// ...previous code
+
+// Generate static type declaration files
 const { clientDts, swrDts, reactQueryDts } = await extractAppRoutesTypesFull(
   app.routes,
   {
@@ -109,18 +123,13 @@ const { clientDts, swrDts, reactQueryDts } = await extractAppRoutesTypesFull(
     includeSourceLocation: false,
   }
 );
-// Write static files
+
+// Write generated type files
 await Promise.all([
   fs.writeFile("./client/api.d.ts", clientDts),
   fs.writeFile("./client/api-swr.d.ts", swrDts),
   fs.writeFile("./client/api-query.d.ts", reactQueryDts),
 ]);
-
-await fetch("http://localhost:3000/api/users/health")
-  .then((res) => res.json())
-  .then((res) => {
-    console.log(res); // Output: OK
-  });
 ```
 
 ### 3. Frontend: Create client and call APIs
