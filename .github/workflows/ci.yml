@@ -92,6 +92,9 @@ jobs:
           name: dist-tsdkarc-lib
           path: tsdkarc/lib
 
+      - name: Install dependencies(root)
+        run: bun i
+
       - name: Install dependencies
         run: bun install
         working-directory: tsdkarc-x
@@ -129,6 +132,9 @@ jobs:
         with:
           name: dist-tsdkarc-lib
           path: tsdkarc/lib
+
+      - name: Install dependencies(root)
+        run: bun i
 
       - name: Install dependencies
         run: bun install
