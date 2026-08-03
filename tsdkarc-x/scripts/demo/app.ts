@@ -3,7 +3,7 @@ import { defineModule } from "tsdkarc";
 import { defineMiddleware, defineRouter } from "../../src/server";
 import { Request } from "express";
 import { ContextOf } from "tsdkarc";
-import { DeepFlat } from "../../src/types";
+import { DeepFlat, MiddlewareExt, MiddlewareNextMeta } from "../../src/types";
 
 export const dbModule = defineModule({ name: "db" }).init(() => ({
   findUser: (id: string) => ({ id, name: "Alice", role: "admin" }),
@@ -19,7 +19,12 @@ export const emailModule = defineModule({ name: "email" }).init(() => ({
 }));
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 2. Middlewares & Scoped Context
+// 2. Context vs Meta
+//
+// AppCtx     = DI-resolved services. Constant for the lifetime of the app.
+//              Same object every middleware and every route handler sees.
+// RequestMeta = Per-request data. Seeded from createContext(req) as the
+//              initial `meta`, then grown by each middleware via next(ext).
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const createContext = async (c: Request) => ({
@@ -31,35 +36,54 @@ export const createContext = async (c: Request) => ({
   },
 });
 
-export type BaseCtx = DeepFlat<
-  Awaited<ReturnType<typeof createContext>> &
-    ContextOf<typeof dbModule> &
-    ContextOf<typeof emailModule>
+export type AppCtx = DeepFlat<
+  ContextOf<typeof dbModule> & ContextOf<typeof emailModule>
 >;
 
-// 1. Auth Middleware (Auto-infers { user: { id: string, role: string } })
-export const authMw = defineMiddleware<BaseCtx>()(async (ctx, next) => {
-  if (!ctx.token) {
-    // throw new RpcError("UNAUTHORIZED", "Missing Bearer Token");
+export type RequestMeta = Awaited<ReturnType<typeof createContext>>;
+
+/**
+ * Verifies the bearer token and resolves the calling user.
+ * Adds: { user: { id: string, role: string } }
+ */
+export const authMw = defineMiddleware<AppCtx, RequestMeta>()(
+  async ({ ctx, meta }, next) => {
+    if (!meta.token) {
+      // throw new RpcError("UNAUTHORIZED", "Missing Bearer Token");
+    }
+    // Real DI access — ctx.findUser comes from dbModule, not from meta.
+    const user = ctx.db.findUser("u_1");
+    return next({ user: { id: user.id, role: user.role } });
   }
-  // In reality, verify token and fetch user
-  return next({ user: { id: "u_1", role: "admin" } });
+);
+
+/**
+ * Route-level MFA check. Requires `user` to already be in meta,
+ * so it must run after authMw in the chain.
+ * Adds: { mfaPassed: boolean }
+ */
+export const verifyMfaMw = defineMiddleware<
+  AppCtx,
+  MiddlewareExt<typeof authMw>
+>()(async ({ meta, ctx }, next) => {
+  return next({ mfaPassed: meta.user.role === "admin" });
 });
 
-// 2. Route-Level MFA Middleware (Auto-infers { mfaPassed: boolean })
-export const verifyMfaMw = defineMiddleware<{ user: { id: string } }>()(
-  async (ctx, next) => {
-    return next({ mfaPassed: true });
-  }
-);
-
-// 3. Logger Middleware (Demonstrating chainability)
-export const loggerMw = defineMiddleware<{ ip: string | null }>()(
-  async (ctx, next) => {
-    console.log(`[Access Log] Request from IP: ${ctx.ip}`);
-    return next({ traceId: `req_${Date.now()}` });
-  }
-);
+/**
+ * Logs the request and fires a background alert email without blocking
+ * the response, using ctx.sendBackgroundAlert + waitUntil.
+ * Adds: { traceId: string }
+ */
+export const loggerMw = defineMiddleware<
+  AppCtx,
+  MiddlewareNextMeta<typeof authMw>
+>()(async ({ ctx, meta, waitUntil }, next) => {
+  console.log(`[Access Log] Request from IP: ${meta.ip}`);
+  waitUntil(
+    ctx.email.sendBackgroundAlert(`Request from ${meta.ip ?? "unknown"}`)
+  );
+  return next({ traceId: `req_${Date.now()}` });
+});
 
 export const appRouter = defineRouter({
   modules: [dbModule, emailModule],

@@ -16,6 +16,8 @@ import type {
   PlainRoute,
   RouteTreeModule,
   RuntimeRouteTree,
+  MiddlewareEnv,
+  NextFn,
 } from "./types";
 import { isRouteTreeModule } from "./types";
 
@@ -24,7 +26,7 @@ import { isRouteTreeModule } from "./types";
 // ─────────────────────────────────────────────────────────────────────────────
 
 function makeRouteBuilder<AppCtx extends object, Meta extends object>(
-  routeMiddlewares: Middleware<any, any>[] = []
+  routeMiddlewares: Middleware<any, any, any>[] = []
 ): RouteBuilder<AppCtx, Meta> {
   return {
     use(mw) {
@@ -102,32 +104,44 @@ function normaliseRouteDict(
  * existing ones. In development, key collisions emit a console.warn so they
  * are caught early instead of silently swallowing data.
  */
+/**
+ * Runs a middleware chain in order, threading `meta` through each layer.
+ * Every middleware receives the same fixed `ctx` (DI deps) and `waitUntil`;
+ * only `meta` grows as each middleware calls next(ext).
+ *
+ * Invariant: middlewares only ADD new keys to meta — they do not overwrite
+ * existing ones. In development, key collisions emit a console.warn so they
+ * are caught early instead of silently swallowing data.
+ */
 async function runMiddlewareChain(
-  middlewares: Middleware<any, any>[],
-  initialCtx: object,
+  middlewares: Middleware<any, any, any>[],
+  appCtx: object,
+  waitUntil: (promise: Promise<unknown>) => void,
+  initialMeta: object,
   handler: (meta: object) => Promise<unknown>
 ): Promise<unknown> {
-  async function dispatch(index: number, ctx: object): Promise<unknown> {
-    if (index === middlewares.length) return handler(ctx);
+  async function dispatch(index: number, meta: object): Promise<unknown> {
+    if (index === middlewares.length) return handler(meta);
     const mw = middlewares[index]!;
-    const { result } = await mw(ctx, async (ext) => {
+    const env = { ctx: appCtx, meta, waitUntil };
+    const { result } = await mw(env, async (ext) => {
       if (process.env.NODE_ENV !== "production") {
         for (const key of Object.keys(ext)) {
-          if (key in ctx) {
+          if (key in meta) {
             console.warn(
-              `[runMiddlewareChain] middleware[${index}] overwrites existing ctx key: "${key}". ` +
+              `[runMiddlewareChain] middleware[${index}] overwrites existing meta key: "${key}". ` +
                 `Each middleware should only contribute new keys.`
             );
           }
         }
       }
-      const nextCtx = { ...ctx, ...ext };
-      const res = await dispatch(index + 1, nextCtx);
-      return { result: res, ctx: nextCtx as any };
+      const nextMeta = { ...meta, ...ext };
+      const res = await dispatch(index + 1, nextMeta);
+      return { result: res, meta: nextMeta as any };
     });
     return result;
   }
-  return dispatch(0, initialCtx);
+  return dispatch(0, initialMeta);
 }
 
 async function invokeRoute(
@@ -164,17 +178,19 @@ async function invokeRoute(
 // Public API
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function defineMiddleware<TInCtx extends object = {}>() {
-  return <TReturn extends { ctx: any }>(
+export function defineMiddleware<
+  AppCtx extends object = {},
+  TInMeta extends object = {}
+>() {
+  return <TReturn extends { meta: any }>(
     fn: (
-      ctx: TInCtx,
-      next: <T extends object>(
-        ext: T
-      ) => Promise<{ result: unknown; ctx: Simplify<TInCtx & T> }>
+      env: MiddlewareEnv<AppCtx, TInMeta>,
+      next: NextFn<TInMeta>
     ) => Promise<TReturn>
   ): Middleware<
-    TInCtx,
-    Simplify<Omit<Awaited<TReturn>["ctx"], keyof TInCtx>>
+    AppCtx,
+    TInMeta,
+    Simplify<Omit<Awaited<TReturn>["meta"], keyof TInMeta>>
   > => fn as any;
 }
 
@@ -197,7 +213,7 @@ let _routeModuleCounter = 0;
  */
 export function defineRouter<
   const TModules extends AnyModule[] = [],
-  const TMiddlewares extends Middleware<any, any>[] = []
+  const TMiddlewares extends Middleware<any, any, any>[] = []
 >(options: { modules?: TModules; middlewares?: TMiddlewares }) {
   type AppCtx = DepCtxFromList<TModules>;
   type Meta = FoldMiddlewares<TMiddlewares>;
@@ -264,6 +280,8 @@ export function defineRouter<
                 handler: (rawInput: unknown, baseEnv: any) =>
                   runMiddlewareChain(
                     combinedMiddlewares,
+                    ctx as AppCtx,
+                    baseEnv.waitUntil,
                     baseEnv.meta ?? {},
                     (meta) =>
                       invokeRoute(route, rawInput, {

@@ -199,29 +199,67 @@ const userRoutes = appRouter.init((r) => ({
 
 ### 中间件与请求上下文
 
-定义 `createContext` 处理请求级数据，并通过 `defineMiddleware` 修改上下文。
+在 `tsdkarc-x` 中，我们将依赖注入的全局实例（`ctx`）与请求级别的状态（`meta`）做了明确区分。通过搭配内置的类型提取工具（如 `MiddlewareExt`），你可以像搭积木一样组合中间件，并保持严格的类型安全。
 
 ```ts
-import { defineMiddleware } from "tsdkarc-x";
+import { defineMiddleware, MiddlewareExt } from "tsdkarc-x";
+import type { ContextOf } from "tsdkarc";
 import type { Request } from "express";
 
-// 1. 提取请求级别上下文
-export const createContext = async (c: Request) => ({
-  get token() { return c.header("Authorization") || null; },
+// 1. 定义基础请求数据 (RequestMeta)
+export const createContext = async (req: Request) => ({
+  get token() { return req.header("Authorization")?.replace("Bearer ", "") ?? null; },
 });
-type BaseContext = Awaited<ReturnType<typeof createContext>>;
+export type RequestMeta = Awaited<ReturnType<typeof createContext>>;
 
-// 2. 定义中间件
-export const authMw = defineMiddleware<BaseContext>()(async (ctx, next) => {
-  return next({ user: { id: "u_1" } }); // 注入 user 数据
+// AppCtx 是由 DI 模块推导出的上下文类型，见 DI 章节
+type AppCtx = ContextOf<typeof dbModule> & ContextOf<typeof auditModule>;
+
+// 2. 全局中间件：附加 Trace ID
+const tracingMw = defineMiddleware<AppCtx, {}>()(async ({ waitUntil }, next) => {
+  return next({ traceId: `req_${Date.now()}` }); // 新增字段：traceId
 });
 
-// 3. 应用于单条路由
-updatePassword: r
-  .use(authMw)
-  .mutate(z.object({ newPwd: z.string() }), async (input, env) => {
-    return `User ${env.meta.user.id} updated password`;
-  }),
+// 3. 鉴权中间件：解析 Token 并注入 User
+const authMw = defineMiddleware<AppCtx, RequestMeta>()(async ({ ctx, meta }, next) => {
+  if (!meta.token) throw new RpcError("UNAUTHORIZED", "Missing Bearer token");
+  const user = await ctx.db.findUserByToken(meta.token);
+  return next({ user }); // 新增字段：user
+});
+
+// 4. 路由级中间件与类型推导组合 (MiddlewareExt)
+// 提取 authMw 和 tracingMw 所“贡献”的类型，无需手动重新声明！
+type AuthExt = MiddlewareExt<typeof authMw>;       // { user: User }
+type TracingExt = MiddlewareExt<typeof tracingMw>; // { traceId: string }
+
+// 需要 user 信息的中间件（仅依赖 AuthExt）
+const requireAdminMw = defineMiddleware<AppCtx, AuthExt>()(async ({ meta }, next) => {
+  if (meta.user.role !== "admin") throw new RpcError("FORBIDDEN", "Admin only");
+  return next({});
+});
+
+// 需要 user 且需要 traceId 的中间件（组合依赖）
+const auditMw = defineMiddleware<AppCtx, & AuthExt TracingExt>()(
+  async ({ ctx, meta, waitUntil }, next) => {
+    // 放入后台执行，不阻塞请求响应
+    waitUntil(ctx.audit.log("action", { userId: meta.user.id, traceId: meta.traceId }));
+    return next({});
+  }
+);
+
+// 5. 在路由中应用
+export const appRouter = defineRouter({
+  modules: [dbModule, auditModule],
+  middlewares: [tracingMw, authMw], // 全局注册：所有路由自带 traceId 和 auth
+}).init((r) => ({
+  deleteAccount: r
+    .use(requireAdminMw) // 路由级附加中间件
+    .use(auditMw)
+    .mutate(z.object({ confirm: z.boolean() }), async (input, env) => {
+      // env.meta 拥有严格的强类型，包含：token, traceId, user
+      return `User ${env.meta.user.id} deleted`;
+    }),
+}));
 
 ```
 
@@ -327,7 +365,7 @@ export const app = launchApp({
 });
 ```
 
-or 或者在 Next.js 中使用 `FetchAdapter`:
+或者在 Next.js 中使用 `FetchAdapter`:
 
 ```ts
 import { FetchAdapter, toNextRouteHandlers } from "tsdkarc-x/fetch";
@@ -452,8 +490,17 @@ export type AppRoutes = RoutesOf<typeof app>;
 | ------------------------------------------ | ---------------------------------------------------------- |
 | `defineRouter({ modules, middlewares })`   | 创建 `appRouter` 实例，接受模块与全局中间件配置            |
 | `appRouter.init((r, ctx) => routesObject)` | 定义路由树，`r` 包含 `query/mutate/stream/upload/use` 方法 |
-| `r.use(middleware)`                        | 为单条路由添加中间件                                       |
-| `defineMiddleware<InputCtx>()(...)`        | 定义请求中间件                                             |
+| `r.use(middleware)`                        | 为单条路由添加局部中间件                                   |
+| `defineMiddleware<Ctx, Meta>()(...)`       | 定义请求中间件                                             |
+
+### 辅助类型工具 (Helper Types)
+
+| 类型工具                        | 说明                                                               | 示例场景                                                                      |
+| ------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `ContextOf<typeof module>`      | 提取特定 DI 模块初始化后的上下文类型。                             | `type AppCtx = ContextOf<typeof dbModule>`                                    |
+| `MiddlewareExt<typeof mw>`      | 提取某个中间件向 `meta` 中**新增注入（Ext）** 的对象类型。         | `type AuthExt = MiddlewareExt<typeof authMw>`，下游中间件可将其作为泛型入参。 |
+| `MiddlewareNextMeta<typeof mw>` | 提取经过该中间件后，传递给下游的**完整** `meta` 类型。             | 用于获取请求流经某个节点后的全量快照类型。                                    |
+| `MiddlewareEnv<Ctx, Meta>`      | 提取中间件的 `env` (包含 `ctx`, `meta`, `waitUntil` 等) 参数类型。 | 适用于将大段中间件逻辑抽离成普通独立函数的场景。                              |
 
 ### 服务端运行
 
@@ -480,13 +527,13 @@ import { createQueryClient as createReactQueryClient } from "tsdkarc-x/react/que
 import { createQueryClient as createVueQueryClient } from "tsdkarc-x/vue/query";
 ```
 
-| API                                         | 说明                           |
-| ------------------------------------------- | ------------------------------ |
-| `createClient<AppRoutes>(config)`           | 创建类型安全的客户端实例       |
-| `isRpcError(err)`                           | 验证并收窄 `RpcError` 错误类型 |
-| `createSwrClient<AppRoutes>(client)`        | 将基础 client 包装为 SWR Hooks |
-| `createReactQueryClient<AppRoutes>(client)` | 将基础 client 包装为 SWR Hooks |
-| `createVueQueryClient<AppRoutes>(client)`   | 将基础 client 包装为 SWR Hooks |
+| API                                         | 说明                                   |
+| ------------------------------------------- | -------------------------------------- |
+| `createClient<AppRoutes>(config)`           | 创建类型安全的客户端实例               |
+| `isRpcError(err)`                           | 验证并收窄 `RpcError` 错误类型         |
+| `createSwrClient<AppRoutes>(client)`        | 将基础 client 包装为 SWR Hooks         |
+| `createReactQueryClient<AppRoutes>(client)` | 将基础 client 包装为 React Query Hooks |
+| `createVueQueryClient<AppRoutes>(client)`   | 将基础 client 包装为 Vue Query Hooks   |
 
 ### 代码生成
 

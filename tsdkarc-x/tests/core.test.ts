@@ -43,7 +43,7 @@ import { createServer } from "node:net";
 import type { Request } from "express";
 import { describe, it, expect, vi } from "vitest";
 import { z } from "zod";
-import { defineModule } from "tsdkarc";
+import { ContextOf, defineModule } from "tsdkarc";
 import { defineRouter, defineMiddleware, launchApp, RpcError } from "../src";
 import { ExpressAdapter } from "../src/express-adapter";
 import {
@@ -52,6 +52,7 @@ import {
   RouteTreeModule,
   InferRouteTree,
   HTTP,
+  MiddlewareNextMeta,
 } from "../src/types";
 import { createClient, isRpcError } from "../src/client";
 
@@ -205,11 +206,11 @@ describe("0. Type-level checks", () => {
   });
 
   it("route-level r.use() adds a field only visible on that route's env.meta", () => {
-    const authMw = defineMiddleware<{}>()(async (_ctx, next) =>
+    const authMw = defineMiddleware<{}, {}>()(async (_env, next) =>
       next({ user: { id: "u_1" } })
     );
-    const verifyMfaMw = defineMiddleware<{ user: { id: string } }>()(
-      async (ctx, next) => next({ mfaPassed: true })
+    const verifyMfaMw = defineMiddleware<{}, { user: { id: string } }>()(
+      async ({ meta }, next) => next({ mfaPassed: true })
     );
 
     defineRouter({ middlewares: [authMw] }).init((r) => ({
@@ -418,18 +419,19 @@ describe("2. Context (env.ctx) & meta (env.meta) resolution", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 // 3. Middleware chain composition
 // ─────────────────────────────────────────────────────────────────────────────
-
 describe("3. Middleware chain composition", () => {
   it("runs global middlewares in declaration order, merging next() patches", async () => {
     const order: string[] = [];
-    const mwA = defineMiddleware<{}>()(async (_ctx, next) => {
+    const mwA = defineMiddleware<{}, {}>()(async ({ meta }, next) => {
       order.push("A");
       return next({ a: 1 });
     });
-    const mwB = defineMiddleware<{ a: number }>()(async (ctx, next) => {
-      order.push(`B:sees-a=${ctx.a}`);
-      return next({ b: 2 });
-    });
+    const mwB = defineMiddleware<{}, { a: number }>()(
+      async ({ meta }, next) => {
+        order.push(`B:sees-a=${meta.a}`);
+        return next({ b: 2 });
+      }
+    );
     const router = defineRouter({ middlewares: [mwA, mwB] }).init((r) => ({
       probe: r.query(async (_input, env) => env.meta),
     }));
@@ -445,11 +447,11 @@ describe("3. Middleware chain composition", () => {
   });
 
   it("a later middleware can read fields patched in by an earlier one", async () => {
-    const seedMw = defineMiddleware<{}>()(async (_ctx, next) =>
+    const seedMw = defineMiddleware<{}, {}>()(async (_env, next) =>
       next({ requestId: "r_1" })
     );
-    const echoMw = defineMiddleware<{ requestId: string }>()(
-      async (ctx, next) => next({ echoedRequestId: ctx.requestId })
+    const echoMw = defineMiddleware<{}, { requestId: string }>()(
+      async ({ meta }, next) => next({ echoedRequestId: meta.requestId })
     );
     const router = defineRouter({ middlewares: [seedMw, echoMw] }).init(
       (r) => ({
@@ -465,15 +467,15 @@ describe("3. Middleware chain composition", () => {
     }
   });
 
-  it("createContext output is visible to the first middleware", async () => {
-    const authMw = defineMiddleware<{ token: string | null }>()(
-      async (ctx, next) => next({ tokenSeen: ctx.token })
+  it("createContext output is visible to the first middleware via meta", async () => {
+    const authMw = defineMiddleware<{}, { token: string | null }>()(
+      async ({ meta }, next) => next({ tokenSeen: meta.token })
     );
     const router = defineRouter({ middlewares: [authMw] }).init((r) => ({
       probe: r.query(async (_input, env) => env.meta.tokenSeen),
     }));
     const { client, stop } = await startTestServer(router, {
-      createContext: async (req) => ({
+      createContext: async (req: Request) => ({
         get token() {
           return req.header("Authorization") || null;
         },
@@ -483,6 +485,189 @@ describe("3. Middleware chain composition", () => {
 
     try {
       expect(await client.probe.query()).toBe("Bearer abc");
+    } finally {
+      await stop();
+    }
+  });
+
+  it("middleware can read DI-resolved ctx, separately from meta", async () => {
+    const dbModule = defineModule({ name: "db" }).init(() => ({
+      findUser: (id: string) => ({ id, role: "admin" }),
+    }));
+    const authMw = defineMiddleware<ContextOf<typeof dbModule>, {}>()(
+      async ({ ctx }, next) => {
+        const user = ctx.db.findUser("u_1");
+        return next({ user });
+      }
+    );
+    const router = defineRouter({
+      modules: [dbModule],
+      middlewares: [authMw],
+    }).init((r) => ({
+      probe: r.query(async (_input, env) => env.meta.user),
+    }));
+    const { client, stop } = await startTestServer(router);
+
+    try {
+      expect(await client.probe.query()).toEqual({ id: "u_1", role: "admin" });
+    } finally {
+      await stop();
+    }
+  });
+
+  it("waitUntil keeps a background task alive after the response resolves", async () => {
+    let backgroundDone = false;
+    const loggerMw = defineMiddleware<{}, {}>()(async ({ waitUntil }, next) => {
+      waitUntil(
+        new Promise<void>((resolve) =>
+          setTimeout(() => {
+            backgroundDone = true;
+            resolve();
+          }, 20)
+        )
+      );
+      return next({});
+    });
+    const router = defineRouter({ middlewares: [loggerMw] }).init((r) => ({
+      probe: r.query(async () => "ok"),
+    }));
+    const { client, stop } = await startTestServer(router);
+
+    try {
+      const result = await client.probe.query();
+      expect(result).toBe("ok");
+      // response resolved before the background task's timeout fires
+      expect(backgroundDone).toBe(false);
+      await new Promise((resolve) => setTimeout(resolve, 30));
+      expect(backgroundDone).toBe(true);
+    } finally {
+      await stop();
+    }
+  });
+
+  it("route-level .use() middleware only runs for that route, not sibling routes", async () => {
+    const calls: string[] = [];
+    const onlyForA = defineMiddleware<{}, {}>()(async (_env, next) => {
+      calls.push("onlyForA");
+      return next({ flagged: true });
+    });
+    const router = defineRouter({}).init((r) => ({
+      a: r.use(onlyForA).query(async (_input, env) => env.meta.flagged),
+      b: r.query(async (_input, env) => (env.meta as any).flagged ?? null),
+    }));
+    const { client, stop } = await startTestServer(router);
+
+    try {
+      expect(await client.a.query()).toBe(true);
+      expect(await client.b.query()).toBe(null);
+      expect(calls).toEqual(["onlyForA"]);
+    } finally {
+      await stop();
+    }
+  });
+
+  it("route-level middleware runs after global middlewares, and can depend on their meta", async () => {
+    const order: string[] = [];
+    const globalMw = defineMiddleware<{}, {}>()(async (_env, next) => {
+      order.push("global");
+      return next({ user: { role: "admin" } });
+    });
+    const mfaMw = defineMiddleware<{}, { user: { role: string } }>()(
+      async ({ meta }, next) => {
+        order.push("mfa");
+        return next({ mfaPassed: meta.user.role === "admin" });
+      }
+    );
+    const router = defineRouter({ middlewares: [globalMw] }).init((r) => ({
+      secure: r.use(mfaMw).query(async (_input, env) => env.meta.mfaPassed),
+    }));
+    const { client, stop } = await startTestServer(router);
+
+    try {
+      expect(await client.secure.query()).toBe(true);
+      expect(order).toEqual(["global", "mfa"]);
+    } finally {
+      await stop();
+    }
+  });
+
+  it("propagates an RpcError thrown inside a middleware to the client", async () => {
+    const guardMw = defineMiddleware<{}, {}>()(async (_env, _next) => {
+      throw new RpcError("UNAUTHORIZED", "Missing Bearer Token");
+    });
+    const router = defineRouter({ middlewares: [guardMw] }).init((r) => ({
+      probe: r.query(async () => "unreachable"),
+    }));
+    const { client, stop } = await startTestServer(router);
+
+    try {
+      await client.probe.query();
+      expect.fail("expected probe.query() to throw");
+    } catch (err) {
+      expect(isRpcError(err)).toBe(true);
+      if (isRpcError(err)) {
+        expect(err.code).toBe("UNAUTHORIZED");
+      }
+    } finally {
+      await stop();
+    }
+  });
+
+  it("warns (dev only) when a middleware's next() patch collides with an existing meta key", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
+
+    const mwA = defineMiddleware<{}, {}>()(async (_env, next) =>
+      next({ a: 1 })
+    );
+    const mwB = defineMiddleware<{}, { a: number }>()(async (_env, next) =>
+      // deliberately re-sets "a" instead of adding a new key
+      next({ a: 2 } as any)
+    );
+    const router = defineRouter({ middlewares: [mwA, mwB] }).init((r) => ({
+      probe: r.query(async (_input, env) => env.meta),
+    }));
+    const { client, stop } = await startTestServer(router);
+
+    try {
+      await client.probe.query();
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('overwrites existing meta key: "a"')
+      );
+    } finally {
+      await stop();
+      process.env.NODE_ENV = originalEnv;
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("MiddlewareNextMeta<M> types the merged meta a downstream middleware/route sees", async () => {
+    const authMw = defineMiddleware<{}, { token: string | null }>()(
+      async (_env, next) => next({ user: { id: "u_1" } })
+    );
+
+    // Compile-time check: this should be exactly the input + contributed meta.
+    type AfterAuth = MiddlewareNextMeta<typeof authMw>;
+    const sample: AfterAuth = {
+      token: "t",
+      user: { id: "u_1" },
+    };
+    expect(sample.user.id).toBe("u_1");
+
+    // Runtime confirmation that meta really does merge this way.
+    const router = defineRouter({ middlewares: [authMw] }).init((r) => ({
+      probe: r.query(async (_input, env) => env.meta),
+    }));
+    const { client, stop } = await startTestServer(router, {
+      createContext: async () => ({ token: "t" }),
+    });
+
+    try {
+      expect(await client.probe.query()).toEqual({
+        token: "t",
+        user: { id: "u_1" },
+      });
     } finally {
       await stop();
     }

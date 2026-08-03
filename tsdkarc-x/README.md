@@ -203,30 +203,67 @@ const userRoutes = appRouter.init((r) => ({
 
 ### Middleware & Request Context
 
-Define `createContext` for request-level data, and use `defineMiddleware` to modify context.
+In `tsdkarc-x`, we clearly separate global singletons injected by DI (`ctx`) from request-level state (`meta`). With built-in type extraction tools (like `MiddlewareExt`), you can compose middlewares like building blocks while maintaining strict type safety.
 
 ```ts
-import { defineMiddleware } from "tsdkarc-x";
+import { defineMiddleware, MiddlewareExt } from "tsdkarc-x";
+import type { ContextOf } from "tsdkarc";
 import type { Request } from "express";
 
-// 1. Extract request-level context
-export const createContext = async (c: Request) => ({
-  get token() { return c.header("Authorization") || null; },
+// 1. Define base request data (RequestMeta)
+export const createContext = async (req: Request) => ({
+  get token() { return req.header("Authorization")?.replace("Bearer ", "") ?? null; },
 });
-type BaseContext = Awaited<ReturnType<typeof createContext>>;
+export type RequestMeta = Awaited<ReturnType<typeof createContext>>;
 
-// 2. Define middleware
-export const authMw = defineMiddleware<BaseContext>()(async (ctx, next) => {
-  return next({ user: { id: "u_1" } }); // Inject user data
+// AppCtx is the context type inferred from DI modules, see the DI section
+type AppCtx = ContextOf<typeof dbModule> & ContextOf<typeof auditModule>;
+
+// 2. Global middleware: Attach Trace ID
+const tracingMw = defineMiddleware<AppCtx, {}>()(async ({ waitUntil }, next) => {
+  return next({ traceId: `req_${Date.now()}` }); // New field: traceId
 });
 
-// 3. Apply to a single route
-updatePassword: r
-  .use(authMw)
-  .mutate(z.object({ newPwd: z.string() }), async (input, env) => {
-    return `User ${env.meta.user.id} updated password`;
-  }),
+// 3. Auth middleware: Parse Token and inject User
+const authMw = defineMiddleware<AppCtx, RequestMeta>()(async ({ ctx, meta }, next) => {
+  if (!meta.token) throw new RpcError("UNAUTHORIZED", "Missing Bearer token");
+  const user = await ctx.db.findUserByToken(meta.token);
+  return next({ user }); // New field: user
+});
 
+// 4. Route-level middleware and type inference composition (MiddlewareExt)
+// Extract the types "contributed" by authMw and tracingMw, no manual redeclaration needed!
+type AuthExt = MiddlewareExt<typeof authMw>;       // { user: User }
+type TracingExt = MiddlewareExt<typeof tracingMw>; // { traceId: string }
+
+// Middleware requiring user info (depends only on AuthExt)
+const requireAdminMw = defineMiddleware<AppCtx, AuthExt>()(async ({ meta }, next) => {
+  if (meta.user.role !== "admin") throw new RpcError("FORBIDDEN", "Admin only");
+  return next({});
+});
+
+// Middleware requiring both user and traceId (composite dependency)
+const auditMw = defineMiddleware<AppCtx, & AuthExt TracingExt>()(
+  async ({ ctx, meta, waitUntil }, next) => {
+    // Run in background, doesn't block the request response
+    waitUntil(ctx.audit.log("action", { userId: meta.user.id, traceId: meta.traceId }));
+    return next({});
+  }
+);
+
+// 5. Apply in routes
+export const appRouter = defineRouter({
+  modules: [dbModule, auditModule],
+  middlewares: [tracingMw, authMw], // Registered globally: all routes automatically get traceId and auth
+}).init((r) => ({
+  deleteAccount: r
+    .use(requireAdminMw) // Add route-level middleware
+    .use(auditMw)
+    .mutate(z.object({ confirm: z.boolean() }), async (input, env) => {
+      // env.meta is strictly typed, containing: token, traceId, user
+      return `User ${env.meta.user.id} deleted`;
+    }),
+}));
 
 ```
 
@@ -313,7 +350,6 @@ register: r.mutate(z.object({ id: z.string() }), async (input, env) => {
   env.waitUntil(sendEmail(input.id)); // Won't block the response
   return { success: true };
 }),
-
 
 ```
 
@@ -404,7 +440,7 @@ No. You only need to replace `transport` and `createContext` inside `launchApp`.
 
 **Q: How do I run `tsdkarc-x` in Next.js?**
 
-See the [Next.js Example](../examples/nextjs-example/).
+See the [Next.js Example](https://www.google.com/search?q=../examples/nextjs-example/).
 
 Or follow these steps:
 
@@ -451,6 +487,7 @@ export type AppRoutes = RoutesOf<typeof app>;
 
 ```
 OK
+
 ```
 
 ---
@@ -463,8 +500,17 @@ OK
 | ------------------------------------------ | ------------------------------------------------------------------------------ |
 | `defineRouter({ modules, middlewares })`   | Creates `appRouter` instance, accepts modules and global middleware config.    |
 | `appRouter.init((r, ctx) => routesObject)` | Defines the route tree, `r` contains `query/mutate/stream/upload/use` methods. |
-| `r.use(middleware)`                        | Adds a middleware to a single route.                                           |
-| `defineMiddleware<InputCtx>()(...)`        | Defines a request middleware.                                                  |
+| `r.use(middleware)`                        | Adds a local middleware to a single route.                                     |
+| `defineMiddleware<Ctx, Meta>()(...)`       | Defines a request middleware.                                                  |
+
+### Helper Types
+
+| Type Utility                    | Description                                                                                    | Example Scenario                                                                                        |
+| ------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `ContextOf<typeof module>`      | Extracts the context type after a specific DI module is initialized.                           | `type AppCtx = ContextOf<typeof dbModule>`                                                              |
+| `MiddlewareExt<typeof mw>`      | Extracts the object type **newly injected (Ext)** into `meta` by a specific middleware.        | `type AuthExt = MiddlewareExt<typeof authMw>`, which downstream middlewares can use as a generic input. |
+| `MiddlewareNextMeta<typeof mw>` | Extracts the **complete** `meta` type passed downstream after this middleware.                 | Used to get a full snapshot type of the request after flowing through a specific node.                  |
+| `MiddlewareEnv<Ctx, Meta>`      | Extracts the `env` parameter type (contains `ctx`, `meta`, `waitUntil`, etc.) of a middleware. | Useful when extracting large chunks of middleware logic into standalone plain functions.                |
 
 ### Server Running
 
@@ -508,4 +554,4 @@ import { createVueQueryClient } from "tsdkarc-x/vue/query";
 
 ## Feedback & Issues
 
-If you have any questions or bug reports, Feel free to [open an issue](https://github.com/tsdk-monorepo/tsdkarc/issues)
+If you have any questions or bug reports, feel free to [open an issue](https://github.com/tsdk-monorepo/tsdkarc/issues).

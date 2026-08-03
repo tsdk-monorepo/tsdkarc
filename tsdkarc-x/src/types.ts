@@ -78,32 +78,93 @@ export interface TransportAdapter<TRawReq = unknown> {
   start(port: number | string, basePath: string): MaybePromise<void>;
   stop(): MaybePromise<void>;
 }
-
 // ─────────────────────────────────────────────────────────────────────────────
 // 3. Middlewares & Handler Environment
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type NextFn<TInCtx extends object, TExt extends object> = (
+/**
+ * Environment passed into every middleware.
+ * ctx  = DI-resolved app dependencies (identical to HandlerEnv.ctx, same reference).
+ * meta = request-scoped data accumulated from earlier middlewares in the chain.
+ */
+export interface MiddlewareEnv<AppCtx extends object, TInMeta extends object> {
+  ctx: AppCtx;
+  meta: TInMeta;
+  waitUntil: (promise: Promise<unknown>) => void;
+}
+
+/** Value returned by `next(ext)`, and by the final middleware in the chain. */
+export interface MiddlewareResult<TMeta extends object> {
+  result: unknown;
+  meta: TMeta;
+}
+
+/** Calls the next middleware (or the route handler) with additional meta merged in. */
+export type NextFn<TInMeta extends object> = <TExt extends object>(
   ext: TExt
-) => Promise<{ result: unknown; ctx: Simplify<TInCtx & TExt> }>;
+) => Promise<MiddlewareResult<Simplify<TInMeta & TExt>>>;
 
+/**
+ * A middleware declares only the meta it REQUIRES (TInMeta) and what it ADDS
+ * (TExtMeta) — not the full meta of every builder it might run inside.
+ *
+ * This type is polymorphic over TFullMeta (bounded by TInMeta) so that when a
+ * middleware is composed after others that added more fields, its return
+ * type is computed from the ACTUAL upstream meta, not just its own declared
+ * minimum requirement. Without this, a middleware declared with a narrow
+ * TInMeta (e.g. `{ user: { id: string } }`) could never be `.use()`'d after
+ * middlewares that already added other fields (e.g. `traceId`), because its
+ * return type would only promise back the narrow slice it declared.
+ */
 export type Middleware<
-  TInCtx extends object = object,
-  TExtCtx extends object = object
-> = (
-  inCtx: TInCtx,
-  next: NextFn<TInCtx, TExtCtx>
-) => Promise<{ result: unknown; ctx: Simplify<TInCtx & TExtCtx> }>;
+  AppCtx extends object = object,
+  TInMeta extends object = object,
+  TExtMeta extends object = object
+> = <TFullMeta extends TInMeta>(
+  env: MiddlewareEnv<AppCtx, TFullMeta>,
+  next: NextFn<TFullMeta>
+) => Promise<MiddlewareResult<Simplify<TFullMeta & TExtMeta>>>;
 
+/**
+ * Folds a middleware tuple into the meta shape produced when run in order.
+ * Used to compute RouteBuilder's `Meta` generic as `.use()` calls accumulate.
+ */
 export type FoldMiddlewares<
-  Ms extends Middleware<any, any>[],
+  Ms extends Middleware<any, any, any>[],
   Acc extends object = {}
 > = Ms extends [
-  Middleware<any, infer Ext extends object>,
-  ...infer Rest extends Middleware<any, any>[]
+  Middleware<any, any, infer Ext extends object>,
+  ...infer Rest extends Middleware<any, any, any>[]
 ]
   ? FoldMiddlewares<Rest, Simplify<Acc & Ext>>
   : Acc;
+
+/**
+ * Extracts the meta a single middleware contributes via next(ext).
+ * @example type AuthExt = MiddlewareExt<typeof withAuth>; // { user: User }
+ */
+export type MiddlewareExt<M> = M extends Middleware<
+  any,
+  any,
+  infer Ext extends object
+>
+  ? Ext
+  : never;
+
+/**
+ * Extracts a middleware's declared REQUIRED meta merged with what it adds —
+ * i.e. the meta shape assuming it ran against nothing but its own minimum
+ * requirement. Useful for typing a downstream middleware that depends on
+ * this one's output without re-declaring the shape by hand.
+ * @example type AfterAuth = MiddlewareNextMeta<typeof withAuth>;
+ */
+export type MiddlewareNextMeta<M> = M extends Middleware<
+  any,
+  infer In extends object,
+  infer Ext extends object
+>
+  ? Simplify<In & Ext>
+  : never;
 
 export interface HandlerEnv<AppCtx extends object, Meta extends object> {
   meta: Meta;
@@ -205,7 +266,7 @@ export type AnyRoute = (
   | UploadRoute<any, any, any, any, any>
   | PlainRoute<any, any>
 ) & {
-  ___routeMiddlewares?: Middleware<any, any>[];
+  ___routeMiddlewares?: Middleware<any, any, any>[];
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -220,11 +281,17 @@ export type Flat<T> = T extends Record<string, any>
   : T;
 
 export interface RouteBuilder<AppCtx extends object, Meta extends object> {
-  use<TIn extends object, TExt extends object>(
-    mw: Middleware<TIn, TExt> & (Meta extends TIn ? unknown : never)
-  ): RouteBuilder<AppCtx, Simplify<Meta & TExt>>;
+  /**
+   * Adds a middleware. TypeScript checks that the middleware's required
+   * input meta (TInMeta) is satisfied by the builder's current Meta — no
+   * hack needed since `use` is declared as a function-typed property
+   * (strict, contravariant parameter checking applies).
+   */
+  use: <TReq extends object, TExt extends object>(
+    mw: Middleware<AppCtx, TReq, TExt> & (Meta extends TReq ? unknown : never)
+  ) => RouteBuilder<AppCtx, Simplify<Meta & TExt>>;
 
-  // --- QUERY ---
+  // --- QUERY / MUTATION / STREAM / UPLOAD unchanged below ---
   query<TInput, TOutput>(
     handler: (
       input: TInput,
@@ -235,12 +302,11 @@ export interface RouteBuilder<AppCtx extends object, Meta extends object> {
   query<TSchema extends ZodType, TOutput>(
     schema: TSchema,
     handler: (
-      input: Flat<z.infer<TSchema>>, // Handler receives the parsed output
+      input: Flat<z.infer<TSchema>>,
       env: HandlerEnv<AppCtx, Meta>
     ) => MaybePromise<TOutput>
-  ): QueryRoute<TSchema, Flat<z.input<TSchema>>, TOutput, AppCtx, Meta>; // Client uses the input type
+  ): QueryRoute<TSchema, Flat<z.input<TSchema>>, TOutput, AppCtx, Meta>;
 
-  // --- MUTATION ---
   mutate<TInput, TOutput>(
     handler: (
       input: TInput,
@@ -256,7 +322,6 @@ export interface RouteBuilder<AppCtx extends object, Meta extends object> {
     ) => MaybePromise<TOutput>
   ): MutationRoute<TSchema, Flat<z.input<TSchema>>, TOutput, AppCtx, Meta>;
 
-  // --- STREAM ---
   stream<TInput, TChunk>(
     handler: (
       input: TInput,
@@ -272,7 +337,6 @@ export interface RouteBuilder<AppCtx extends object, Meta extends object> {
     ) => AsyncGenerator<TChunk, void, unknown>
   ): StreamRoute<TSchema, Flat<z.input<TSchema>>, TChunk, AppCtx, Meta>;
 
-  // --- UPLOAD ---
   upload<TInput, TOutput>(
     handler: (
       input: TInput,
@@ -364,6 +428,14 @@ export type InferRouteTree<T> = T extends RouteTreeModule<infer R>
 export type RoutesOf<T extends { routes: any } | Promise<{ routes: any }>> =
   Awaited<T>["routes"];
 
-export type DeepFlat<T> = T extends object
+/**
+ * Recursively flattens intersected object types for readable hover/IDE types.
+ * Functions are returned as-is (not recursed into) — a function is
+ * technically `object` in TS, but mapping over it drops the call signature,
+ * collapsing e.g. `(id: string) => User` down to `{}`.
+ */
+export type DeepFlat<T> = T extends (...args: any[]) => any
+  ? T
+  : T extends object
   ? { [K in keyof T]: DeepFlat<T[K]> }
   : T;
