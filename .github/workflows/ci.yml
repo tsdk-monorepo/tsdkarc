@@ -96,11 +96,11 @@ jobs:
         run: bun i
 
       - name: Install dependencies
-        run: rm -rf node_modules && rm -rf ../tsdkarc/node_modules && bun install
+        run: bun install
         working-directory: tsdkarc-x
 
       - name: Typecheck
-        run: bun run checktype
+        run: rm -rf node_modules/tsdkarc && cp -r ../tsdkarc node_modules/tsdkarc && bun run checktype
         working-directory: tsdkarc-x
 
       - name: Build
