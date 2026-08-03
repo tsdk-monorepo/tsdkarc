@@ -203,7 +203,7 @@ const userRoutes = appRouter.init((r) => ({
 在 `tsdkarc-x` 中，我们将依赖注入的全局实例（`ctx`）与请求级别的状态（`meta`）做了明确区分。通过搭配内置的类型提取工具（如 `MiddlewareExt`），你可以像搭积木一样组合中间件，并保持严格的类型安全。
 
 ```ts
-import { defineMiddleware, MiddlewareExt } from "tsdkarc-x";
+import { defineMiddleware, MiddlewareExt, MiddlewareNextMeta } from "tsdkarc-x";
 import type { ContextOf } from "tsdkarc";
 import type { Request } from "express";
 
@@ -231,6 +231,7 @@ const authMw = defineMiddleware<AppCtx, RequestMeta>()(async ({ ctx, meta }, nex
 // 4. 路由级中间件与类型推导组合 (MiddlewareExt)
 // 提取 authMw 和 tracingMw 所“贡献”的类型，无需手动重新声明！
 type AuthExt = MiddlewareExt<typeof authMw>;       // { user: User }
+type AuthExtMeta = MiddlewareNextMeta<typeof authMw>; // { user: User; readonly token: string }
 type TracingExt = MiddlewareExt<typeof tracingMw>; // { traceId: string }
 
 // 需要 user 信息的中间件（仅依赖 AuthExt）
@@ -240,7 +241,7 @@ const requireAdminMw = defineMiddleware<AppCtx, AuthExt>()(async ({ meta }, next
 });
 
 // 需要 user 且需要 traceId 的中间件（组合依赖）
-const auditMw = defineMiddleware<AppCtx, & AuthExt TracingExt>()(
+const auditMw = defineMiddleware<AppCtx, AuthExt & TracingExt>()(
   async ({ ctx, meta, waitUntil }, next) => {
     // 放入后台执行，不阻塞请求响应
     waitUntil(ctx.audit.log("action", { userId: meta.user.id, traceId: meta.traceId }));

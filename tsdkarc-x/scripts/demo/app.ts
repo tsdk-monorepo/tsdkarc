@@ -64,7 +64,7 @@ export const authMw = defineMiddleware<AppCtx, RequestMeta>()(
  */
 export const verifyMfaMw = defineMiddleware<
   AppCtx,
-  MiddlewareExt<typeof authMw>
+  MiddlewareNextMeta<typeof authMw>
 >()(async ({ meta, ctx }, next) => {
   return next({ mfaPassed: meta.user.role === "admin" });
 });

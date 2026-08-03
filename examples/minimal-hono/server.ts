@@ -5,6 +5,7 @@ import {
   launchApp,
   RpcError,
   type DeepFlat,
+  type MiddlewareExt,
   type RoutesOf,
 } from "tsdkarc-x";
 import { HonoAdapter } from "tsdkarc-x/hono";
@@ -47,9 +48,8 @@ const sharedModule = defineModule().init(() => ({
   },
 }));
 
-export type BaseCtx = DeepFlat<
-  Awaited<ReturnType<typeof createContext>> & ContextOf<typeof sharedModule>
->;
+export type BaseCtx = ContextOf<typeof sharedModule>;
+export type RequestMeta = Awaited<ReturnType<typeof createContext>>;
 
 /**
  * Auth middleware.
@@ -57,23 +57,27 @@ export type BaseCtx = DeepFlat<
  * Applied router-wide via defineRouter's middlewares option.
  * @throws RpcError UNAUTHORIZED when the header is missing
  */
-export const authMw = defineMiddleware<BaseCtx>()(async (ctx, next) => {
-  if (!ctx.token)
-    throw new RpcError("UNAUTHORIZED", "Missing Authorization header");
-  return next({
-    traceId: crypto.randomUUID(),
-    user: { id: "user_1", mfaToken: ctx.mfaToken },
-  });
-});
+export const authMw = defineMiddleware<BaseCtx, RequestMeta>()(
+  async ({ ctx, meta }, next) => {
+    if (!meta.token)
+      throw new RpcError("UNAUTHORIZED", "Missing Authorization header");
+    return next({
+      traceId: crypto.randomUUID(),
+      user: { id: "user_1", mfaToken: meta.mfaToken },
+    });
+  }
+);
 
 /**
  * MFA middleware.
  * Route-level only (attached via r.use). Adds env.meta.mfaPassed.
  */
-export const verifyMfaMw = defineMiddleware<{
-  user: { id: string; mfaToken?: string };
-}>()(async (ctx, next) => {
-  return next({ mfaPassed: ctx.user.mfaToken === "valid" });
+export const verifyMfaMw = defineMiddleware<
+  BaseCtx,
+  MiddlewareExt<typeof authMw> & RequestMeta
+>()(async ({ meta, ctx }, next) => {
+  console.log({ meta, ctx });
+  return next({ mfaPassed: meta.user.mfaToken === "admin" });
 });
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -87,7 +91,7 @@ const appRouter = defineRouter({
 
 const userRoutes = appRouter.init((r) => ({
   /** Liveness probe, no context or schema needed. */
-  health: () => "OK",
+  health: () => "ok",
 
   /** Query without input schema; reads DI and meta. */
   ping: r.query(async (_, env) => ({
@@ -221,7 +225,9 @@ await Promise.all([
 ]);
 
 // Smoke test
-await fetch("http://localhost:3015/api/users/health")
+await fetch("http://localhost:3015/api/users/health", {
+  headers: { Authorization: "x--11" },
+})
   .then((res) => res.json())
   .then((res) => {
     console.log(res); // Output: OK

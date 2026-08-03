@@ -18,6 +18,7 @@ import type {
   RuntimeRouteTree,
   MiddlewareEnv,
   NextFn,
+  ValidateMiddlewareChain,
 } from "./types";
 import { isRouteTreeModule } from "./types";
 
@@ -214,7 +215,10 @@ let _routeModuleCounter = 0;
 export function defineRouter<
   const TModules extends AnyModule[] = [],
   const TMiddlewares extends Middleware<any, any, any>[] = []
->(options: { modules?: TModules; middlewares?: TMiddlewares }) {
+>(options: {
+  modules?: TModules;
+  middlewares?: TMiddlewares & ValidateMiddlewareChain<TMiddlewares>;
+}) {
   type AppCtx = DepCtxFromList<TModules>;
   type Meta = FoldMiddlewares<TMiddlewares>;
 

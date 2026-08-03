@@ -20,6 +20,36 @@ export interface RpcErrorIssue {
   message: string;
 }
 
+/**
+ * Blocks TypeScript from falling back to `any` during generic inference.
+ * (Native NoInfer is TS 5.4+, this polyfill works everywhere).
+ */
+export type _NoInfer<T> = [T][T extends any ? 0 : never];
+
+/** Validates an array of middlewares to ensure each one's requirements are met by the previous ones. */
+export type ValidateMiddlewareChain<
+  Ms extends readonly Middleware<any, any, any>[],
+  Acc extends object = Ms extends readonly [
+    Middleware<any, infer In extends object, any>,
+    ...any[]
+  ]
+    ? In
+    : {}
+> = Ms extends readonly [
+  Middleware<any, infer Req, infer Ext>,
+  ...infer Rest extends readonly Middleware<any, any, any>[]
+]
+  ? [Acc] extends [Req]
+    ? readonly [unknown, ...ValidateMiddlewareChain<Rest, Simplify<Acc & Ext>>]
+    : readonly [
+        {
+          __error_Missing_Required_Meta: Req;
+          __provided_Meta_Has_Only: Acc;
+        },
+        ...unknown[]
+      ]
+  : readonly [];
+
 // ─────────────────────────────────────────────────────────────────────────────
 // 2. Transport & HTTP Escapes
 // ─────────────────────────────────────────────────────────────────────────────
@@ -96,11 +126,16 @@ export type Middleware<
  * Used to compute RouteBuilder's `Meta` generic as `.use()` calls accumulate.
  */
 export type FoldMiddlewares<
-  Ms extends Middleware<any, any, any>[],
-  Acc extends object = {}
-> = Ms extends [
+  Ms extends readonly Middleware<any, any, any>[],
+  Acc extends object = Ms extends readonly [
+    Middleware<any, infer In extends object, any>,
+    ...any[]
+  ]
+    ? In // <-- SEED WITH FIRST MIDDLEWARE'S TInMeta
+    : {}
+> = Ms extends readonly [
   Middleware<any, any, infer Ext extends object>,
-  ...infer Rest extends Middleware<any, any, any>[]
+  ...infer Rest extends readonly Middleware<any, any, any>[]
 ]
   ? FoldMiddlewares<Rest, Simplify<Acc & Ext>>
   : Acc;
@@ -254,7 +289,13 @@ export interface RouteBuilder<AppCtx extends object, Meta extends object> {
    * (strict, contravariant parameter checking applies).
    */
   use: <TReq extends object, TExt extends object>(
-    mw: Middleware<AppCtx, TReq, TExt> & (Meta extends TReq ? unknown : never)
+    mw: Middleware<AppCtx, TReq, TExt> &
+      ([Meta] extends [_NoInfer<TReq>]
+        ? unknown
+        : {
+            __error_Missing_Required_Meta: _NoInfer<TReq>;
+            __provided_Meta_Has_Only: Meta;
+          })
   ) => RouteBuilder<AppCtx, Simplify<Meta & TExt>>;
 
   // --- QUERY / MUTATION / STREAM / UPLOAD unchanged below ---

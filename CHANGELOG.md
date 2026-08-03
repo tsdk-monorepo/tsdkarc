@@ -1,5 +1,8 @@
 # TsdkArc Packages Changelog
 
+## tsdkarc-x@0.1.3
+
+- Improve middleware type
 
 ## tsdkarc-x@0.1.2, tsdkarc@2.0.0-alpha.2, tsdkbundle@0.0.2
 

@@ -207,13 +207,15 @@ const userRoutes = appRouter.init((r) => ({
 In `tsdkarc-x`, we clearly separate global singletons injected by DI (`ctx`) from request-level state (`meta`). With built-in type extraction tools (like `MiddlewareExt`), you can compose middlewares like building blocks while maintaining strict type safety.
 
 ```ts
-import { defineMiddleware, MiddlewareExt } from "tsdkarc-x";
+import { defineMiddleware, MiddlewareExt, MiddlewareNextMeta } from "tsdkarc-x";
 import type { ContextOf } from "tsdkarc";
 import type { Request } from "express";
 
 // 1. Define base request data (RequestMeta)
 export const createContext = async (req: Request) => ({
-  get token() { return req.header("Authorization")?.replace("Bearer ", "") ?? null; },
+  get token() {
+    return req.header("Authorization")?.replace("Bearer ", "") ?? null;
+  },
 });
 export type RequestMeta = Awaited<ReturnType<typeof createContext>>;
 
@@ -221,33 +223,43 @@ export type RequestMeta = Awaited<ReturnType<typeof createContext>>;
 type AppCtx = ContextOf<typeof dbModule> & ContextOf<typeof auditModule>;
 
 // 2. Global middleware: Attach Trace ID
-const tracingMw = defineMiddleware<AppCtx, {}>()(async ({ waitUntil }, next) => {
-  return next({ traceId: `req_${Date.now()}` }); // New field: traceId
-});
+const tracingMw = defineMiddleware<AppCtx, RequestMeta>()(
+  async ({ waitUntil }, next) => {
+    return next({ traceId: `req_${Date.now()}` }); // New field: traceId
+  }
+);
 
 // 3. Auth middleware: Parse Token and inject User
-const authMw = defineMiddleware<AppCtx, RequestMeta>()(async ({ ctx, meta }, next) => {
-  if (!meta.token) throw new RpcError("UNAUTHORIZED", "Missing Bearer token");
-  const user = await ctx.db.findUserByToken(meta.token);
-  return next({ user }); // New field: user
-});
+const authMw = defineMiddleware<AppCtx, RequestMeta>()(
+  async ({ ctx, meta }, next) => {
+    if (!meta.token) throw new RpcError("UNAUTHORIZED", "Missing Bearer token");
+    const user = await ctx.db.findUserByToken(meta.token);
+    return next({ user }); // New field: user
+  }
+);
 
 // 4. Route-level middleware and type inference composition (MiddlewareExt)
 // Extract the types "contributed" by authMw and tracingMw, no manual redeclaration needed!
-type AuthExt = MiddlewareExt<typeof authMw>;       // { user: User }
+type AuthExt = MiddlewareExt<typeof authMw>; // { user: User }
+type AuthExtMeta = MiddlewareNextMeta<typeof authMw>; // { user: User; readonly token: string }
 type TracingExt = MiddlewareExt<typeof tracingMw>; // { traceId: string }
 
 // Middleware requiring user info (depends only on AuthExt)
-const requireAdminMw = defineMiddleware<AppCtx, AuthExt>()(async ({ meta }, next) => {
-  if (meta.user.role !== "admin") throw new RpcError("FORBIDDEN", "Admin only");
-  return next({});
-});
+const requireAdminMw = defineMiddleware<AppCtx, AuthExt & RequestMeta>()(
+  async ({ meta }, next) => {
+    if (meta.user.role !== "admin")
+      throw new RpcError("FORBIDDEN", "Admin only");
+    return next({});
+  }
+);
 
 // Middleware requiring both user and traceId (composite dependency)
-const auditMw = defineMiddleware<AppCtx, & AuthExt TracingExt>()(
+const auditMw = defineMiddleware<AppCtx, AuthExt & TracingExt & RequestMeta>()(
   async ({ ctx, meta, waitUntil }, next) => {
     // Run in background, doesn't block the request response
-    waitUntil(ctx.audit.log("action", { userId: meta.user.id, traceId: meta.traceId }));
+    waitUntil(
+      ctx.audit.log("action", { userId: meta.user.id, traceId: meta.traceId })
+    );
     return next({});
   }
 );
@@ -265,7 +277,6 @@ export const appRouter = defineRouter({
       return `User ${env.meta.user.id} deleted`;
     }),
 }));
-
 ```
 
 ### Error Handling
@@ -496,7 +507,6 @@ OK
 > Note: for `tsdkarc-x/scripts` feature, removed TypeScript@7
 
 See the [Tanstack Example](../examples/tanstack-example/).
-
 
 ---
 

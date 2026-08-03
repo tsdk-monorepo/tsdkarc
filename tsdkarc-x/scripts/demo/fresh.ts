@@ -38,8 +38,9 @@ export const authMw = defineMiddleware<BaseCtx, RequestMeta>()(async (ctx, next)
 
 export const verifyMfaMw = defineMiddleware<
   BaseCtx,
-  MiddlewareExt<typeof authMw> & MiddlewareExt<typeof loggerMw>
+  MiddlewareExt<typeof authMw> & MiddlewareExt<typeof loggerMw> & RequestMeta
 >()(async (ctx, next) => {
+  ctx.meta.token;
   return next({ mfaPassed: true });
 });
 
