@@ -1,0 +1,85 @@
+name: check-examples
+
+# Input: push/PR event with changed files under examples/*/
+# Output: bun run build executed only inside each changed example folder
+on:
+  push:
+    branches: [main]
+    paths:
+      - "examples/**/package.json"
+      - "examples/**/*.ts"
+      - "examples/**/*.tsx"
+  pull_request:
+    paths:
+      - "examples/**/package.json"
+      - "examples/**/*.ts"
+      - "examples/**/*.tsx"
+
+jobs:
+  check-examples:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          # fetch-depth 0 needed so git diff can compare against base branch
+          fetch-depth: 0
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Determine changed example folders
+        id: changed
+        run: |
+          # Input: git history (base vs head commit)
+          # Output: newline-separated list of unique "examples/<name>" dirs
+          #         that had package.json/*.ts/*.tsx changes, written to
+          #         steps.changed.outputs.dirs
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+            HEAD_SHA="${{ github.event.after }}"
+          fi
+
+          # github.event.before is all-zeros on the first push to a branch;
+          # fall back to diffing against the previous commit in that case
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            BASE_SHA="HEAD~1"
+          fi
+
+          CHANGED_FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- \
+            'examples/**/package.json' 'examples/**/*.ts' 'examples/**/*.tsx')
+
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # Reduce each matched path to its top-level "examples/<name>" dir
+          DIRS=$(echo "$CHANGED_FILES" | awk -F/ 'NF>=2 && $1=="examples" {print $1"/"$2}' | sort -u)
+
+          echo "Example dirs to build:"
+          echo "$DIRS"
+
+          {
+            echo "dirs<<EOF"
+            echo "$DIRS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run bun build in each changed example
+        if: steps.changed.outputs.dirs != ''
+        run: |
+          # Input: steps.changed.outputs.dirs (one "examples/<name>" per line)
+          # Output: non-zero exit if any example's build fails
+          echo "${{ steps.changed.outputs.dirs }}" | while IFS= read -r dir; do
+            [ -z "$dir" ] && continue
+            echo "::group::Building $dir"
+            cd "$dir"
+            bun install
+            bun run build
+            cd - > /dev/null
+            echo "::endgroup::"
+          done
