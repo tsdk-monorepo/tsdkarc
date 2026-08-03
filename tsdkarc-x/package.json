@@ -78,7 +78,7 @@
     "build": "concurrently \"npm run build:cjs\"  \"npm run build:esm\"",
     "build:cjs": "rm -rf lib && tsc --project tsconfig.cjs.json && rm -rf lib/tests",
     "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests && node ../scripts/fix-esm-js-imports.mjs ./esm",
-    "checktype": "bun run scripts/gen-routes.ts && bun tsc --noEmit --project tsconfig.json",
+    "checktype": "bun run scripts/gen-routes.ts && ls node_modules/tsdkarc && bun tsc --noEmit --project tsconfig.json",
     "test": "vitest --run --testTimeout=120000 --hookTimeout=60000 ./tests",
     "perf": "echo Perf1 && tsc -p tsconfig.perf1.json && echo '\nPerf0' && tsc -p tsconfig.perf0.json",
     "bundev": "bundle dev api"
