@@ -56,6 +56,7 @@
         "koa": "^3.1.2",
         "multer": "^2.2.0",
         "swr": "^2.4.2",
+        "tsdkarc": "2.0.0-alpha.1",
         "vue": "^3.5.40",
       },
       "optionalPeers": [
@@ -655,6 +656,8 @@
     "toidentifier": ["toidentifier@1.0.1", "", {}, "sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA=="],
 
     "tree-kill": ["tree-kill@1.2.2", "", { "bin": { "tree-kill": "cli.js" } }, "sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A=="],
+
+    "tsdkarc": ["tsdkarc@file:../tsdkarc", {}],
 
     "tsdkarc": ["tsdkarc@file:../tsdkarc", {}],
 

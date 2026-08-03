@@ -6,7 +6,7 @@
     "moduleResolution": "bundler",
     "strict": true,
     "outDir": "dist",
-    "incremental": true,
+    "incremental": false,
     "skipLibCheck": true,
     "declaration": false
   },

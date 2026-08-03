@@ -1,6 +1,6 @@
 {
   "name": "tsdkarc-x",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Fast, End-to-end type-safe RPC for full-stack TypeScript.",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
@@ -77,7 +77,7 @@
   "scripts": {
     "build": "concurrently \"npm run build:cjs\"  \"npm run build:esm\"",
     "build:cjs": "rm -rf lib && tsc --project tsconfig.cjs.json && rm -rf lib/tests",
-    "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests",
+    "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests && node ../scripts/fix-esm-js-imports.mjs ./esm",
     "checktype": "bun run scripts/gen-routes.ts && tsc --noEmit --project tsconfig.json",
     "test": "vitest --run --testTimeout=120000 --hookTimeout=60000 ./tests",
     "perf": "echo Perf1 && tsc -p tsconfig.perf1.json && echo '\nPerf0' &&  tsc -p tsconfig.perf0.json",

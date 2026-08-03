@@ -6,5 +6,8 @@
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
   "homepage": "https://arc.tsdk.dev",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "fast-glob": "^3.3.3"
+  }
 }

@@ -13,7 +13,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "tsdkarc": "next",
-    "tsdkarc-x": "0.0.4",
+    "tsdkarc-x": "0.1.1",
     "swr": "^2.4.2"
   },
   "devDependencies": {

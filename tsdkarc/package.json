@@ -1,6 +1,6 @@
 {
   "name": "tsdkarc",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "Decorator-free, type-safe module composition & dependency injection for TypeScript",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
@@ -18,7 +18,7 @@
   "scripts": {
     "build": "concurrently \"npm run build:cjs\"  \"npm run build:esm\"",
     "build:cjs": "rm -rf lib && tsc --project tsconfig.cjs.json && rm -rf lib/tests",
-    "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests",
+    "build:esm": "rm -rf esm && tsc --project tsconfig.esm.json && rm -rf esm/tests && node ../scripts/fix-esm-js-imports.mjs ./esm",
     "checktype": "tsc --noEmit --project tsconfig.tests.json",
     "checktype2": "tsc --noEmit --project tsconfig.checktype2.json",
     "test": "npm run checktype && vitest --run --testTimeout=120000 --hookTimeout=60000 ./tests",
