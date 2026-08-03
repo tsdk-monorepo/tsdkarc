@@ -217,12 +217,12 @@ export type RequestMeta = Awaited<ReturnType<typeof createContext>>;
 type AppCtx = ContextOf<typeof dbModule> & ContextOf<typeof auditModule>;
 
 // 2. 全局中间件：附加 Trace ID
-const tracingMw = defineMiddleware<AppCtx, {}>()(async ({ waitUntil }, next) => {
+const tracingMw = defineMiddleware<AppCtx, RequestMeta>()(async ({ waitUntil }, next) => {
   return next({ traceId: `req_${Date.now()}` }); // 新增字段：traceId
 });
 
 // 3. 鉴权中间件：解析 Token 并注入 User
-const authMw = defineMiddleware<AppCtx, RequestMeta>()(async ({ ctx, meta }, next) => {
+const authMw = defineMiddleware<AppCtx, MiddlewareNextMeta<typeof tracingMw>>()(async ({ ctx, meta }, next) => {
   if (!meta.token) throw new RpcError("UNAUTHORIZED", "Missing Bearer token");
   const user = await ctx.db.findUserByToken(meta.token);
   return next({ user }); // 新增字段：user
@@ -235,13 +235,13 @@ type AuthExtMeta = MiddlewareNextMeta<typeof authMw>; // { user: User; readonly 
 type TracingExt = MiddlewareExt<typeof tracingMw>; // { traceId: string }
 
 // 需要 user 信息的中间件（仅依赖 AuthExt）
-const requireAdminMw = defineMiddleware<AppCtx, AuthExt>()(async ({ meta }, next) => {
+const requireAdminMw = defineMiddleware<AppCtx, AuthExtMeta>()(async ({ meta }, next) => {
   if (meta.user.role !== "admin") throw new RpcError("FORBIDDEN", "Admin only");
   return next({});
 });
 
 // 需要 user 且需要 traceId 的中间件（组合依赖）
-const auditMw = defineMiddleware<AppCtx, AuthExt & TracingExt>()(
+const auditMw = defineMiddleware<AppCtx, AuthExtMeta>()(
   async ({ ctx, meta, waitUntil }, next) => {
     // 放入后台执行，不阻塞请求响应
     waitUntil(ctx.audit.log("action", { userId: meta.user.id, traceId: meta.traceId }));

@@ -6,6 +6,7 @@ import {
   RpcError,
   type DeepFlat,
   type MiddlewareExt,
+  type MiddlewareNextMeta,
   type RoutesOf,
 } from "tsdkarc-x";
 import { HonoAdapter } from "tsdkarc-x/hono";
@@ -74,7 +75,7 @@ export const authMw = defineMiddleware<BaseCtx, RequestMeta>()(
  */
 export const verifyMfaMw = defineMiddleware<
   BaseCtx,
-  MiddlewareExt<typeof authMw> & RequestMeta
+  MiddlewareNextMeta<typeof authMw>
 >()(async ({ meta, ctx }, next) => {
   console.log({ meta, ctx });
   return next({ mfaPassed: meta.user.mfaToken === "admin" });

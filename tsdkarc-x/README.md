@@ -230,7 +230,7 @@ const tracingMw = defineMiddleware<AppCtx, RequestMeta>()(
 );
 
 // 3. Auth middleware: Parse Token and inject User
-const authMw = defineMiddleware<AppCtx, RequestMeta>()(
+const authMw = defineMiddleware<AppCtx, MiddlewareNextMeta<typeof tracingMw>>()(
   async ({ ctx, meta }, next) => {
     if (!meta.token) throw new RpcError("UNAUTHORIZED", "Missing Bearer token");
     const user = await ctx.db.findUserByToken(meta.token);
@@ -245,7 +245,7 @@ type AuthExtMeta = MiddlewareNextMeta<typeof authMw>; // { user: User; readonly 
 type TracingExt = MiddlewareExt<typeof tracingMw>; // { traceId: string }
 
 // Middleware requiring user info (depends only on AuthExt)
-const requireAdminMw = defineMiddleware<AppCtx, AuthExt & RequestMeta>()(
+const requireAdminMw = defineMiddleware<AppCtx, AuthExtMeta>()(
   async ({ meta }, next) => {
     if (meta.user.role !== "admin")
       throw new RpcError("FORBIDDEN", "Admin only");
@@ -254,7 +254,7 @@ const requireAdminMw = defineMiddleware<AppCtx, AuthExt & RequestMeta>()(
 );
 
 // Middleware requiring both user and traceId (composite dependency)
-const auditMw = defineMiddleware<AppCtx, AuthExt & TracingExt & RequestMeta>()(
+const auditMw = defineMiddleware<AppCtx, AuthExtMeta>()(
   async ({ ctx, meta, waitUntil }, next) => {
     // Run in background, doesn't block the request response
     waitUntil(
