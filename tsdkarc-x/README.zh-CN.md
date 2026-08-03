@@ -27,6 +27,7 @@
 - [Next.js Example](../examples/nextjs-example/)
 - [Minimal Express.js Example](../examples/minimal-express/)
 - [Minimal Hono.js Example](../examples/minimal-hono/)
+- [Tanstack Example](../examples/tanstack-example/)
 
 Want more examples? [Request one](https://github.com/tsdk-monorepo/tsdkarc/issues).
 
@@ -479,6 +480,10 @@ export type AppRoutes = RoutesOf<typeof app>;
 ```
 
 3. 访问 `http://localhost:3000/api/neat/users/health` 查看结果
+
+**Q: 如何在 Tanstack Router 中运行？**
+
+点击查看 [Tanstack Example](../examples/tanstack-example/)
 
 ---
 

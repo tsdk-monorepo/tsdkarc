@@ -32,14 +32,14 @@ export const openapi = extractOpenApi(
   {
     info: { title: "Nextjs Example API", version: "0.0.5" },
   },
-  { entryFile: "./server/main.ts" }
+  { entryFile: "./src/tsdkarc/main.ts" }
 );
 
 // Generate static type of routes
 /*
 const result =
   await extractAppRoutesTypesFull(app.routes, {
-    entryFile: "./server/main.ts",
+    entryFile: "./src/tsdkarc/main.ts",
   });
 fs.writeFile('./types/client.d.ts', result.clientDts, 'utf8');
 fs.writeFile('./types/swr-client.d.ts', result.swrDts, 'utf8');

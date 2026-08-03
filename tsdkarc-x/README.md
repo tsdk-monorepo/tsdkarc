@@ -27,6 +27,7 @@
 - [Next.js Example](../examples/nextjs-example/)
 - [Minimal Express.js Example](../examples/minimal-express/)
 - [Minimal Hono.js Example](../examples/minimal-hono/)
+- [Tanstack Example](../examples/tanstack-example/)
 
 Want more examples? [Request one](https://github.com/tsdk-monorepo/tsdkarc/issues).
 
@@ -440,7 +441,7 @@ No. You only need to replace `transport` and `createContext` inside `launchApp`.
 
 **Q: How do I run `tsdkarc-x` in Next.js?**
 
-See the [Next.js Example](https://www.google.com/search?q=../examples/nextjs-example/).
+See the [Next.js Example](../examples/nextjs-example/).
 
 Or follow these steps:
 
@@ -489,6 +490,10 @@ export type AppRoutes = RoutesOf<typeof app>;
 OK
 
 ```
+
+**Q: How do I run `tsdkarc-x` with Tanstack Router?**
+
+See the [Tanstack Example](../examples/tanstack-example/).
 
 ---
 
