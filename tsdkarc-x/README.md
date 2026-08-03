@@ -508,6 +508,20 @@ OK
 
 See the [Tanstack Example](../examples/tanstack-example/).
 
+**Q: Why doesn't `tsdkarc-x/scripts` support TS7?**
+
+`tsdkarc-x/scripts` relies on the TypeScript Compiler API. As of now, TS7 does not provide the required API, so `tsdkarc-x/scripts` is not yet compatible with TS7.
+
+This limitation only affects `tsdkarc-x/scripts`; all other features of `tsdkarc-x` work normally.
+
+**Q: What is the relationship between `tsdkarc-x` and `tsdk`?**
+
+`tsdk` was the author's first end-to-end type-safe API toolkit. While it was built around a code generation approach, real-world usage exposed challenges with multi-package distribution and sharing. Those challenges ultimately led to the creation of `tsdkarc`, and later, the more refined `tsdkarc-x`.
+
+Without `tsdk`, there would be no `tsdkarc` or `tsdkarc-x`.
+
+Going forward, development will focus on the `tsdkarc` ecosystem. That said, as the project that started it all, `tsdk` will still receive a proper `1.0` release to bring its journey to a complete close. 🥇
+
 ---
 
 ## API Reference

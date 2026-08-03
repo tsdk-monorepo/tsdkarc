@@ -215,7 +215,7 @@ let _routeModuleCounter = 0;
 export function defineRouter<
   const TModules extends AnyModule[] = [],
   const TMiddlewares extends Middleware<any, any, any>[] = []
->(options: {
+>(options?: {
   modules?: TModules;
   middlewares?: TMiddlewares & ValidateMiddlewareChain<TMiddlewares>;
 }) {
@@ -255,14 +255,14 @@ export function defineRouter<
 
       const routeMod = defineModule({
         name: moduleName,
-        modules: options.modules ?? [],
+        modules: options?.modules ?? [],
       }).init((ctx) => {
         const routeBuilder = makeRouteBuilder<AppCtx, Meta>();
 
         // ctx and routeBuilder are now passed separately — type matches runtime.
         const rawRoutes = factory(routeBuilder, ctx as AppCtx);
         const normalised = normaliseRouteDict(rawRoutes);
-        const moduleMiddlewares = options.middlewares ?? [];
+        const moduleMiddlewares = options?.middlewares ?? [];
 
         function wrapTree(tree: any): any {
           const wrapped: any = {};

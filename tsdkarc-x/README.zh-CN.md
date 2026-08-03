@@ -209,7 +209,9 @@ import type { Request } from "express";
 
 // 1. 定义基础请求数据 (RequestMeta)
 export const createContext = async (req: Request) => ({
-  get token() { return req.header("Authorization")?.replace("Bearer ", "") ?? null; },
+  get token() {
+    return req.header("Authorization")?.replace("Bearer ", "") ?? null;
+  },
 });
 export type RequestMeta = Awaited<ReturnType<typeof createContext>>;
 
@@ -217,34 +219,43 @@ export type RequestMeta = Awaited<ReturnType<typeof createContext>>;
 type AppCtx = ContextOf<typeof dbModule> & ContextOf<typeof auditModule>;
 
 // 2. 全局中间件：附加 Trace ID
-const tracingMw = defineMiddleware<AppCtx, RequestMeta>()(async ({ waitUntil }, next) => {
-  return next({ traceId: `req_${Date.now()}` }); // 新增字段：traceId
-});
+const tracingMw = defineMiddleware<AppCtx, RequestMeta>()(
+  async ({ waitUntil }, next) => {
+    return next({ traceId: `req_${Date.now()}` }); // 新增字段：traceId
+  }
+);
 
 // 3. 鉴权中间件：解析 Token 并注入 User
-const authMw = defineMiddleware<AppCtx, MiddlewareNextMeta<typeof tracingMw>>()(async ({ ctx, meta }, next) => {
-  if (!meta.token) throw new RpcError("UNAUTHORIZED", "Missing Bearer token");
-  const user = await ctx.db.findUserByToken(meta.token);
-  return next({ user }); // 新增字段：user
-});
+const authMw = defineMiddleware<AppCtx, MiddlewareNextMeta<typeof tracingMw>>()(
+  async ({ ctx, meta }, next) => {
+    if (!meta.token) throw new RpcError("UNAUTHORIZED", "Missing Bearer token");
+    const user = await ctx.db.findUserByToken(meta.token);
+    return next({ user }); // 新增字段：user
+  }
+);
 
 // 4. 路由级中间件与类型推导组合 (MiddlewareExt)
 // 提取 authMw 和 tracingMw 所“贡献”的类型，无需手动重新声明！
-type AuthExt = MiddlewareExt<typeof authMw>;       // { user: User }
+type AuthExt = MiddlewareExt<typeof authMw>; // { user: User }
 type AuthExtMeta = MiddlewareNextMeta<typeof authMw>; // { user: User; readonly token: string }
 type TracingExt = MiddlewareExt<typeof tracingMw>; // { traceId: string }
 
 // 需要 user 信息的中间件（仅依赖 AuthExt）
-const requireAdminMw = defineMiddleware<AppCtx, AuthExtMeta>()(async ({ meta }, next) => {
-  if (meta.user.role !== "admin") throw new RpcError("FORBIDDEN", "Admin only");
-  return next({});
-});
+const requireAdminMw = defineMiddleware<AppCtx, AuthExtMeta>()(
+  async ({ meta }, next) => {
+    if (meta.user.role !== "admin")
+      throw new RpcError("FORBIDDEN", "Admin only");
+    return next({});
+  }
+);
 
 // 需要 user 且需要 traceId 的中间件（组合依赖）
 const auditMw = defineMiddleware<AppCtx, AuthExtMeta>()(
   async ({ ctx, meta, waitUntil }, next) => {
     // 放入后台执行，不阻塞请求响应
-    waitUntil(ctx.audit.log("action", { userId: meta.user.id, traceId: meta.traceId }));
+    waitUntil(
+      ctx.audit.log("action", { userId: meta.user.id, traceId: meta.traceId })
+    );
     return next({});
   }
 );
@@ -262,7 +273,6 @@ export const appRouter = defineRouter({
       return `User ${env.meta.user.id} deleted`;
     }),
 }));
-
 ```
 
 ### 错误处理
@@ -487,6 +497,21 @@ export type AppRoutes = RoutesOf<typeof app>;
 > 注意: 对于 `tsdkarc-x/scripts` 功能, 需要移除 package.json 中的 TypeScript@7 依赖
 
 点击查看 [Tanstack Example](../examples/tanstack-example/)
+
+**Q: 为什么 `tsdkarc-x/scripts` 不支持 TS7？**
+
+`tsdkarc-x/scripts` 依赖 TypeScript 提供的 Compiler API，而截至目前，TS7 尚未提供兼容的接口，因此暂时不支持 TS7。
+
+不过，这一限制仅影响 `tsdkarc-x/scripts`，`tsdkarc-x` 的其他功能均可正常使用。
+
+
+**Q: `tsdkarc-x` 和 `tsdk` 是什么关系？**
+
+`tsdk` 是作者最早的端到端类型安全接口开发工具。虽然采用的是基于脚本生成的方案，但在实践过程中遇到了多模块分发与共享等问题，于是诞生了 `tsdkarc`，随后又发展出了体验更好的 `tsdkarc-x`。
+
+没有 `tsdk`，就不会有今天的 `tsdkarc` 和 `tsdkarc-x`。
+
+未来，作者将把主要精力投入到 `tsdkarc` 系列的开发与维护。不过，作为一切的起点，`tsdk` 仍会发布正式的 `1.0` 版本，为它画上一个完整的句号。🥇
 
 ---
 

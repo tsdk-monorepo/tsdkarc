@@ -1,12 +1,14 @@
 # TsdkArc Packages Changelog
 
+## tsdkarc-x@0.1.6
+
+- Support `defineRouter()` no need pass `{}` as `defineRouter({})`
+- Update README
+
 ## tsdkarc-x@0.1.5
 
 - Fix empty middleware type issue
-
-## tsdkarc-x@0.1.4
-
-- Fix empty middleware type issue
+- Update README
 
 ## tsdkarc-x@0.1.3
 
@@ -15,8 +17,6 @@
 ## tsdkarc-x@0.1.2, tsdkarc@2.0.0-alpha.2, tsdkbundle@0.0.2
 
 - Fix esm bundle output(need `.js` ext for vite)
-
-- Fix `tsdkarc-x/esm` not build
 
 ## tsdkarc-x@0.1.1
 

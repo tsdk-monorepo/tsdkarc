@@ -31,10 +31,7 @@ const authMw = defineMiddleware<{}, RequestMeta>()(async (
 });
 
 // 1. Create router instance
-const appRouter = defineRouter({
-  middlewares: [],
-  modules: [],
-});
+const appRouter = defineRouter();
 
 // 2. Define specific routes
 const userRoutes = appRouter.init((r) => ({
