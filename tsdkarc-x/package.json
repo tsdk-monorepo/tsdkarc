@@ -1,6 +1,6 @@
 {
   "name": "tsdkarc-x",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "Fast, End-to-end type-safe RPC for full-stack TypeScript.",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",

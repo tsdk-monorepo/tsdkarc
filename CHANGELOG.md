@@ -1,8 +1,10 @@
 # TsdkArc Packages Changelog
 
-## tsdkarc-x@0.0.5
+## tsdkarc-x@0.1.0
 
+- Breaking⚠️: Refactor the middleware implementation with better DX
 - Add `"tsdkarc/scripts"' exports
+- Add Tanstack example
 
 ```ts
 import { extractOpenApi, extractAppRoutesTypesFull } from "tsdkarc/scripts";
