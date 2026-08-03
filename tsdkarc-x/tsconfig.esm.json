@@ -7,16 +7,16 @@
     "esModuleInterop": true,
     "declaration": true,
     "noImplicitAny": true,
-    "module": "esnext",
-    "target": "es2018",
+    "module": "ES2015",
+    "target": "ES2015",
     "rootDir": "./src",
     "outDir": "./esm",
-    "lib": ["ESNext", "DOM", "ES2022.Array", "ES2019.Array", "ES2017.Object"],
+    "lib": ["ES2015", "DOM", "ES2022.Array", "ES2019.Array", "ES2017.Object"],
     "incremental": true,
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "resolveJsonModule": true
   },
-  "include": ["./src"],
+  "include": ["./src/"],
   "exclude": ["node_modules"]
 }
