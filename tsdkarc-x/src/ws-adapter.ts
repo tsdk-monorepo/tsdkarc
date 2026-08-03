@@ -1,6 +1,6 @@
 // websocket-adapter.ts
 import { WebSocketServer, WebSocket } from "ws";
-import { IncomingMessage, Server } from "http";
+import { IncomingMessage, Server, createServer } from "http";
 import { ZodError } from "zod";
 import { HttpResponse, RpcError } from "./types";
 import type {
@@ -161,18 +161,16 @@ export class WebSocketAdapter implements TransportAdapter<WsContext> {
 
   start(port: number | string): Promise<void> {
     return new Promise((resolve) => {
-      import("http").then(({ createServer }) => {
-        this.httpServer = createServer();
-        this.httpServer.on("upgrade", (request, socket, head) => {
-          this.wss.handleUpgrade(request, socket, head, (ws) => {
-            this.wss.emit("connection", ws, request);
-          });
+      this.httpServer = createServer();
+      this.httpServer.on("upgrade", (request, socket, head) => {
+        this.wss.handleUpgrade(request, socket, head, (ws) => {
+          this.wss.emit("connection", ws, request);
         });
+      });
 
-        this.httpServer.listen(port, () => {
-          console.log(`🚀 WebSocket Server ready on ws://localhost:${port}`);
-          resolve();
-        });
+      this.httpServer.listen(port, () => {
+        console.log(`🚀 WebSocket Server ready on ws://localhost:${port}`);
+        resolve();
       });
     });
   }
