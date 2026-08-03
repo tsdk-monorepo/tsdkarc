@@ -73,6 +73,7 @@ jobs:
 
       - name: Typecheck and build tsdkarc
         run: |
+          bun i
           cd tsdkarc
           bun i
           bun run checktype
