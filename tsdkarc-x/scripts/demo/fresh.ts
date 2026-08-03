@@ -1,5 +1,9 @@
 // server.ts
-import { DeepFlat, defineMiddleware, defineRouter } from "../../src";
+import {
+  defineMiddleware,
+  defineRouter,
+  MiddlewareExt,
+} from "../../src";
 import { launchApp } from "../../src";
 import { ExpressAdapter } from "../../src/express-adapter";
 import { Request } from "express";
@@ -18,29 +22,34 @@ export const createContext = async (c: Request) => ({
   get token() {
     return c.header("Authorization") || null;
   },
+  get ip() {
+    return "";
+  },
 });
 
-export type BaseCtx = DeepFlat<
-  Awaited<ReturnType<typeof createContext>> & ContextOf<typeof dbModule>
->;
+export type BaseCtx = ContextOf<typeof dbModule>;
+export type RequestMeta = Awaited<ReturnType<typeof createContext>>;
 
-export const authMw = defineMiddleware<BaseCtx>()(async (ctx, next) => {
+
+export const authMw = defineMiddleware<BaseCtx, RequestMeta>()(async (ctx, next) => {
   // 这里校验 ctx.token，拿到用户信息
   return next({ user: { id: "u_1", role: "admin" } });
 });
 
-export const verifyMfaMw = defineMiddleware<{ user: { id: string } }>()(
-  async (ctx, next) => {
-    return next({ mfaPassed: true });
-  }
-);
+export const verifyMfaMw = defineMiddleware<
+  BaseCtx,
+  MiddlewareExt<typeof authMw> & MiddlewareExt<typeof loggerMw>
+>()(async (ctx, next) => {
+  return next({ mfaPassed: true });
+});
 
-export const loggerMw = defineMiddleware<{ ip: string | null }>()(
-  async (ctx, next) => {
-    console.log(`[Access Log] IP: ${ctx.ip}`);
-    return next({ traceId: `req_${Date.now()}` });
-  }
-);
+export const loggerMw = defineMiddleware<
+  BaseCtx,
+  MiddlewareExt<typeof authMw> & RequestMeta
+>()(async ({ ctx, meta }, next) => {
+  console.log(`[Access Log] IP: ${meta.ip}`);
+  return next({ traceId: `req_${Date.now()}` });
+});
 
 const appRouter = defineRouter({
   modules: [dbModule], // 声明依赖
@@ -57,7 +66,7 @@ const userRoutes = appRouter.init((r) => ({
   getProfile: r.query(
     z.object({ includeHistory: z.boolean().default(false) }),
     async (input, env) => {
-      const user = env.ctx.db.findUser("u_1"); // ✅ 类型自动来自 dbModule
+      const user = env.ctx.db.findUser("u_1");
       return { ...user, history: input.includeHistory ? [] : null };
     }
   ),
@@ -66,7 +75,7 @@ const userRoutes = appRouter.init((r) => ({
     (input) => `Theme changed to ${input.theme}`
   ),
   updatePassword: r
-    .use(verifyMfaMw) // 只有这个路由会多经过一次 MFA 校验
+    .use(verifyMfaMw)
     .mutate(z.object({ newPwd: z.string().min(8) }), async (input, env) => {
       if (!env.meta.mfaPassed) throw new RpcError("FORBIDDEN", "MFA Failed");
       return "Password updated securely";
