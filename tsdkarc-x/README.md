@@ -493,7 +493,10 @@ OK
 
 **Q: How do I run `tsdkarc-x` with Tanstack Router?**
 
+> Note: for `tsdkarc-x/scripts` feature, removed TypeScript@7
+
 See the [Tanstack Example](../examples/tanstack-example/).
+
 
 ---
 

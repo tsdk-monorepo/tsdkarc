@@ -483,6 +483,8 @@ export type AppRoutes = RoutesOf<typeof app>;
 
 **Q: 如何在 Tanstack Router 中运行？**
 
+> 注意: 对于 `tsdkarc-x/scripts` 功能, 需要移除 package.json 中的 TypeScript@7 依赖
+
 点击查看 [Tanstack Example](../examples/tanstack-example/)
 
 ---
