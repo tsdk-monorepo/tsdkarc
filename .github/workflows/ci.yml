@@ -100,7 +100,7 @@ jobs:
         working-directory: tsdkarc-x
 
       - name: Typecheck
-        run: rm -rf node_modules/tsdkarc && cp -r ../tsdkarc node_modules/tsdkarc && bun run checktype
+        run: bun run checktype
         working-directory: tsdkarc-x
 
       - name: Build
