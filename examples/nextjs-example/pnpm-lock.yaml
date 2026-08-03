@@ -24,8 +24,11 @@ importers:
         specifier: next
         version: 2.0.0-alpha.1
       tsdkarc-x:
-        specifier: 0.0.4
-        version: 0.0.4(@tanstack/react-query@5.101.4(react@19.2.4))(swr@2.4.2(react@19.2.4))(tsdkarc@2.0.0-alpha.1)
+        specifier: 0.1.2
+        version: 0.1.2(@tanstack/react-query@5.101.4(react@19.2.4))(swr@2.4.2(react@19.2.4))(tsdkarc@2.0.0-alpha.1)
+      xior:
+        specifier: ^0.8.3
+        version: 0.8.3
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4
@@ -1884,8 +1887,8 @@ packages:
   tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
 
-  tsdkarc-x@0.0.4:
-    resolution: {integrity: sha512-3+67NJnbAc461W9YUyl5Z+4djBDlJb/UAwUTlQZ2U+wNh9ZgvfwcqnPaZV+QdZ86g1R4DkJlxnXxB/9ubflLvw==}
+  tsdkarc-x@0.1.2:
+    resolution: {integrity: sha512-agI3RfFjTNJ3rcPYTwzRlccZ74cQ78sx7BZti/TMQDReix9FTcdGnuhN1zXMyOaszHlQog0h1beXqI0sUTs3Fg==}
     peerDependencies:
       '@hono/node-server': ^2.0.11
       '@hono/swagger-ui': ^0.6.1
@@ -4046,7 +4049,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdkarc-x@0.0.4(@tanstack/react-query@5.101.4(react@19.2.4))(swr@2.4.2(react@19.2.4))(tsdkarc@2.0.0-alpha.1):
+  tsdkarc-x@0.1.2(@tanstack/react-query@5.101.4(react@19.2.4))(swr@2.4.2(react@19.2.4))(tsdkarc@2.0.0-alpha.1):
     dependencies:
       '@tanstack/react-query': 5.101.4(react@19.2.4)
       tsdkarc: 2.0.0-alpha.1

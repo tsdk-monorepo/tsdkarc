@@ -5,15 +5,15 @@ import { RpcError } from "./utils";
 
 export { RpcError, isRpcError } from "./utils";
 
+const defaultAxiosInstance = axios.create();
+
 export interface RequestOptions
   extends Omit<
     AxiosRequestConfig,
     "url" | "method" | "data" | "params" | "baseURL"
   > {}
 
-export interface ClientConfig {
-  baseURL?: string;
-  headers?: Record<string, string>;
+export interface ClientConfig extends AxiosRequestConfig {
   getHeaders?: () => Promise<Record<string, string>> | Record<string, string>;
   axiosInstance?: AxiosInstance;
 }
@@ -157,18 +157,24 @@ async function* readSSE<O>(
 
 async function executeRequest(
   baseURL: string,
-  cfg: ClientConfig,
+  {
+    axiosInstance,
+    getHeaders,
+    headers: _headers = {},
+    ...restOpts
+  }: ClientConfig,
   pathSegments: string[],
   kind: RouteKind,
   input: unknown,
   reqOpts: RequestOptions
 ): Promise<unknown> {
   const url = `${baseURL}/${pathSegments.join("/")}`;
-  const dynamicHeaders = cfg.getHeaders ? await cfg.getHeaders() : {};
-  const headers = { ...cfg.headers, ...dynamicHeaders, ...reqOpts.headers };
+  const dynamicHeaders = getHeaders ? await getHeaders() : {};
+  const headers = { ..._headers, ...dynamicHeaders, ...reqOpts.headers };
 
   const axiosConfig: AxiosRequestConfig = {
     ...reqOpts,
+    ...restOpts,
     url,
     headers,
     method: kind === "query" || kind === "plain" ? "GET" : "POST",
@@ -183,7 +189,7 @@ async function executeRequest(
 
   if (kind === "stream") axiosConfig.responseType = "stream";
 
-  const http = cfg.axiosInstance ?? axios;
+  const http = axiosInstance ?? defaultAxiosInstance;
 
   try {
     const res = await http.request(axiosConfig);

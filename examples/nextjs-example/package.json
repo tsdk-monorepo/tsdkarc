@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "PORT=3015 next build",
     "start": "PORT=3015 next start",
     "lint": "eslint"
   },
@@ -13,8 +13,9 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "tsdkarc": "next",
-    "tsdkarc-x": "0.1.1",
-    "swr": "^2.4.2"
+    "tsdkarc-x": "0.1.2",
+    "swr": "^2.4.2",
+    "xior": "^0.8.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

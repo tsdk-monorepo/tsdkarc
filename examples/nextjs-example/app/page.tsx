@@ -1,4 +1,4 @@
-import { api } from "@/server/client";
+import { api } from "@/tsdkarc/client";
 import Image from "next/image";
 
 export default async function Home() {
