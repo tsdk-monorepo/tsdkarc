@@ -1,8 +1,12 @@
 # TsdkArc Packages Changelog
 
+## tsdkarc-x@0.1.5
+
+- Fix empty middleware type issue
+
 ## tsdkarc-x@0.1.4
 
-- Update README
+- Fix empty middleware type issue
 
 ## tsdkarc-x@0.1.3
 

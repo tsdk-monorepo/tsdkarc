@@ -1,6 +1,6 @@
 {
   "name": "tsdkarc-x",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Fast, End-to-end type-safe RPC for full-stack TypeScript.",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
@@ -111,7 +111,7 @@
     "@koa/router": "^15.4.0",
     "@koa/bodyparser": "^6.1.0",
     "@tanstack/react-query": "^5.101.4",
-    "swr": "^2.4.2",
+    "swr": "^2.5.0",
     "@koa/multer": "^4.0.0",
     "react": "^19.2.4",
     "@hono/swagger-ui": "^0.6.1",
@@ -125,7 +125,7 @@
     "fast-glob": "^3.3.3"
   },
   "peerDependencies": {
-    "swr": "^2.4.2",
+    "swr": "^2.5.0",
     "@tanstack/react-query": "^5.101.4",
     "koa": "^3.1.2",
     "express": "^5.2.1",
@@ -137,11 +137,15 @@
     "hono": "^4.12.32",
     "vue": "^3.5.40",
     "@tanstack/vue-query": "^5.101.4",
-    "tsdkarc": "2.0.0-alpha.1"
+    "tsdkarc": "2.0.0-alpha.1",
+    "typescript": "^5"
   },
   "peerDependenciesMeta": {
     "tsdkarc": {
       "optional": false
+    },
+    "typescript": {
+      "optional": true
     },
     "swr": {
       "optional": true

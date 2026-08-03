@@ -204,7 +204,7 @@ const userRoutes = appRouter.init((r) => ({
 
 ### Middleware & Request Context
 
-In `tsdkarc-x`, we clearly separate global singletons injected by DI (`ctx`) from request-level state (`meta`). With built-in type extraction tools (like `MiddlewareExt`), you can compose middlewares like building blocks while maintaining strict type safety.
+In `tsdkarc-x`, we clearly separate global singletons injected by DI (`ctx`) from request-level state (`meta`). With built-in type extraction tools (like `MiddlewareExt` / `MiddlewareNextMeta`), you can compose middlewares like building blocks while maintaining strict type safety.
 
 ```ts
 import { defineMiddleware, MiddlewareExt, MiddlewareNextMeta } from "tsdkarc-x";

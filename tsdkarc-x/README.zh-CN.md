@@ -200,7 +200,7 @@ const userRoutes = appRouter.init((r) => ({
 
 ### 中间件与请求上下文
 
-在 `tsdkarc-x` 中，我们将依赖注入的全局实例（`ctx`）与请求级别的状态（`meta`）做了明确区分。通过搭配内置的类型提取工具（如 `MiddlewareExt`），你可以像搭积木一样组合中间件，并保持严格的类型安全。
+在 `tsdkarc-x` 中，我们将依赖注入的全局实例（`ctx`）与请求级别的状态（`meta`）做了明确区分。通过搭配内置的类型提取工具（如 `MiddlewareExt` / `MiddlewareNextMeta`），你可以像搭积木一样组合中间件，并保持严格的类型安全。
 
 ```ts
 import { defineMiddleware, MiddlewareExt, MiddlewareNextMeta } from "tsdkarc-x";

@@ -26,14 +26,13 @@ export interface RpcErrorIssue {
  */
 export type _NoInfer<T> = [T][T extends any ? 0 : never];
 
-/** Validates an array of middlewares to ensure each one's requirements are met by the previous ones. */
 export type ValidateMiddlewareChain<
   Ms extends readonly Middleware<any, any, any>[],
   Acc extends object = Ms extends readonly [
     Middleware<any, infer In extends object, any>,
     ...any[]
   ]
-    ? In
+    ? In // Seed with the first middleware's requirements
     : {}
 > = Ms extends readonly [
   Middleware<any, infer Req, infer Ext>,
@@ -131,7 +130,7 @@ export type FoldMiddlewares<
     Middleware<any, infer In extends object, any>,
     ...any[]
   ]
-    ? In // <-- SEED WITH FIRST MIDDLEWARE'S TInMeta
+    ? In // Seed with the first middleware's requirements
     : {}
 > = Ms extends readonly [
   Middleware<any, any, infer Ext extends object>,
@@ -290,13 +289,19 @@ export interface RouteBuilder<AppCtx extends object, Meta extends object> {
    */
   use: <TReq extends object, TExt extends object>(
     mw: Middleware<AppCtx, TReq, TExt> &
-      ([Meta] extends [_NoInfer<TReq>]
+      // If Meta has no keys (empty), skip the check. Otherwise, enforce TReq.
+      ([keyof Meta] extends [never]
+        ? unknown
+        : [Meta] extends [_NoInfer<TReq>]
         ? unknown
         : {
             __error_Missing_Required_Meta: _NoInfer<TReq>;
             __provided_Meta_Has_Only: Meta;
           })
-  ) => RouteBuilder<AppCtx, Simplify<Meta & TExt>>;
+  ) => RouteBuilder<
+    AppCtx,
+    Simplify<([keyof Meta] extends [never] ? TReq : Meta) & TExt>
+  >;
 
   // --- QUERY / MUTATION / STREAM / UPLOAD unchanged below ---
   query<TInput, TOutput>(
