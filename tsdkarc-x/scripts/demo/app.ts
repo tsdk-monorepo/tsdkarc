@@ -69,6 +69,13 @@ export const verifyMfaMw = defineMiddleware<
   return next({ mfaPassed: meta.user.role === "admin" });
 });
 
+export const verifyMfaMwWithTypeError = defineMiddleware<
+  AppCtx,
+  MiddlewareNextMeta<typeof authMw> & { extraField: number }
+>()(async ({ meta, ctx }, next) => {
+  return next({ mfaPassed: meta.user.role === "admin" });
+});
+
 /**
  * Logs the request and fires a background alert email without blocking
  * the response, using ctx.sendBackgroundAlert + waitUntil.

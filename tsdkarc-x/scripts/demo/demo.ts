@@ -4,7 +4,12 @@ import { RpcError, type RoutesOf, type InferRouteTree } from "../../src/types";
 import { HonoAdapter } from "../../src/hono-adapter";
 import { ExpressAdapter } from "../../src/express-adapter";
 import { apiReference } from "@scalar/express-api-reference";
-import { appRouter, createContext, verifyMfaMw } from "./app";
+import {
+  appRouter,
+  createContext,
+  verifyMfaMw,
+  verifyMfaMwWithTypeError,
+} from "./app";
 import mockRoutes from "../routes";
 import { extractOpenApi } from "../../src/scripts/openapi";
 
@@ -61,7 +66,16 @@ export const userRoutes = appRouter.init((r, ctx) => ({
 
   // ✅ Feature D: Route-Level Middleware & Mutation
   updatePassword: r
-    .use(verifyMfaMw) // 🌟 Granular middleware only for this endpoint!
+    .use(verifyMfaMw)
+    .mutate(z.object({ newPwd: z.string().min(8) }), async (input, env) => {
+      // Strict types check: env.meta now has `mfaPassed: boolean`
+      if (!env.meta.mfaPassed) throw new RpcError("FORBIDDEN", "MFA Failed");
+      return "Password updated securely";
+    }),
+
+  updatePassword2: r
+    // @ts-expect-error
+    .use(verifyMfaMwWithTypeError)
     .mutate(z.object({ newPwd: z.string().min(8) }), async (input, env) => {
       // Strict types check: env.meta now has `mfaPassed: boolean`
       if (!env.meta.mfaPassed) throw new RpcError("FORBIDDEN", "MFA Failed");
