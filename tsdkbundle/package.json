@@ -41,7 +41,7 @@
   "devDependencies": {
     "@types/bun": "latest",
     "@types/node": "^25.5.0",
-    "typescript": "^7",
+    "typescript": "6",
     "pg": "^8.20.0",
     "drizzle-orm": "^0.45.2",
     "dotenv": "^17.3.1",

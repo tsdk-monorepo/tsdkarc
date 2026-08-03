@@ -40,7 +40,7 @@
     "tsdk"
   ],
   "devDependencies": {
-    "typescript": "^7",
+    "typescript": "6",
     "@tsconfig/recommended": "^1.0.10",
     "vitest": "^3.2.4",
     "concurrently": "^10.0.3",
