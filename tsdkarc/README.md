@@ -131,7 +131,7 @@ Deep merging is only performed if both conflicting fields are plain objects. Arr
 
 **What is the relationship between tsdkarc-x and tsdkarc?**
 
-tsdkarc-x depends on the core features of tsdkarc. Also, [`tsdkarc-x`](https://npmjs.com/package/tsdkarc-x) is an end-to-end (frontend to backend) type-safe development library built on top of tsdkarc.
+tsdkarc-x depends on the core features of tsdkarc. Also, [`tsdkarc-x`](https://npmjs.com/package/tsdkarc-x) is an end-to-end (backend to frontend) type-safe development library built on top of tsdkarc.
 
 ## API Reference
 

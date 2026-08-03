@@ -24,10 +24,10 @@
 
 ## Examples
 
-- [Next.js Example](../examples/nextjs-example/)
-- [Minimal Express.js Example](../examples/minimal-express/)
-- [Minimal Hono.js Example](../examples/minimal-hono/)
-- [Tanstack Example](../examples/tanstack-example/)
+- [Next.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/nextjs-example/)
+- [Minimal Express.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/minimal-express/)
+- [Minimal Hono.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/minimal-hono/)
+- [Tanstack Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/tanstack-example/)
 
 Want more examples? [Request one](https://github.com/tsdk-monorepo/tsdkarc/issues).
 
@@ -461,7 +461,7 @@ No. You only need to replace `transport` and `createContext` inside `launchApp`.
 
 **Q: How do I run `tsdkarc-x` in Next.js?**
 
-See the [Next.js Example](../examples/nextjs-example/).
+See the [Next.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/nextjs-example/).
 
 Or follow these steps:
 
@@ -515,7 +515,7 @@ OK
 
 > Note: for `tsdkarc-x/scripts` feature, removed TypeScript@7
 
-See the [Tanstack Example](../examples/tanstack-example/).
+See the [Tanstack Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/tanstack-example/).
 
 **Q: Why doesn't `tsdkarc-x/scripts` support TS7?**
 

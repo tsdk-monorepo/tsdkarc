@@ -24,10 +24,10 @@
 
 ## Examples
 
-- [Next.js Example](../examples/nextjs-example/)
-- [Minimal Express.js Example](../examples/minimal-express/)
-- [Minimal Hono.js Example](../examples/minimal-hono/)
-- [Tanstack Example](../examples/tanstack-example/)
+- [Next.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/nextjs-example/)
+- [Minimal Express.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/minimal-express/)
+- [Minimal Hono.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/minimal-hono/)
+- [Tanstack Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/tanstack-example/)
 
 Want more examples? [Request one](https://github.com/tsdk-monorepo/tsdkarc/issues).
 
@@ -455,7 +455,7 @@ Multipart FormData 的字段在网络传输中均为字符串形式，使用 `z.
 
 **Q: 如何在 Next.js 中运行？**
 
-点击查看 [Next.js Example](../examples/nextjs-example/)
+点击查看 [Next.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/nextjs-example/)
 
 或者按照下列步骤：
 
@@ -504,7 +504,7 @@ export type AppRoutes = RoutesOf<typeof app>;
 
 > 注意: 对于 `tsdkarc-x/scripts` 功能, 需要移除 package.json 中的 TypeScript@7 依赖
 
-点击查看 [Tanstack Example](../examples/tanstack-example/)
+点击查看 [Tanstack Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/tanstack-example/)
 
 **Q: 为什么 `tsdkarc-x/scripts` 不支持 TS7？**
 

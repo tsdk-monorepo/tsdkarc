@@ -127,7 +127,7 @@ console.log(app.graph().formatted);
 
 **tsdkarc-x 和 tsdkarc 什么关系？**
 
-tsdkarc-x 依赖 tsdkarc 的核心特性，而且[`tsdkarc-x`](https://npmjs.com/package/tsdkarc-x) 是一款基于 tsdkarc 特性开发的前端到到后端（端到端）类型安全开发库。
+tsdkarc-x 依赖 tsdkarc 的核心特性，而且[`tsdkarc-x`](https://npmjs.com/package/tsdkarc-x) 是一款基于 tsdkarc 特性开发的后端到前端（端到端）类型安全开发库。
 
 ## API 参考
 
