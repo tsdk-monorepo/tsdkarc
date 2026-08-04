@@ -83,6 +83,7 @@ jobs:
             echo "::group::Building $dir"
             cd "$dir"
             npm install --force
+            npm install tsdkarc-x@latest --force
             npm run build
             cd - > /dev/null
             echo "::endgroup::"
