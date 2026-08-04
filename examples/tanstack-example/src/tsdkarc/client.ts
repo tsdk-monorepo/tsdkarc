@@ -3,10 +3,9 @@ import { createClient } from "tsdkarc-x/client";
 import type { AppRoutes } from "./main";
 import axios from "xior";
 
-const baseURL =
+export const api = createClient<AppRoutes>(
   typeof window === "undefined"
     ? `http://localhost:${process.env.PORT || 3001}/api/arcx`
-    : `/api/arcx`;
-
-export const api = createClient<AppRoutes>(baseURL);
+    : `/api/arcx`
+);
 // export const apiSwr = createSwrClient<AppRoutes>(api);
