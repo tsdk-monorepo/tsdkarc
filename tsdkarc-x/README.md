@@ -27,7 +27,6 @@
 - [Next.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/nextjs-example/)
 - [Minimal Express.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/minimal-express/)
 - [Minimal Hono.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/minimal-hono/)
-- [Tanstack Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/tanstack-example/)
 
 Want more examples? [Request one](https://github.com/tsdk-monorepo/tsdkarc/issues).
 
@@ -508,14 +507,7 @@ export type AppRoutes = RoutesOf<typeof app>;
 
 ```
 OK
-
 ```
-
-**Q: How do I run `tsdkarc-x` with Tanstack Router?**
-
-> Note: for `tsdkarc-x/scripts` feature, removed TypeScript@7
-
-See the [Tanstack Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/tanstack-example/).
 
 **Q: Why doesn't `tsdkarc-x/scripts` support TS7?**
 

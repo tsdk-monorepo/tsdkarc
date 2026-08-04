@@ -27,7 +27,6 @@
 - [Next.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/nextjs-example/)
 - [Minimal Express.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/minimal-express/)
 - [Minimal Hono.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/minimal-hono/)
-- [Tanstack Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/tanstack-example/)
 
 Want more examples? [Request one](https://github.com/tsdk-monorepo/tsdkarc/issues).
 
@@ -499,12 +498,6 @@ export type AppRoutes = RoutesOf<typeof app>;
 ```
 
 3. 访问 `http://localhost:3000/api/neat/users/health` 查看结果
-
-**Q: 如何在 Tanstack Router 中运行？**
-
-> 注意: 对于 `tsdkarc-x/scripts` 功能, 需要移除 package.json 中的 TypeScript@7 依赖
-
-点击查看 [Tanstack Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/tanstack-example/)
 
 **Q: 为什么 `tsdkarc-x/scripts` 不支持 TS7？**
 
