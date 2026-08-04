@@ -25,6 +25,10 @@ jobs:
           # fetch-depth 0 needed so git diff can compare against base branch
           fetch-depth: 0
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
       - name: Setup bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -78,8 +82,8 @@ jobs:
             [ -z "$dir" ] && continue
             echo "::group::Building $dir"
             cd "$dir"
-            bun install
-            bun run build
+            npm install
+            npm run build
             cd - > /dev/null
             echo "::endgroup::"
           done
