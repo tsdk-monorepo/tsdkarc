@@ -15,7 +15,6 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   plugins: [
-    tailwindcss(),
     esmExternalRequirePlugin({
       external: ["typescript"],
     }),
@@ -23,6 +22,7 @@ export default defineConfig({
       srcDirectory: "src",
     }),
     viteReact(),
+    tailwindcss(),
     nitro(),
   ],
 });
