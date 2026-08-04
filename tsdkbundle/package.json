@@ -46,7 +46,7 @@
     "drizzle-orm": "^0.45.2",
     "dotenv": "^17.3.1",
     "concurrently": "^10.0.3",
-    "@tsconfig/recommended": "^1.0.10",
+    "@tsconfig/recommended": "^1.0.13",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "fast-glob": "^3.3.3"
