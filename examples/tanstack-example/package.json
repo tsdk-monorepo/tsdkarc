@@ -28,7 +28,7 @@
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^6.0.1",
     "nitro": "^3.0.260311-beta",
-    "tailwindcss": "^4.2.2",
+    "tailwindcss": "^4.3.3",
     "vite": "^8.2.0",
     "@tsconfig/recommended": "^1.0.13"
   }
