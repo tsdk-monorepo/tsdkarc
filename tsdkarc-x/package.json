@@ -85,7 +85,7 @@
   },
   "dependencies": {
     "zod": "^4.4.3",
-    "xior": "^0.8.3"
+    "xior": "^0.8.4"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

@@ -15,7 +15,7 @@
     "tsdkarc": "next",
     "tsdkarc-x": "0.1.6",
     "swr": "^2.5.0",
-    "xior": "^0.8.3"
+    "xior": "^0.8.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
