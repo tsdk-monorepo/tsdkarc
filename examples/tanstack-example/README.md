@@ -1,5 +1,13 @@
 # TanStack Start - Basic Example
 
+## Create a new project based on this example
+
+```bash
+npx gitpick tsdk-monorepo/tsdkarc/tree/main/examples/tanstack-example tanstack-example
+```
+
+## Introduction
+
 This is the basic TanStack Start example, demonstrating the fundamentals of building applications with TanStack Router and TanStack Start.
 
 - [TanStack Router Docs](https://tanstack.com/router)
