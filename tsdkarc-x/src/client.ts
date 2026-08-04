@@ -161,6 +161,7 @@ async function executeRequest(
     axiosInstance,
     getHeaders,
     headers: _headers = {},
+    baseURL: _cfgBaseURL, // strip: url below is already fully-qualified
     ...restOpts
   }: ClientConfig,
   pathSegments: string[],

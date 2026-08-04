@@ -24,7 +24,7 @@ import type { ResolvedProject } from "./types";
 async function isPortInUse(port: number): Promise<boolean> {
   try {
     const conn = await Bun.connect({
-      hostname: "127.0.0.1",
+      hostname: "localhost",
       port,
       socket: { data() {}, open() {}, close() {}, error() {} },
     });
