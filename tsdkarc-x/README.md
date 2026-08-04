@@ -92,6 +92,14 @@ await fetch("http://localhost:3000/api/users/health")
 ```ts
 // ...previous code
 
+// Generate OpenAPI JSON result
+const openapi = extractOpenApi(
+  app.routes,
+  {
+    info: { title: "API", version: "1.0.0" },
+  },
+  { entryFile: "./server.ts" }
+);
 // Visit openapi.json: http://localhost:3000/api/openapi
 transport.app.get(`/api/openapi`, async (req, res) => {
   res.json(openapiResult);
