@@ -218,22 +218,9 @@ jobs:
           name: dist-tsdkarc-x-lib
           path: tsdkarc-x/lib
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist-tsdkbundle-esm
-          path: tsdkbundle/esm
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist-tsdkbundle-lib
-          path: tsdkbundle/lib
-
       - name: Install tsdkarc dependencies
         run: bun install
         working-directory: tsdkarc
-
-      - name: Install tsdkbundle dependencies
-        run: bun install
-        working-directory: tsdkbundle
 
       - name: Install tsdkarc-x dependencies
         run: bun install
@@ -248,8 +235,6 @@ jobs:
         run: |
           rm -rf node_modules/tsdkarc
           cp -r ../tsdkarc node_modules/tsdkarc
-          rm -rf node_modules/tsdkbundle
-          cp -r ../tsdkbundle node_modules/tsdkbundle
         working-directory: tsdkarc-x
 
       - name: Install e2e-tests dependencies
