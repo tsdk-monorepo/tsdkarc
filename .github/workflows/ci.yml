@@ -204,7 +204,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: dist-tsdkarc-esm
-          path: tsdkarc-x/esm
+          path: tsdkarc/esm
       - uses: actions/download-artifact@v4
         with:
           name: dist-tsdkarc-lib
