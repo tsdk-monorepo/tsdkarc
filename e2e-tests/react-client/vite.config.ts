@@ -11,6 +11,6 @@ export default defineConfig({
   plugins: [react(), vue(), tailwindcss()],
   resolve: {
     // Forces Vite to always resolve these libraries to the root node_modules version
-    dedupe: ["react", "react-dom", "tsdkarc", "tsdkarc-x", "vue"],
+    dedupe: ["react", "react-dom", "vue"],
   },
 });
