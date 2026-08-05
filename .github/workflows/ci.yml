@@ -239,7 +239,7 @@ jobs:
         run: bun install
         working-directory: tsdkarc-x
 
-      - name: Force-link local file: deps into tsdkarc-x
+      - name: Force-link local file deps into tsdkarc-x
         # tsdkarc-x's own devDependencies "tsdkarc" and "tsdkbundle" are
         # file:../X protocol. Bun's file: resolution does not reliably
         # pick up freshly rebuilt esm/lib content in this repo (see the
