@@ -1,5 +1,5 @@
-import { defineRouter, launchApp, type RoutesOf } from "tsdkarc-x";
-import { FetchAdapter, toFetchHandler } from "tsdkarc-x/fetch";
+import { defineRouter, launchApp, type RoutesOf } from "../../esm"; // 'tsdkarc-x'
+import { FetchAdapter, toFetchHandler } from "../../esm/fetch-adapter"; // 'tsdkarc-x/fetch'
 
 // 1. Create router instance
 const appRouter = defineRouter({});
@@ -23,7 +23,7 @@ const fetchHandler = toFetchHandler(transport);
 // @ts-ignore
 const server = Bun.serve({
   port: 3002,
-// @ts-ignore
+  // @ts-ignore
   fetch(req) {
     return fetchHandler(req);
   },
