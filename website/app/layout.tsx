@@ -150,6 +150,14 @@ export default function RootLayout({
 
               <div className="flex items-center gap-5 md:gap-8">
                 <NavLink
+                  href="/llms.txt"
+                  activeClassName="text-black!"
+                  className={`flex items-center gap-2 text-sm font-medium transition-all active:scale-95 text-blue-600 hover:text-slate-500`}>
+                  <span className='text-xl'>✨</span>
+                  <span className="hidden sm:inline">LLMs.txt</span>
+                  <span className="sm:hidden">LLMs.txt</span>
+                </NavLink>
+                <NavLink
                   href="/docs"
                   activeClassName="text-black!"
                   className={`flex items-center gap-2 text-sm font-medium transition-all active:scale-95 text-gray-500 hover:text-black`}>

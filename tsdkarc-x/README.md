@@ -426,7 +426,7 @@ register: r.mutate(z.object({ id: z.string() }), async (input, env) => {
 No need to modify route logic. Just replace the `transport` adapter in `launchApp`.
 
 ```ts
-import { HonoAdapter } from "tsdkarc-x";
+import { HonoAdapter } from "tsdkarc-x/hono";
 
 export const app = launchApp({
   basePath: "/api",

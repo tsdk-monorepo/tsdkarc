@@ -421,7 +421,7 @@ register: r.mutate(z.object({ id: z.string() }), async (input, env) => {
 无需修改路由逻辑，只需在 `launchApp` 中替换 `transport` 适配器。
 
 ```ts
-import { HonoAdapter } from "tsdkarc-x";
+import { HonoAdapter } from "tsdkarc-x/hono";
 
 export const app = launchApp({
   basePath: "/api",

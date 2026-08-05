@@ -110,6 +110,12 @@ export default function DocsView({
               </button>
             );
           })}
+          <a
+            href="/llms.txt"
+            className={`whitespace-nowrap md:whitespace-normal text-left px-4 md:pr-0 py-2 text-sm transition-all active:scale-95 rounded-lg font-medium text-blue-600 hover:text-black hover:bg-gray-50"
+            }`}>
+            LLMs.txt ✨
+          </a>
         </div>
       </aside>
 

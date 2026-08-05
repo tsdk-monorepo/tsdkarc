@@ -41,3 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 public/input.mp4
+public/llms.txt
