@@ -64,10 +64,10 @@ jobs:
       - uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies(root)
-        run: bun i
+        run: bun install --force
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --force
         working-directory: tsdkarc
 
       - name: Typecheck
@@ -118,10 +118,10 @@ jobs:
           path: tsdkarc/lib
 
       - name: Install dependencies(root)
-        run: bun i
+        run: bun install --force
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --force
         working-directory: tsdkarc-x
 
       - name: Typecheck
@@ -219,11 +219,8 @@ jobs:
           name: dist-tsdkarc-x-lib
           path: tsdkarc-x/lib
 
-      - name: Install dependencies(root)
-        run: bun i
-
       - name: Install dependencies
-        run: bun install
+        run: bun install --force
         working-directory: e2e-tests
 
       - name: Install Playwright browsers

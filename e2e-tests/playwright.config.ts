@@ -15,7 +15,7 @@ export default defineConfig({
       stdout: "pipe",
     },
     {
-      command: "bun install && bun run dev", // Removed the cd command
+      command: "bun install --force && bun run dev", // Removed the cd command
       cwd: "./react-client", // Added the working directory property
       url: "http://localhost:5173", // Changed from localhost
       reuseExistingServer: !process.env.CI,
