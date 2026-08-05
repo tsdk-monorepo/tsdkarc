@@ -18,6 +18,7 @@ To manually run the tests:
 bun run server/main.ts
 
 cd react-client && bun run dev
+cd vue-client && bun run dev
 ```
 
 This project was created using `bun init` in bun v1.3.14. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.

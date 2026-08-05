@@ -21,6 +21,13 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       stdout: "pipe",
     },
+    {
+      command: "bun install --force && bun run dev", // Removed the cd command
+      cwd: "./vue-client", // Added the working directory property
+      url: "http://localhost:5174", // Changed from localhost
+      reuseExistingServer: !process.env.CI,
+      stdout: "pipe",
+    },
   ],
   projects: [
     {

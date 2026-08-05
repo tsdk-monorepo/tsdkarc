@@ -3,6 +3,7 @@ import { test, expect, type Page } from "@playwright/test";
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 // Adjust to your Vite dev server port
 const APP_URL = "http://localhost:5173";
+const VUE_APP_URL = "http://localhost:5174";
 
 /**
  * Each adapter mounts the same 13 test components under its own route
@@ -10,14 +11,16 @@ const APP_URL = "http://localhost:5173";
  * adapters covered without duplicating test bodies.
  */
 const ADAPTERS = [
-  { name: "SWR", basePath: "/test" },
-  { name: "React Query", basePath: "/test/tanstack-query" },
+  { name: "SWR", basePath: "/test", appUrl: APP_URL },
+  { name: "React Query", basePath: "/test/tanstack-query", appUrl: APP_URL },
+  { name: "Vue Query", basePath: "/test/vue-query", appUrl: VUE_APP_URL },
 ];
 
 for (const adapter of ADAPTERS) {
   test.describe(`PawShare ${adapter.name} adapter E2E tests`, () => {
-    const goto = (page: Page, suffix: string) =>
-      page.goto(`${APP_URL}/#${adapter.basePath}/${suffix}`);
+    const goto = (page: Page, suffix: string) => {
+      return page.goto(`${adapter.appUrl}/#${adapter.basePath}/${suffix}`);
+    };
 
     test("Health: Plain handler returns expected text", async ({ page }) => {
       await goto(page, "health");

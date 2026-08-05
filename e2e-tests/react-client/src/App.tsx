@@ -4,6 +4,8 @@ import type { AppRoutes } from "../../server/main";
 import { createClient } from "tsdkarc-x/client";
 import { createSwrClient } from "tsdkarc-x/react/swr";
 import { createReactQueryClient } from "tsdkarc-x/react/query";
+import { createVueQueryClient } from "tsdkarc-x/vue/query";
+
 import { useHashRouter } from "./router";
 
 const config = {
@@ -16,6 +18,8 @@ const config = {
 export const client = createClient<AppRoutes>(config);
 export const hooks = createSwrClient<AppRoutes>(client);
 export const queryHooks = createReactQueryClient<AppRoutes>(client);
+export const vueQueryHooks = createVueQueryClient<AppRoutes>(client);
+
 
 /**
  * Single QueryClient instance for the whole app. Created once at module
@@ -894,15 +898,15 @@ function App() {
     <div className="min-h-screen flex bg-gray-100 font-sans text-gray-900">
       {/* Sidebar Navigation */}
       <nav className="w-64 bg-white border-r border-gray-200 shadow-sm flex flex-col fixed inset-y-0 z-10 overflow-y-auto">
-        <div className="h-16 flex items-center px-6 border-b border-gray-200">
+        <div className="h-16 flex items-center px-6 border-b border-gray-200 justify-between">
           <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
             PawShare Test
           </span>
           <button
             data-testid="resetdata-btn"
-            className={btnClass}
+            className="text-xs px-2 py-1 bg-red-600 rounded-lg text-white cursor-pointer"
             onClick={() => client.paw.resetDb.query()}>
-            Enable Query
+            reset
           </button>
         </div>
 

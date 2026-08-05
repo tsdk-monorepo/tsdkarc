@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 恢复并优化流光动画 */
+@keyframes border-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-border-flow {
+  background-size: 200% 200%;
+  animation: border-flow 8s linear infinite;
+}
+
+@keyframes periodic-shimmer {
+  0% {
+    transform: translateX(-150%) skewX(-15deg);
+    opacity: 0;
+  }
+
+  2% {
+    opacity: 1;
+  }
+
+  15% {
+    transform: translateX(300%) skewX(-15deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(300%) skewX(-15deg);
+    opacity: 0;
+  }
+}
+
+.animate-periodic-shimmer {
+  animation: periodic-shimmer 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
