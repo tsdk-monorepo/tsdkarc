@@ -15,7 +15,7 @@
 
 ## Why use it / Pain points solved
 
-1. **No frontend-backend type gap**: Frontend doesn't need to manually define API types or rely on extra code generation steps. Server input and return types are automatically inferred to the frontend caller.
+1. **No frontend-backend type gap**: Frontend doesn't need to manually define API types or rely on extra code generation steps. Server input and return types are automatically inferred to the frontend caller, Include API call function, and React/Vue hooks(SWR/Tanstack Query).
 2. **No duplicate types & validation**: By integrating Zod, you get runtime validation on the server while directly inferring static types from the Schema (optional). Keeps runtime and static types in sync.
 3. **Messy context & dependency management**: Based on `tsdkarc`'s type-safe DI module system, it automatically infers types for databases, global middlewares, and request-level context. No more passing `any` around or manual type casting.
 4. **Framework lock-in**: Routes and business logic are decoupled from the underlying HTTP framework (like Express or Hono). You don't need to rewrite business code when switching frameworks.
