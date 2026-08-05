@@ -1,4 +1,6 @@
-import { toNextRouteHandlers } from "tsdkarc-x/fetch";
+import { toFetchHandler } from "tsdkarc-x/fetch";
 import { transport } from "@/tsdkarc/main";
 
-export const { GET, POST } = toNextRouteHandlers(transport);
+const handler = toFetchHandler(transport);
+export const GET = handler;
+export const POST = handler;

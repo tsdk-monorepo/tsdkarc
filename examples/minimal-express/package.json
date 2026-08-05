@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "tsdkarc": "^2.0.0-alpha.2",
-    "tsdkarc-x": "^0.1.7",
+    "tsdkarc-x": "^0.1.8",
     "express": "^5.2.1",
     "multer": "^2.2.0",
     "@scalar/express-api-reference": "^0.10.11",

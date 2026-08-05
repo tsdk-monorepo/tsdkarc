@@ -1,18 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { toNextRouteHandlers } from "tsdkarc-x/fetch";
+import { toFetchHandler } from "tsdkarc-x/fetch";
 import { transport } from "@/tsdkarc/main";
 
-const { GET, POST } = toNextRouteHandlers(transport);
+const handler = toFetchHandler(transport);
 
 export const Route = createFileRoute("/api/arcx/$")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        return GET(request);
+        return handler(request);
       },
       POST: async ({ request }) => {
-        return POST(request);
+        return handler(request);
       },
     },
   },

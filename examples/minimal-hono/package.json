@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "tsdkarc": "^2.0.0-alpha.2",
-    "tsdkarc-x": "^0.1.7",
+    "tsdkarc-x": "^0.1.8",
     "hono": "^4.13.0",
     "@hono/node-server": "^2.0.12",
     "@scalar/hono-api-reference": "^0.11.11",

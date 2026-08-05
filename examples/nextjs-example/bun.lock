@@ -10,7 +10,7 @@
         "react-dom": "19.2.4",
         "swr": "^2.5.0",
         "tsdkarc": "latest",
-        "tsdkarc-x": "0.1.7",
+        "tsdkarc-x": "^0.1.8",
         "xior": "^0.8.4",
       },
       "devDependencies": {
@@ -826,9 +826,9 @@
 
     "tsconfig-paths": ["tsconfig-paths@3.15.0", "", { "dependencies": { "@types/json5": "0.0.29", "json5": "1.0.2", "minimist": "1.2.8", "strip-bom": "3.0.0" } }, "sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg=="],
 
-    "tsdkarc": ["tsdkarc@2.0.0-alpha.1", "", {}, "sha512-RVzUUGV/zBQKREl9TuFJvyTbxCJfB2Y0r16xHoAfc9JQofWIIrmHHQUXHxMGFGroqzZF9KmB4NXUKGCYPeA2pQ=="],
+    "tsdkarc": ["tsdkarc@2.0.0", "", {}, "sha512-uZxQVd4bRQAHnmywxNoaqby7pkX85rRwiiUFP2tWFJBzL6MvmmVOBgnRp3M0i1QruJ7nlAUEDD+VKgYjBw+Cpw=="],
 
-    "tsdkarc-x": ["tsdkarc-x@0.1.7", "", { "dependencies": { "xior": "^0.8.3", "zod": "^4.4.3" }, "peerDependencies": { "@hono/node-server": "^2.1.0", "@hono/swagger-ui": "^0.6.1", "@scalar/express-api-reference": "^0.10.11", "@scalar/hono-api-reference": "^0.11.11", "@tanstack/react-query": "^5.101.4", "@tanstack/vue-query": "^5.101.4", "express": "^5.2.1", "hono": "^4.13.0", "koa": "^3.1.2", "multer": "^2.2.0", "swr": "^2.5.0", "tsdkarc": "2.0.0-alpha.1", "typescript": "^5", "vue": "^3.5.40" }, "optionalPeers": ["@hono/node-server", "@hono/swagger-ui", "@scalar/express-api-reference", "@scalar/hono-api-reference", "@tanstack/vue-query", "express", "hono", "koa", "multer", "swr", "typescript", "vue"] }, "sha512-34m0KwjcGvZaULWlZWEHxH2653f6qHX8JIcT9R0qkMRpjG1jAQKAXvfwzSat2+o0HK33HXUgCqLsOAgJ8eGVtQ=="],
+    "tsdkarc-x": ["tsdkarc-x@0.1.8", "", { "dependencies": { "xior": "^0.8.4", "zod": "^4.4.3" }, "peerDependencies": { "@hono/node-server": "^2.1.0", "@hono/swagger-ui": "^0.6.1", "@scalar/express-api-reference": "^0.10.11", "@scalar/hono-api-reference": "^0.11.11", "@tanstack/react-query": "^5.101.4", "@tanstack/vue-query": "^5.101.4", "express": "^5.2.1", "hono": "^4.13.0", "koa": "^3.1.2", "multer": "^2.2.0", "swr": "^2.5.0", "tsdkarc": "^2.0.0", "typescript": "^5", "vue": "^3.5.40" }, "optionalPeers": ["@hono/node-server", "@hono/swagger-ui", "@scalar/express-api-reference", "@scalar/hono-api-reference", "@tanstack/vue-query", "express", "hono", "koa", "multer", "swr", "typescript", "vue"] }, "sha512-xlayJaKyDz3um0u7y0gG607+LAnbOiVPhWEKt/KXYiIcVu8M8ImqDkBTANZ8bPaFYl4KKT4yA9N9ADG2fuGYVA=="],
 
     "tslib": ["tslib@2.8.1", "", {}, "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="],
 
@@ -913,8 +913,6 @@
     "next/postcss": ["postcss@8.5.23", "", { "dependencies": { "nanoid": "^3.3.16", "picocolors": "^1.1.1", "source-map-js": "^1.2.1" } }, "sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg=="],
 
     "sharp/semver": ["semver@7.8.5", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA=="],
-
-    "tsdkarc-x/xior": ["xior@0.8.3", "", { "dependencies": { "tiny-lru": "11.4.7" } }, "sha512-yHzIBnpGS3qhSjGnvi5IvLQVPlWXDYmvtaO6TfOaIUMes/6lFnoHL02cdHo5xPj3JUSfEts9Q3hTiVGfnHAh5w=="],
 
     "@next/eslint-plugin-next/@eslint-community/eslint-utils/eslint-visitor-keys": ["eslint-visitor-keys@3.4.3", "", {}, "sha512-wpc+LXeiyiisxPlEkUzU6svyS1frIO3Mgxj1fdy7Pm8Ygzguax2N3Fa/D/ag1WqbOprdI+uY6wMUl8/a2G+iag=="],
 

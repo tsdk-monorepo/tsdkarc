@@ -400,7 +400,7 @@ export const app = launchApp({
 or use fetch adapter for Next.js:
 
 ```ts
-import { FetchAdapter, toNextRouteHandlers } from "tsdkarc-x/fetch";
+import { FetchAdapter, toFetchHandler } from "tsdkarc-x/fetch";
 
 export const transport = new FetchAdapter({
   log: true,
@@ -415,7 +415,9 @@ const app = await launchApp({
 export type AppRoutes = RoutesOf<typeof app>;
 
 // api/arcx/[...paths]/route.ts
-export const { GET, POST } = toNextRouteHandlers(transport);
+const handler = toFetchHandler(transport);
+export const GET = handler;
+export const POST = handler;
 ```
 
 ### Generating Frontend Types and OpenAPI
@@ -489,11 +491,13 @@ Or follow these steps:
 1. Create `project/app/api/arcx/[...tsdkarc]/route.ts`:
 
 ```ts
-import { toNextRouteHandlers } from "tsdkarc-x/fetch";
+import { toFetchHandler } from "tsdkarc-x/fetch";
 import { transport } from "project/server/main";
 
-export const { GET, POST } = toNextRouteHandlers(transport);
-`````
+const handler = toFetchHandler(transport);
+export const GET = handler;
+export const POST = handler;
+```
 
 2. Create `project/server/main.ts`:
 

@@ -12,7 +12,7 @@
         "react": "^19.2.8",
         "swr": "^2.5.0",
         "tsdkarc": "^2.0.0-alpha.2",
-        "tsdkarc-x": "^0.1.7",
+        "tsdkarc-x": "^0.1.8",
         "zod": "^4.4.3",
       },
       "devDependencies": {
@@ -71,7 +71,7 @@
 
     "tsdkarc": ["tsdkarc@2.0.0-alpha.2", "", {}, "sha512-0k01HRRrh4bj8vKSidkKO498toQ0zpv/+k03bxc1P8/iZWQ7cBuNB3mWh7qtaSVhcUGb+ErwDum8IS29kxqP4Q=="],
 
-    "tsdkarc-x": ["tsdkarc-x@0.1.7", "", { "dependencies": { "xior": "^0.8.3", "zod": "^4.4.3" }, "peerDependencies": { "@hono/node-server": "^2.1.0", "@hono/swagger-ui": "^0.6.1", "@scalar/express-api-reference": "^0.10.11", "@scalar/hono-api-reference": "^0.11.11", "@tanstack/react-query": "^5.101.4", "@tanstack/vue-query": "^5.101.4", "express": "^5.2.1", "hono": "^4.13.0", "koa": "^3.1.2", "multer": "^2.2.0", "swr": "^2.5.0", "tsdkarc": "2.0.0-alpha.1", "typescript": "^5", "vue": "^3.5.40" }, "optionalPeers": ["@hono/node-server", "@hono/swagger-ui", "@scalar/express-api-reference", "@scalar/hono-api-reference", "@tanstack/vue-query", "express", "hono", "koa", "multer", "swr", "typescript", "vue"] }, "sha512-IfBGjQFXC+DGz21EkpWo214qcgIKm6O/eGfpFGoJny3Y91k61UEKU4oeHOJhME19OsZxHeu9RjO21VmVYkIRSQ=="],
+    "tsdkarc-x": ["tsdkarc-x@0.1.8", "", { "dependencies": { "xior": "^0.8.3", "zod": "^4.4.3" }, "peerDependencies": { "@hono/node-server": "^2.1.0", "@hono/swagger-ui": "^0.6.1", "@scalar/express-api-reference": "^0.10.11", "@scalar/hono-api-reference": "^0.11.11", "@tanstack/react-query": "^5.101.4", "@tanstack/vue-query": "^5.101.4", "express": "^5.2.1", "hono": "^4.13.0", "koa": "^3.1.2", "multer": "^2.2.0", "swr": "^2.5.0", "tsdkarc": "2.0.0-alpha.1", "typescript": "^5", "vue": "^3.5.40" }, "optionalPeers": ["@hono/node-server", "@hono/swagger-ui", "@scalar/express-api-reference", "@scalar/hono-api-reference", "@tanstack/vue-query", "express", "hono", "koa", "multer", "swr", "typescript", "vue"] }, "sha512-IfBGjQFXC+DGz21EkpWo214qcgIKm6O/eGfpFGoJny3Y91k61UEKU4oeHOJhME19OsZxHeu9RjO21VmVYkIRSQ=="],
 
     "tsdkbundle": ["tsdkbundle@0.0.2", "", { "dependencies": { "minimatch": "^10.2.6" }, "peerDependencies": { "typescript": "^5.0.0" }, "bin": { "bb": "lib/cli.js", "bundle": "lib/cli.js" } }, "sha512-XNrI7n+CsjKsdGhx2BS03x/n0+42X0RjsA3TcPS1hic0C7tH1NzOt6m+jWCzFACCEZrplLTsfYVQJKa+eAjEzw=="],
 

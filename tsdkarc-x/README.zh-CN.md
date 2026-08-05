@@ -394,7 +394,7 @@ export const app = launchApp({
 或者在 Next.js 中使用 `FetchAdapter`:
 
 ```ts
-import { FetchAdapter, toNextRouteHandlers } from "tsdkarc-x/fetch";
+import { FetchAdapter, toFetchHandler } from "tsdkarc-x/fetch";
 
 export const transport = new FetchAdapter({
   log: true,
@@ -409,7 +409,9 @@ const app = await launchApp({
 export type AppRoutes = RoutesOf<typeof app>;
 
 // api/tsdkarc/[...path]/route.ts
-export const { GET, POST } = toNextRouteHandlers(transport);
+const handler = toFetchHandler(transport);
+export const GET = handler;
+export const POST = handler;
 ```
 
 ### 生成前端类型文件与 OpenAPI
@@ -484,10 +486,12 @@ transport.app.use(...); // `app` 是底层的 Hono 应用实例
 1. 创建文件 `project/app/api/arcx/[...tsdkarc]/route.ts`:
 
 ```ts
-import { toNextRouteHandlers } from "tsdkarc-x/fetch";
+import { toFetchHandler } from "tsdkarc-x/fetch";
 import { transport } from "project/server/main";
 
-export const { GET, POST } = toNextRouteHandlers(transport);
+const handler = toFetchHandler(transport);
+export const GET = handler;
+export const POST = handler;
 ```
 
 2. `project/server/main.ts` 内容:

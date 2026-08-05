@@ -12,4 +12,3 @@ const axiosInstance = axios.create({
 });
 
 export const api = createClient<AppRoutes>(baseURL, { axiosInstance });
-// export const apiSwr = createSwrClient<AppRoutes>(api);
