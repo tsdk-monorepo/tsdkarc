@@ -49,9 +49,6 @@ permissions:
   contents: read
 
 jobs:
-  # ... (build-tsdkarc, build-tsdkarc-x, build-tsdkbundle, e2e-tests unchanged)
-
-jobs:
   # ── 1. tsdkarc ──────────────────────────────────────────────────────────────
   build-tsdkarc:
     runs-on: ubuntu-latest
