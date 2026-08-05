@@ -136,6 +136,17 @@ jobs:
         run: bun run test
         working-directory: tsdkarc-x
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-tsdkarc-x-esm
+          path: tsdkarc-x/esm
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-tsdkarc-x-lib
+          path: tsdkarc-x/lib
+          retention-days: 1
+
   # ── 2b. tsdkbundle (depends on tsdkarc, parallel with tsdkarc-x) ────────────
   build-tsdkbundle:
     needs: build-tsdkarc
@@ -179,7 +190,7 @@ jobs:
 
   # ── 3. e2e-tests (depends on tsdkarc-x and tsdkbundle) ───────────────────────
   e2e-tests:
-    needs: [build-tsdkarc-x, build-tsdkbundle]
+    needs: [build-tsdkarc, build-tsdkarc-x, build-tsdkbundle]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -193,7 +204,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: dist-tsdkarc-esm
-          path: tsdkarc/esm
+          path: tsdkarc-x/esm
       - uses: actions/download-artifact@v4
         with:
           name: dist-tsdkarc-lib
