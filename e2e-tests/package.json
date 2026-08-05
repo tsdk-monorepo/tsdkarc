@@ -1,0 +1,27 @@
+{
+  "name": "e2e-tests",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "playwright test -c ./playwright.config.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.57",
+    "@types/bun": "latest",
+    "@types/node": "26.1.2",
+    "playwright": "1.57",
+    "tsdkarc": "file:../tsdkarc",
+    "tsdkarc-x": "file:../tsdkarc-x",
+    "tsdkbundle": "file:../tsdkbundle",
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "@types/multer": "^2.2.0",
+    "@types/express": "^5.0.6",
+    "cors": "^2.8.6",
+    "@types/cors": "^2.8.19"
+  },
+  "peerDependencies": {
+    "typescript": "6"
+  }
+}

@@ -466,6 +466,20 @@ Multipart FormData fields are all strings during network transmission. `z.coerce
 
 No. You only need to replace `transport` and `createContext` inside `launchApp`. The specific route definitions and middleware logic are completely unaffected.
 
+**Q: How do I use Express middleware with the ExpressAdapter?**
+
+```ts
+const transport = new ExpressAdapter();
+transport.app.use(cors()); // `app` is the underlying Express application
+```
+
+**Q: How do I use Hono middleware with the HonoAdapter?**
+
+```ts
+const transport = new HonoAdapter();
+transport.app.use(...) // `app` is the underlying Hono application
+```
+
 **Q: How do I run `tsdkarc-x` in Next.js?**
 
 See the [Next.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/nextjs-example/).
@@ -479,7 +493,7 @@ import { toNextRouteHandlers } from "tsdkarc-x/fetch";
 import { transport } from "project/server/main";
 
 export const { GET, POST } = toNextRouteHandlers(transport);
-```
+`````
 
 2. Create `project/server/main.ts`:
 

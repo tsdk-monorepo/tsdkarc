@@ -140,30 +140,83 @@ function buildQueryParams(
 // ─── TypeScript Heuristic Parser ──────────────────────────────────────────────
 
 /**
- * Compiled once at module load. Matches top-level TS object property shapes:
- *   id: string;
- *   role?: "admin";
- * Avoids recompiling the RegExp on every bestEffortTsToSchema call.
+ * Matches a single `key: value` chunk once brace-depth splitting has already
+ * isolated it. No global/lastIndex state, so it's safe to reuse across calls.
  */
-const TS_PROPERTY_REGEX = /([a-zA-Z0-9_]+)\??\s*:\s*([^;}]+)/g;
+const TS_PROPERTY_LINE_REGEX = /^([a-zA-Z0-9_]+)\??\s*:\s*([\s\S]+)$/;
+
+/**
+ * Splits the top-level `;`-separated members of a TS object-type body,
+ * tracking brace depth so a `;` inside a nested `{ ... }` is never mistaken
+ * for a separator between top-level properties.
+ * @param body string — content strictly between the outermost `{` and `}`
+ * @returns string[] raw `key: value` chunks, one per top-level property
+ */
+function splitTopLevelProperties(body: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (const char of body) {
+    if (char === "{") depth++;
+    else if (char === "}") depth--;
+
+    if (char === ";" && depth === 0) {
+      parts.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  if (current.trim()) parts.push(current);
+  return parts;
+}
+
+/**
+ * Finds the first top-level `{ ... }` object-literal span in `tsType` and
+ * returns its inner content, tracking brace depth so a nested object's
+ * closing brace doesn't end the scan early.
+ * @param tsType string
+ * @returns string | null — inner content, or null if no balanced `{...}` exists
+ */
+function extractOuterObjectBody(tsType: string): string | null {
+  const start = tsType.indexOf("{");
+  if (start === -1) return null;
+
+  let depth = 0;
+  for (let i = start; i < tsType.length; i++) {
+    if (tsType[i] === "{") depth++;
+    else if (tsType[i] === "}") {
+      depth--;
+      if (depth === 0) return tsType.slice(start + 1, i);
+    }
+  }
+  return null; // unbalanced braces — best effort gives up
+}
 
 /**
  * Best-effort converter from a raw TypeScript return type string
  * to a basic OpenAPI JSON Schema properties object.
  * Only handles top-level primitive shapes; nested objects produce `{ type: "object" }`.
+ * Brace depth is tracked throughout, so a nested object's own members are
+ * never mistaken for siblings of the property that contains them.
  */
 function bestEffortTsToSchema(tsType: string | undefined): object {
-  if (!tsType || !tsType.includes("{")) return {};
+  if (!tsType) return {};
+
+  const body = extractOuterObjectBody(tsType);
+  if (body === null) return {};
 
   const properties: Record<string, any> = {};
 
-  // Reset lastIndex before each use — required when reusing a global RegExp across calls.
-  TS_PROPERTY_REGEX.lastIndex = 0;
+  for (const rawChunk of splitTopLevelProperties(body)) {
+    const chunk = rawChunk.trim();
+    if (!chunk) continue;
 
-  let match: RegExpExecArray | null;
-  while ((match = TS_PROPERTY_REGEX.exec(tsType)) !== null) {
-    const key = match[1];
-    const val = match[2].trim();
+    const propMatch = TS_PROPERTY_LINE_REGEX.exec(chunk);
+    if (!propMatch) continue;
+
+    const key = propMatch[1];
+    const val = propMatch[2].trim();
 
     if (val === "string") properties[key] = { type: "string" };
     else if (val === "number") properties[key] = { type: "number" };

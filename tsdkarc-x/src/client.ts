@@ -113,7 +113,8 @@ function toFormData(data: any): FormData {
 async function* readSSE<O>(
   res: AxiosResponse
 ): AsyncGenerator<O, void, unknown> {
-  const data = res.data;
+  const data = res.data || res.response.body;
+
   if (data && typeof data.getReader === "function") {
     const reader = data.getReader();
     const decoder = new TextDecoder();
@@ -151,7 +152,9 @@ async function* readSSE<O>(
       }
     }
   } else {
-    throw new Error("[client] Axios response is not a stream.");
+    throw new Error(
+      `[client] Axios response is not a stream. Received type: ${typeof data}`
+    );
   }
 }
 
@@ -181,7 +184,11 @@ async function executeRequest(
     method: kind === "query" || kind === "plain" ? "GET" : "POST",
   };
 
-  if ((kind === "query" || kind === "plain") && input) {
+  if (
+    (kind === "query" || kind === "plain") &&
+    input !== undefined &&
+    input !== null
+  ) {
     axiosConfig.params = input;
   } else {
     const isMultipart = kind === "upload" || hasFileOrBlob(input);

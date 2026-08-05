@@ -459,6 +459,22 @@ Multipart FormData 的字段在网络传输中均为字符串形式，使用 `z.
 
 不需要。仅需替换 `launchApp` 里的 `transport` 和 `createContext`，具体的路由定义和中间件逻辑完全不受影响。
 
+**Q：如何在 ExpressAdapter 中使用 Express 中间件？**
+
+```ts
+const transport = new ExpressAdapter();
+
+transport.app.use(cors()); // `app` 是底层的 Express 应用实例
+```
+
+**Q：如何在 HonoAdapter 中使用 Hono 中间件？**
+
+```ts
+const transport = new HonoAdapter();
+
+transport.app.use(...); // `app` 是底层的 Hono 应用实例
+```
+
 **Q: 如何在 Next.js 中运行？**
 
 点击查看 [Next.js Example](https://github.com/tsdk-monorepo/tsdkarc/tree/main/examples/nextjs-example/)

@@ -1,5 +1,11 @@
 # TsdkArc Packages Changelog
 
+## tsdkarc-x@0.1.7
+
+- Fix client's stream not working on browser
+- Add enabled option to useQuery to swr hooks
+- Add e2e tests for `swr` / `@tanstack/react-query` hooks
+
 ## tsdkarc-x@0.1.6
 
 - Support `defineRouter()` no need pass `{}` as `defineRouter({})`

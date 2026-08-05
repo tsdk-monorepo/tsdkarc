@@ -1,6 +1,7 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 
 import { createClient, RpcError } from "../src/client";
+
 /**
  * xior is mocked so tests are hermetic and don't depend on real HTTP or the
  * real xior implementation. `isAxiosError` mimics the real library's shape
@@ -124,21 +125,37 @@ describe("query / plain — GET requests", () => {
   });
 
   test(
-    "KNOWN BUG: falsy-but-meaningful query input (e.g. 0) is dropped from params " +
-      "and incorrectly routed into `data` on a GET request, because executeRequest " +
-      "checks `if (... && input)` instead of `input !== undefined`.",
+    "falsy-but-meaningful query input (0, '', false) is still sent as params, " +
+      "not silently dropped (regression test for a fixed bug: the old code used " +
+      '`if (... && input)`, which treated any falsy input as "no input").',
     async () => {
       const http = fakeHttp(async (config) => ({ data: config }));
       const c = client("https://api.example.com", {
         axiosInstance: http as any,
       });
+
       await c.count.query(0);
-      const cfg = http.request.mock.calls[0][0];
-      expect(cfg.method).toBe("GET");
-      expect(cfg.params).toBeUndefined();
-      expect(cfg.data).toBe(0); // demonstrates the bug rather than desired behavior
+      expect(http.request.mock.calls[0][0].params).toBe(0);
+      expect(http.request.mock.calls[0][0].data).toBeUndefined();
+
+      await c.search.query("");
+      expect(http.request.mock.calls[1][0].params).toBe("");
+
+      await c.filter.query(false);
+      expect(http.request.mock.calls[2][0].params).toBe(false);
     }
   );
+
+  test("undefined/null input is still treated as 'no input' and omitted from params", async () => {
+    const http = fakeHttp(async (config) => ({ data: config }));
+    const c = client("https://api.example.com", { axiosInstance: http as any });
+
+    await c.users.query();
+    expect(http.request.mock.calls[0][0].params).toBeUndefined();
+
+    await c.users.query(null);
+    expect(http.request.mock.calls[1][0].params).toBeUndefined();
+  });
 });
 
 describe("mutate — POST requests", () => {

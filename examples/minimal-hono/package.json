@@ -10,7 +10,7 @@
   "dependencies": {
     "tsdkarc": "^2.0.0-alpha.2",
     "tsdkarc-x": "^0.1.6",
-    "hono": "^4.12.32",
+    "hono": "^4.13.0",
     "@hono/node-server": "^2.0.12",
     "@scalar/hono-api-reference": "^0.11.11",
     "@tanstack/react-query": "^5.101.4",
