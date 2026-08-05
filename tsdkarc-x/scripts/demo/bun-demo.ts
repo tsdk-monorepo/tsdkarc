@@ -1,5 +1,5 @@
-import { defineRouter, launchApp, type RoutesOf } from "../../esm"; // 'tsdkarc-x'
-import { FetchAdapter, toFetchHandler } from "../../esm/fetch-adapter"; // 'tsdkarc-x/fetch'
+import { defineRouter, launchApp, type RoutesOf } from "../../src"; // 'tsdkarc-x'
+import { FetchAdapter, toFetchHandler } from "../../src/fetch-adapter"; // 'tsdkarc-x/fetch'
 
 // 1. Create router instance
 const appRouter = defineRouter({});
