@@ -187,8 +187,7 @@ jobs:
       - name: Test
         run: bun run test
         working-directory: tsdkbundle
-
-  # ── 3. e2e-tests (depends on tsdkarc-x and tsdkbundle) ───────────────────────
+  # ── 3. e2e-tests (depends on tsdkarc, tsdkarc-x, and tsdkbundle) ────────────
   e2e-tests:
     needs: [build-tsdkarc, build-tsdkarc-x, build-tsdkbundle]
     runs-on: ubuntu-latest
@@ -219,8 +218,42 @@ jobs:
           name: dist-tsdkarc-x-lib
           path: tsdkarc-x/lib
 
-      - name: Install dependencies
-        run: bun install && cd ../tsdkarc && bun install && cd ../tsdkarc-x && bun install
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkbundle-esm
+          path: tsdkbundle/esm
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkbundle-lib
+          path: tsdkbundle/lib
+
+      - name: Install tsdkarc dependencies
+        run: bun install
+        working-directory: tsdkarc
+
+      - name: Install tsdkbundle dependencies
+        run: bun install
+        working-directory: tsdkbundle
+
+      - name: Install tsdkarc-x dependencies
+        run: bun install
+        working-directory: tsdkarc-x
+
+      - name: Force-link local file: dependencies into tsdkarc-x
+        # Bun's `file:../pkg` resolution does not reliably pick up rebuilt
+        # esm/lib output after the lockfile was generated (see this
+        # package's own `checktype` script, which uses the same
+        # rm -rf + cp -r workaround). Replicate it here so tsdkarc-x
+        # resolves the freshly-downloaded build artifacts at runtime.
+        run: |
+          rm -rf node_modules/tsdkarc
+          cp -r ../tsdkarc node_modules/tsdkarc
+          rm -rf node_modules/tsdkbundle
+          cp -r ../tsdkbundle node_modules/tsdkbundle
+        working-directory: tsdkarc-x
+
+      - name: Install e2e-tests dependencies
+        run: bun install
         working-directory: e2e-tests
 
       - name: Install Playwright browsers
