@@ -29,6 +29,7 @@ on:
       - "e2e-tests/**/*.tsx"
       - "e2e-tests/package.json"
       - "e2e-tests/react-client/package.json"
+      - ".github/workflows/ci.yml"
   pull_request:
     paths:
       - "tsdkarc/**/*.ts"
@@ -44,6 +45,7 @@ on:
       - "e2e-tests/**/*.tsx"
       - "e2e-tests/package.json"
       - "e2e-tests/react-client/package.json"
+      - ".github/workflows/ci.yml"
 
 permissions:
   contents: read
