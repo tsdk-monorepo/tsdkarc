@@ -227,7 +227,7 @@ jobs:
         working-directory: e2e-tests
 
       - name: Install Playwright browsers
-        run: bunx playwright install --with-deps
+        run: bunx playwright install --with-deps chromium
         working-directory: e2e-tests
 
       - name: Test
