@@ -199,6 +199,15 @@ jobs:
           name: dist-tsdkarc-lib
           path: tsdkarc/lib
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkarc-x-esm
+          path: tsdkarc-x/esm
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tsdkarc-x-lib
+          path: tsdkarc-x/lib
+
       - name: Install dependencies(root)
         run: bun i
 
