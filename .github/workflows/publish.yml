@@ -76,9 +76,9 @@ jobs:
     needs: parse-tag
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -114,9 +114,9 @@ jobs:
       PACKAGE: ${{ needs.parse-tag.outputs.package }}
       VERSION: ${{ needs.parse-tag.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -174,9 +174,9 @@ jobs:
       VERSION: ${{ needs.parse-tag.outputs.version }}
       NPM_TAG: ${{ needs.parse-tag.outputs.npm_tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           registry-url: "https://registry.npmjs.org"
