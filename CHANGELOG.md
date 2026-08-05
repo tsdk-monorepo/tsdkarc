@@ -1,5 +1,9 @@
 # TsdkArc Packages Changelog
 
+## tsdkarc@2.0.0
+
+- Publish tsdkarc@2.0.0 from alpha version
+
 ## tsdkarc-x@0.1.7
 
 - Fix client's stream not working on browser

@@ -86,7 +86,7 @@ export default function HomeView({
   }, []); // Only run once on mount
 
   const handleCopy = () => {
-    navigator.clipboard.writeText("npm install tsdkarc@next");
+    navigator.clipboard.writeText("npm install tsdkarc");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -200,7 +200,7 @@ export default function HomeView({
               onClick={handleCopy}
               className="group flex items-center justify-center gap-3 bg-black text-white px-8 py-4 rounded-lg font-medium hover:bg-gray-800 active:scale-95 transition-all w-full sm:w-auto">
               <TerminalIcon className="size-5 text-gray-400 group-hover:text-white transition-colors" />
-              {copied ? "Copied to clipboard" : "npm install tsdkarc@next"}
+              {copied ? "Copied to clipboard" : "npm install tsdkarc"}
             </button>
 
             <Link

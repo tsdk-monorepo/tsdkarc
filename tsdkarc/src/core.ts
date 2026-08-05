@@ -54,7 +54,7 @@ export function isPlainObject(
 }
 
 export function isSafeKey(key: string) {
-  return key !== "__proto__" && key !== "prototype";
+  return key !== "__proto__" && key !== "prototype" && key !== "constructor";
 }
 
 /**
@@ -168,11 +168,6 @@ function buildGraphResult(node: ModuleNode) {
   };
 }
 
-/**
- * Renders a ModuleGraphNode tree as an indented, printable string.
- * @param graph  ModuleGraphNode
- * @param depth  current indentation depth (internal, defaults to 0)
- */
 /**
  * Renders a ModuleGraphNode tree as an indented, printable string.
  * `seen` guards against cyclic graphs: buildGraphNode() can produce a
@@ -303,22 +298,50 @@ async function shutdownNodes(
   options: StartOptions<any, any>,
   reason?: any
 ) {
-  await options.beforeShutdown?.(ctx, reason);
+  const shutdownErrors: unknown[] = [];
 
+  // 1. Safely run global beforeShutdown
+  try {
+    await options.beforeShutdown?.(ctx, reason);
+  } catch (error) {
+    shutdownErrors.push(error);
+  }
+
+  // 2. Iterate and shut down each module independently
   for (const node of [...bootOrder].reverse()) {
     const meta: ModuleMeta = {
       name: node.name,
       kind: node.name ? "named" : "anon",
     };
 
-    await options.beforeEachShutdown?.(ctx, meta, reason);
-    await node.beforeShutdown?.(ctx, reason);
-    await node.shutdown?.(ctx, reason);
-    await node.afterShutdown?.(ctx, reason);
-    await options.afterEachShutdown?.(ctx, meta, reason);
+    try {
+      await options.beforeEachShutdown?.(ctx, meta, reason);
+      await node.beforeShutdown?.(ctx, reason);
+      await node.shutdown?.(ctx, reason);
+      await node.afterShutdown?.(ctx, reason);
+      await options.afterEachShutdown?.(ctx, meta, reason);
+    } catch (error) {
+      // Collect the error and let the loop continue to the next module
+      shutdownErrors.push(error);
+    }
   }
 
-  await options.afterShutdown?.(ctx, reason);
+  // 3. Safely run global afterShutdown
+  try {
+    await options.afterShutdown?.(ctx, reason);
+  } catch (error) {
+    shutdownErrors.push(error);
+  }
+
+  // 4. Throw all collected errors at once if any occurred
+  if (shutdownErrors.length > 0) {
+    // If there is only one error, you could optionally just throw shutdownErrors[0],
+    // but AggregateError perfectly represents "multiple things might have failed".
+    throw new AggregateError(
+      shutdownErrors,
+      `[tsdkarc] ${shutdownErrors.length} error(s) occurred during module shutdown.`
+    );
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

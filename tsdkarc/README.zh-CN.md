@@ -22,7 +22,7 @@ tsdkarc 是一个用于 TypeScript 的模块组合与依赖注入（DI）库。
 直接通过 npm 安装，运行在常规的 `tsc` 或打包工具上即可：
 
 ```bash
-npm install tsdkarc@next
+npm install tsdkarc
 
 ```
 

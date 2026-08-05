@@ -26,7 +26,7 @@ Its core design uses no decorators and does not rely on `reflect-metadata`. The 
 Install directly via npm. It works with standard `tsc` or any bundler:
 
 ```bash
-npm install tsdkarc@next
+npm install tsdkarc
 
 ```
 

@@ -37,7 +37,7 @@ Want more examples? [Request one](https://github.com/tsdk-monorepo/tsdkarc/issue
 ### 1. Install Dependencies
 
 ```bash
-npm install tsdkarc-x tsdkarc@next zod
+npm install tsdkarc-x tsdkarc zod
 # npm install express multer @types/multer @types/express @scalar/express-api-reference
 # npm install hono @hono/node-server @scalar/hono-api-reference
 
