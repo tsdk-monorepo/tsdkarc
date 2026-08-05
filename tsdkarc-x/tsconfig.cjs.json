@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/recommended/tsconfig.json",
+  
   "compilerOptions": {
     "strict": true,
     "lib": ["ES2015", "DOM", "ES2022.Array", "ES2019.Array", "ES2017.Object"],
