@@ -220,7 +220,7 @@ jobs:
           path: tsdkarc-x/lib
 
       - name: Install dependencies
-        run: bun install && cd tsdkarc && bun install && cd ../tsdkarc-x && bun install
+        run: bun install && cd ../tsdkarc && bun install && cd ../tsdkarc-x && bun install
         working-directory: e2e-tests
 
       - name: Install Playwright browsers
