@@ -1,5 +1,10 @@
 # TsdkArc Packages Changelog
 
+## tsdkarc-x@0.1.8
+
+- Update peerDependencies `tsdkarc` to 2.0.0
+- @deprecated `toNextRouteHandlers` instead to use `toFetchHandler`
+
 ## tsdkarc@2.0.0
 
 - Publish tsdkarc@2.0.0 from alpha version

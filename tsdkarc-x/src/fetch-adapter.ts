@@ -335,10 +335,19 @@ export class FetchAdapter implements TransportAdapter<Request> {
  *   serverless/edge runtimes.
  * @returns { GET, POST } route handler functions
  */
-export function toNextRouteHandlers(
+export function toFetchHandler(
   adapter: FetchAdapter,
   waitUntil?: (p: Promise<unknown>) => void
 ) {
   const handler = (req: Request) => adapter.handle(req, waitUntil);
-  return { GET: handler, POST: handler };
+  return handler;
 }
+
+/** @deprecated use `toFetchHandler` instead */
+export const toNextRouteHandlers = (
+  adapter: FetchAdapter,
+  waitUntil?: (p: Promise<unknown>) => void
+) => {
+  const handler = toFetchHandler(adapter, waitUntil);
+  return { GET: handler, POST: handler };
+};
