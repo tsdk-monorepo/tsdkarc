@@ -11,7 +11,7 @@
     "@types/bun": "latest",
     "@types/node": "26.1.2",
     "playwright": "1.57",
-    "tsdkarc": "^2.0.0",
+    "tsdkarc": "file:../tsdkarc",
     "tsdkarc-x": "file:../tsdkarc-x",
     "express": "^5.2.1",
     "multer": "^2.2.0",
