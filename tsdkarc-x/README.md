@@ -40,10 +40,9 @@ Want more examples? [Request one](https://github.com/tsdk-monorepo/tsdkarc/issue
 npm install tsdkarc-x tsdkarc zod
 # npm install express multer @types/multer @types/express @scalar/express-api-reference
 # npm install hono @hono/node-server @scalar/hono-api-reference
-
 ```
 
-> Note: Install the HTTP framework (like `express` or `hono`) needed for your adapter as you need.
+> Note: Install the HTTP framework required by your adapter, such as `express`, `hono`, or any Web Standard `fetch`-compatible framework that supports the `Request`/`Response` API.
 
 ### 2. Server: Define routes and start the app
 
@@ -51,12 +50,6 @@ npm install tsdkarc-x tsdkarc zod
 // server.ts
 import { defineRouter, launchApp, type RoutesOf } from "tsdkarc-x";
 import { ExpressAdapter } from "tsdkarc-x/express";
-import { extractOpenApi } from "tsdkarc-x/openapi"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
-import { extractAppRoutesTypesFull } from "tsdkarc-x/extract"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
-// import { extractOpenApi, extractAppRoutesTypesFull } from "tsdkarc/scripts";
-import { apiReference } from "@scalar/express-api-reference";
-import fs from "fs/promises";
-import path from "path";
 
 // 1. Create router instance
 const appRouter = defineRouter({});
@@ -91,6 +84,13 @@ await fetch("http://localhost:3000/api/users/health")
 
 ```ts
 // ...previous code
+
+import { extractOpenApi } from "tsdkarc-x/openapi"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
+import { extractAppRoutesTypesFull } from "tsdkarc-x/extract"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
+// import { extractOpenApi, extractAppRoutesTypesFull } from "tsdkarc/scripts";
+import { apiReference } from "@scalar/express-api-reference";
+import fs from "fs/promises";
+import path from "path";
 
 // Generate OpenAPI JSON result
 const openapi = extractOpenApi(
@@ -397,7 +397,7 @@ export const app = launchApp({
 });
 ```
 
-or use fetch adapter for Next.js:
+Or use `FetchAdapter` in modern Web Standard `Request` / `Response` API frameworks, such as Next.js:
 
 ```ts
 import { FetchAdapter, toFetchHandler } from "tsdkarc-x/fetch";
@@ -415,9 +415,9 @@ const app = await launchApp({
 export type AppRoutes = RoutesOf<typeof app>;
 
 // api/arcx/[...paths]/route.ts
-const handler = toFetchHandler(transport);
-export const GET = handler;
-export const POST = handler;
+const fetchHandler = toFetchHandler(transport);
+export const GET = fetchHandler;
+export const POST = fetchHandler;
 ```
 
 ### Generating Frontend Types and OpenAPI
@@ -452,7 +452,7 @@ const openapi = extractOpenApi(
 
 `tsdkarc` handles modular dependency injection; `tsdkarc-x` builds the RPC routing layer on top of it. `defineRouter` directly accepts `tsdkarc` modules, and their type inference mechanisms are completely connected.
 
-**Q: What happens if I don't pass a Schema to `r.query`?**
+**Q: What happens if I don't pass a Schema to `r.query` or `r.mutate`?**
 
 The input type falls back to whatever manual type you set for the handler's first parameter. You'll only have static type checking without runtime input validation.
 
@@ -480,6 +480,101 @@ transport.app.use(cors()); // `app` is the underlying Express application
 ```ts
 const transport = new HonoAdapter();
 transport.app.use(...) // `app` is the underlying Hono application
+```
+
+**Q: How do I use `tsdkarc-x` with Web Standard `fetch` frameworks?**
+
+Many modern frameworks support the standard `Request`/`Response` API, including Next.js, Bun, and Deno.
+
+`tsdkarc-x` works with all of them through the `fetch` adapter.
+
+**Bun**
+
+```ts
+import { toFetchHandler } from "tsdkarc-x/fetch";
+import { transport } from "./tsdkarc/main";
+
+const handler = toFetchHandler(transport);
+
+const server = Bun.serve({
+  port: 3005,
+  fetch(req) {
+    if (req.method === "GET") {
+      return handler(req);
+    }
+    if (req.method === "POST") {
+      return handler(req);
+    }
+    return new Response("Not Found", { status: 404 });
+  },
+});
+
+console.log(`Backend listening on http://localhost:${server.port}`);
+```
+
+**Deno**
+
+```ts
+import { toFetchHandler } from "tsdkarc-x/fetch";
+import { transport } from "./tsdkarc/main";
+
+const handler = toFetchHandler(transport);
+
+const server = Deno.serve(
+  {
+    port: 3005,
+  },
+  (req) => {
+    if (req.method === "GET") {
+      return handler(req);
+    }
+    if (req.method === "POST") {
+      return handler(req);
+    }
+    return new Response("Not Found", { status: 404 });
+  }
+);
+
+console.log(`Backend listening on http://localhost:${server.port}`);
+```
+
+**Service Worker**
+
+```ts
+import { toFetchHandler } from "tsdkarc-x/fetch";
+import { transport } from "./tsdkarc/main";
+
+const handler = toFetchHandler(transport);
+
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+
+  if (request.method === "GET" || request.method === "POST") {
+    event.respondWith(handler(request));
+    return;
+  }
+
+  event.respondWith(new Response("Not Found", { status: 404 }));
+});
+```
+
+**Cloudflare Workers**
+
+```ts
+import { toFetchHandler } from "tsdkarc-x/fetch";
+import { transport } from "./tsdkarc/main";
+
+const handler = toFetchHandler(transport);
+
+export default {
+  fetch(req: Request) {
+    if (req.method === "GET" || req.method === "POST") {
+      return handler(req);
+    }
+
+    return new Response("Not Found", { status: 404 });
+  },
+};
 ```
 
 **Q: How do I run `tsdkarc-x` in Next.js?**

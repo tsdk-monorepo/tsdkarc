@@ -42,7 +42,7 @@ npm install tsdkarc-x tsdkarc zod
 # npm install hono @hono/node-server @scalar/hono-api-reference
 ```
 
-> 注：适配器所需的 HTTP 框架（如 `express` 或 `hono`）请按需安装。
+> > 注意：请根据你的适配器需求，安装所需的 HTTP 框架，例如 `express`、`hono`，或者任何支持 Web Standard `fetch` 并实现 `Request` / `Response` API 的框架。
 
 ### 2. 服务端：定义路由并启动服务
 
@@ -50,11 +50,6 @@ npm install tsdkarc-x tsdkarc zod
 // server.ts
 import { defineRouter, launchApp, type RoutesOf } from "tsdkarc-x";
 import { ExpressAdapter } from "tsdkarc-x/express";
-import { extractOpenApi } from "tsdkarc-x/openapi"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
-import { extractAppRoutesTypesFull } from "tsdkarc-x/extract"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
-import { apiReference } from "@scalar/express-api-reference";
-import fs from "fs/promises";
-import path from "path";
 
 // 1. 创建路由实例
 const appRouter = defineRouter({});
@@ -88,6 +83,12 @@ await fetch("http://localhost:3000/api/users/health")
 
 ```ts
 // ...previous code
+
+import { extractOpenApi } from "tsdkarc-x/openapi"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
+import { extractAppRoutesTypesFull } from "tsdkarc-x/extract"; // Requires TypeScript v6. TypeScript v7 is currently not supported.
+import { apiReference } from "@scalar/express-api-reference";
+import fs from "fs/promises";
+import path from "path";
 
 const openapi = extractOpenApi(
   app.routes,
@@ -391,7 +392,7 @@ export const app = launchApp({
 });
 ```
 
-或者在 Next.js 中使用 `FetchAdapter`:
+或者在支持现代 Web Standard `Request` / `Response` API 的框架中（例如 Next.js），使用 `FetchAdapter`：
 
 ```ts
 import { FetchAdapter, toFetchHandler } from "tsdkarc-x/fetch";
@@ -409,9 +410,9 @@ const app = await launchApp({
 export type AppRoutes = RoutesOf<typeof app>;
 
 // api/tsdkarc/[...path]/route.ts
-const handler = toFetchHandler(transport);
-export const GET = handler;
-export const POST = handler;
+const fetchHandler = toFetchHandler(transport);
+export const GET = fetchHandler;
+export const POST = fetchHandler;
 ```
 
 ### 生成前端类型文件与 OpenAPI
@@ -475,6 +476,101 @@ transport.app.use(cors()); // `app` 是底层的 Express 应用实例
 const transport = new HonoAdapter();
 
 transport.app.use(...); // `app` 是底层的 Hono 应用实例
+```
+
+**Q: 如何在支持 Web Standard `fetch` 的框架中使用 `tsdkarc-x`？**
+
+许多现代框架都支持标准的 `Request` / `Response` API，例如 Next.js、Bun 和 Deno。
+
+`tsdkarc-x` 通过 `fetch` 适配器支持这些框架，可以在所有这些环境中运行：
+
+**Bun**
+
+```ts
+import { toFetchHandler } from "tsdkarc-x/fetch";
+import { transport } from "./tsdkarc/main";
+
+const handler = toFetchHandler(transport);
+
+const server = Bun.serve({
+  port: 3005,
+  fetch(req) {
+    if (req.method === "GET") {
+      return handler(req);
+    }
+    if (req.method === "POST") {
+      return handler(req);
+    }
+    return new Response("Not Found", { status: 404 });
+  },
+});
+
+console.log(`Backend listening on http://localhost:${server.port}`);
+```
+
+**Deno**
+
+```ts
+import { toFetchHandler } from "tsdkarc-x/fetch";
+import { transport } from "./tsdkarc/main";
+
+const handler = toFetchHandler(transport);
+
+const server = Deno.serve(
+  {
+    port: 3005,
+  },
+  (req) => {
+    if (req.method === "GET") {
+      return handler(req);
+    }
+    if (req.method === "POST") {
+      return handler(req);
+    }
+    return new Response("Not Found", { status: 404 });
+  }
+);
+
+console.log(`Backend listening on http://localhost:${server.port}`);
+```
+
+**Service Worker**
+
+```ts
+import { toFetchHandler } from "tsdkarc-x/fetch";
+import { transport } from "./tsdkarc/main";
+
+const handler = toFetchHandler(transport);
+
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+
+  if (request.method === "GET" || request.method === "POST") {
+    event.respondWith(handler(request));
+    return;
+  }
+
+  event.respondWith(new Response("Not Found", { status: 404 }));
+});
+```
+
+**Cloudflare Workers**
+
+```ts
+import { toFetchHandler } from "tsdkarc-x/fetch";
+import { transport } from "./tsdkarc/main";
+
+const handler = toFetchHandler(transport);
+
+export default {
+  fetch(req: Request) {
+    if (req.method === "GET" || req.method === "POST") {
+      return handler(req);
+    }
+
+    return new Response("Not Found", { status: 404 });
+  },
+};
 ```
 
 **Q: 如何在 Next.js 中运行？**
@@ -564,11 +660,11 @@ export type AppRoutes = RoutesOf<typeof app>;
 
 ### 服务端运行
 
-| API                                  | 说明            |
-| ------------------------------------ | --------------- |
-| `launchApp({ ...config })`           | 启动 HTTP 服务  |
-| `ExpressAdapter()` / `HonoAdapter()` | HTTP 框架适配器 |
-| `RpcError(code, message)`            | 抛出结构化异常  |
+| API                                                   | 说明                                   |
+| ----------------------------------------------------- | -------------------------------------- |
+| `launchApp({ ...config })`                            | 启动 HTTP 服务                         |
+| `ExpressAdapter()` / `HonoAdapter()` / `FetchAdapter` | HTTP / Request&Response 标准框架适配器 |
+| `RpcError(code, message)`                             | 抛出结构化异常                         |
 
 ### 类型工具
 
