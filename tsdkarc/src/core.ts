@@ -292,6 +292,15 @@ async function bootNodes(
 // Shutdown execution
 // ─────────────────────────────────────────────────────────────────────────────
 
+class MultiError extends Error {
+  errors: unknown[];
+  constructor(errors: unknown[], message: string) {
+    super(message);
+    this.name = "AggregateError";
+    this.errors = errors;
+  }
+}
+
 async function shutdownNodes(
   bootOrder: ModuleNode[],
   ctx: any,
@@ -337,7 +346,7 @@ async function shutdownNodes(
   if (shutdownErrors.length > 0) {
     // If there is only one error, you could optionally just throw shutdownErrors[0],
     // but AggregateError perfectly represents "multiple things might have failed".
-    throw new AggregateError(
+    throw new MultiError(
       shutdownErrors,
       `[tsdkarc] ${shutdownErrors.length} error(s) occurred during module shutdown.`
     );
