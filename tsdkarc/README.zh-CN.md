@@ -154,3 +154,7 @@ tsdkarc-x 依赖 tsdkarc 的核心特性，而且[`tsdkarc-x`](https://npmjs.com
 - `ContextOf<M>`: 提取模块完整的上下文类型。
 - `DepCtxOf<M>`: 提取模块所依赖的上下文类型（不含自身）。
 - `OwnSliceOf<M>`: 提取模块自身 `init()` 返回值的类型。
+
+## 目前谁在使用 tsdkarc？
+
+- [tsdkarc-x](https://github.com/tsdk-monorepo/tsdkarc/blob/main/tsdkarc-x/README.zh-CN.md) 是一款基于 tsdkarc 构建的端到端类型安全 RPC 框架。通过它，你可以在服务端定义路由后，让前端客户端自动获取对应的请求类型、调用方法以及 React/Vue Hooks。支持 Next.js、Express、Hono、Deno、Cloudflare Workers、Browser Service Workers 等环境。

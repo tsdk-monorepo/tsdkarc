@@ -158,3 +158,7 @@ Used to declare a module. Returns a `ModuleDeclaration` object.
 - `ContextOf<M>`: Extracts the full context type of a module.
 - `DepCtxOf<M>`: Extracts the context type the module depends on (excluding itself).
 - `OwnSliceOf<M>`: Extracts the type of the return value from the module's own `init()` method.
+
+## Who is using tsdkarc now？
+
+- [tsdkarc-x](https://github.com/tsdk-monorepo/tsdkarc/blob/main/tsdkarc-x/README.md) is an end-to-end type-safe RPC framework built on top of tsdkarc. After defining your routes on the server side, the frontend client can automatically obtain the corresponding request types, API methods, and React/Vue hooks. It supports Next.js, Express, Hono, Deno, Cloudflare Workers, Browser Service Workers, and more.
