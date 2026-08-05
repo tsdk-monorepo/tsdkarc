@@ -239,12 +239,12 @@ jobs:
         run: bun install
         working-directory: tsdkarc-x
 
-      - name: Force-link local file: dependencies into tsdkarc-x
-        # Bun's `file:../pkg` resolution does not reliably pick up rebuilt
-        # esm/lib output after the lockfile was generated (see this
-        # package's own `checktype` script, which uses the same
-        # rm -rf + cp -r workaround). Replicate it here so tsdkarc-x
-        # resolves the freshly-downloaded build artifacts at runtime.
+      - name: Force-link local file: deps into tsdkarc-x
+        # tsdkarc-x's own devDependencies "tsdkarc" and "tsdkbundle" are
+        # file:../X protocol. Bun's file: resolution does not reliably
+        # pick up freshly rebuilt esm/lib content in this repo (see the
+        # checktype script in tsdkarc-x/package.json, which uses this
+        # same rm -rf + cp -r pattern as its own workaround).
         run: |
           rm -rf node_modules/tsdkarc
           cp -r ../tsdkarc node_modules/tsdkarc
@@ -254,6 +254,19 @@ jobs:
 
       - name: Install e2e-tests dependencies
         run: bun install
+        working-directory: e2e-tests
+
+      - name: Force-link local file: deps into e2e-tests
+        # e2e-tests depends on tsdkarc and tsdkarc-x via the same
+        # file:../X protocol as above — same staleness issue applies here.
+        # tsdkarc-x must already have its own node_modules/tsdkarc populated
+        # (previous step) before it's copied in, since server.js resolves
+        # 'tsdkarc' relative to tsdkarc-x's own real (symlink-resolved) path.
+        run: |
+          rm -rf node_modules/tsdkarc
+          cp -r ../tsdkarc node_modules/tsdkarc
+          rm -rf node_modules/tsdkarc-x
+          cp -r ../tsdkarc-x node_modules/tsdkarc-x
         working-directory: e2e-tests
 
       - name: Install Playwright browsers
