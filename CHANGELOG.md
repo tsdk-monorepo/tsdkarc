@@ -4,7 +4,7 @@
 
 - Fix client's stream not working on browser
 - Add enabled option to useQuery to swr hooks
-- Add e2e tests for `swr` / `@tanstack/react-query` hooks
+- Add e2e tests for `swr` / `@tanstack/react-query` / `@tanstack/vue-query` hooks
 
 ## tsdkarc-x@0.1.6
 
