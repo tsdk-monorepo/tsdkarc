@@ -136,7 +136,7 @@
     "hono": "^4.13.0",
     "vue": "^3.5.40",
     "@tanstack/vue-query": "^5.101.4",
-    "tsdkarc": "2.0.0-alpha.1",
+    "tsdkarc": "^2.0.0",
     "typescript": "^5"
   },
   "peerDependenciesMeta": {

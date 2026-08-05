@@ -17,7 +17,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "tailwind-merge": "^3.6.0",
-    "tsdkarc": "next",
+    "tsdkarc": "latest",
     "tsdkarc-x": "^0.1.7",
     "typescript": "6",
     "zod": "^4.4.3"

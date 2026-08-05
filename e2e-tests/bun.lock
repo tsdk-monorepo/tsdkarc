@@ -16,7 +16,7 @@
         "express": "^5.2.1",
         "multer": "^2.2.0",
         "playwright": "1.57",
-        "tsdkarc": "next",
+        "tsdkarc": "latest",
         "tsdkarc-x": "file:../tsdkarc-x",
       },
       "peerDependencies": {
