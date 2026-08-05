@@ -239,10 +239,10 @@ jobs:
         run: bun install
         working-directory: tsdkarc-x
 
-      - name: Force-link local file deps into tsdkarc-x
-        # tsdkarc-x's own devDependencies "tsdkarc" and "tsdkbundle" are
-        # file:../X protocol. Bun's file: resolution does not reliably
-        # pick up freshly rebuilt esm/lib content in this repo (see the
+      - name: Relink local dependencies for tsdkarc-x
+        # tsdkarc-x's devDependencies "tsdkarc" and "tsdkbundle" use the
+        # file:../X protocol. Bun does not reliably pick up freshly
+        # rebuilt esm/lib content through this protocol (see the
         # checktype script in tsdkarc-x/package.json, which uses this
         # same rm -rf + cp -r pattern as its own workaround).
         run: |
@@ -256,12 +256,13 @@ jobs:
         run: bun install
         working-directory: e2e-tests
 
-      - name: Force-link local file: deps into e2e-tests
+      - name: Relink local dependencies for e2e-tests
         # e2e-tests depends on tsdkarc and tsdkarc-x via the same
         # file:../X protocol as above — same staleness issue applies here.
-        # tsdkarc-x must already have its own node_modules/tsdkarc populated
-        # (previous step) before it's copied in, since server.js resolves
-        # 'tsdkarc' relative to tsdkarc-x's own real (symlink-resolved) path.
+        # The previous step must run first so tsdkarc-x's own
+        # node_modules/tsdkarc is already populated before it's copied in,
+        # since server.js resolves 'tsdkarc' relative to tsdkarc-x's own
+        # real (symlink-resolved) path.
         run: |
           rm -rf node_modules/tsdkarc
           cp -r ../tsdkarc node_modules/tsdkarc
