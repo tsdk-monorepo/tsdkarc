@@ -8,7 +8,7 @@
 
 A Bun-based ESM bundler and watcher for multi-entry projects.
 
-<img src="./banner.jpg" width="360" alt="A Bun-based ESM bundler and watcher for multi-entry projects." />
+<img src="./banner.jpg" width="86%" alt="A Bun-based ESM bundler and watcher for multi-entry projects." />
 
 ## 🚀 Quick Start
 
