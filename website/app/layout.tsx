@@ -149,14 +149,12 @@ export default function RootLayout({
               </NavLink>
 
               <div className="flex items-center gap-5 md:gap-8">
-                <NavLink
+                <a
                   href="/llms.txt"
-                  activeClassName="text-black!"
                   className={`flex items-center gap-2 text-sm font-medium transition-all active:scale-95 text-blue-600 hover:text-slate-500`}>
-                  <span className='text-xl'>✨</span>
-                  <span className="hidden sm:inline">LLMs.txt</span>
-                  <span className="sm:hidden">LLMs.txt</span>
-                </NavLink>
+                  <span className="text-xl">✨</span>
+                  <span>LLMs.txt</span>
+                </a>
                 <NavLink
                   href="/docs"
                   activeClassName="text-black!"
@@ -171,8 +169,6 @@ export default function RootLayout({
                   rel="noreferrer"
                   className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black transition-all active:scale-95">
                   <GithubIcon className="size-5" />
-                  <span className="hidden sm:inline">GitHub</span>
-                  <span className="sm:hidden">Code</span>
                 </a>
               </div>
             </header>
