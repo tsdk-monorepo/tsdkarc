@@ -46,6 +46,41 @@ npm install tsdkarc-x tsdkarc zod
 
 ### 2. 服务端：定义路由并启动服务
 
+使用 **Express.js**:
+
+```ts
+// server.ts
+import { defineRouter, launchApp, type RoutesOf } from "tsdkarc-x";
+import { ExpressAdapter } from "tsdkarc-x/express";
+
+// 1. 创建路由实例
+const appRouter = defineRouter({});
+
+// 2. 定义具体路由
+const userRoutes = appRouter.init(() => ({
+  health: () => "OK",
+}));
+const routes = { users: userRoutes }; // routesExportName
+const transport = new ExpressAdapter();
+// 3. 启动服务
+export const app = await launchApp({
+  basePath: "/api",
+  transport,
+  routes,
+  port: 3000,
+});
+
+// 4. 导出路由类型供前端使用
+export type AppRoutes = RoutesOf<typeof app>;
+
+// 测试
+await fetch("http://localhost:3000/api/users/health")
+  .then((res) => res.json())
+  .then((res) => {
+    console.log(res); // Output: OK
+  });
+```
+
 使用 **Bun**:
 
 ```ts
@@ -82,41 +117,6 @@ console.log(`Backend listening on http://localhost:${server.port}`);
 
 // 4. Export route types for frontend
 export type AppRoutes = RoutesOf<typeof app>;
-```
-
-使用 **Express.js**:
-
-```ts
-// server.ts
-import { defineRouter, launchApp, type RoutesOf } from "tsdkarc-x";
-import { ExpressAdapter } from "tsdkarc-x/express";
-
-// 1. 创建路由实例
-const appRouter = defineRouter({});
-
-// 2. 定义具体路由
-const userRoutes = appRouter.init(() => ({
-  health: () => "OK",
-}));
-const routes = { users: userRoutes }; // routesExportName
-const transport = new ExpressAdapter();
-// 3. 启动服务
-export const app = await launchApp({
-  basePath: "/api",
-  transport,
-  routes,
-  port: 3000,
-});
-
-// 4. 导出路由类型供前端使用
-export type AppRoutes = RoutesOf<typeof app>;
-
-// 测试
-await fetch("http://localhost:3000/api/users/health")
-  .then((res) => res.json())
-  .then((res) => {
-    console.log(res); // Output: OK
-  });
 ```
 
 ### 2.1 生成 opeanpi 接口文档

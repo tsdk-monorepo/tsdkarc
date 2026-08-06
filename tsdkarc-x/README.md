@@ -46,6 +46,43 @@ npm install tsdkarc-x tsdkarc zod
 
 ### 2. Server: Define routes and start the app
 
+With **Express.js**:
+
+```ts
+// server.ts
+import { defineRouter, launchApp, type RoutesOf } from "tsdkarc-x";
+import { ExpressAdapter } from "tsdkarc-x/express";
+
+// 1. Create router instance
+const appRouter = defineRouter({});
+
+// 2. Define specific routes
+const userRoutes = appRouter.init(() => ({
+  health: () => "OK",
+}));
+const routes = { users: userRoutes }; // routesExportName
+const transport = new ExpressAdapter({ log: true });
+
+// 3. Start server
+export const app = await launchApp({
+  basePath: "/api",
+  transport,
+  routes,
+  port: 3000,
+});
+
+// 4. Export route types for frontend
+export type AppRoutes = RoutesOf<typeof app>;
+
+// 5. test
+await fetch("http://localhost:3000/api/users/health")
+  .then((res) => res.json())
+  .then((res) => {
+    console.log(res); // Output: OK
+  });
+```
+
+
 With **Bun**:
 
 ```ts
@@ -84,41 +121,6 @@ console.log(`Backend listening on http://localhost:${server.port}`);
 export type AppRoutes = RoutesOf<typeof app>;
 ```
 
-With **Express.js**:
-
-```ts
-// server.ts
-import { defineRouter, launchApp, type RoutesOf } from "tsdkarc-x";
-import { ExpressAdapter } from "tsdkarc-x/express";
-
-// 1. Create router instance
-const appRouter = defineRouter({});
-
-// 2. Define specific routes
-const userRoutes = appRouter.init(() => ({
-  health: () => "OK",
-}));
-const routes = { users: userRoutes }; // routesExportName
-const transport = new ExpressAdapter({ log: true });
-
-// 3. Start server
-export const app = await launchApp({
-  basePath: "/api",
-  transport,
-  routes,
-  port: 3000,
-});
-
-// 4. Export route types for frontend
-export type AppRoutes = RoutesOf<typeof app>;
-
-// 5. test
-await fetch("http://localhost:3000/api/users/health")
-  .then((res) => res.json())
-  .then((res) => {
-    console.log(res); // Output: OK
-  });
-```
 
 ### 2.1 Generate OpenAPI Documentation
 
