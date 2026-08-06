@@ -24,7 +24,8 @@
     "lib/*",
     "esm/*",
     "README.md",
-    "README.zh-CN.md"
+    "README.zh-CN.md",
+    "banner.jpg"
   ],
   "scripts": {
     "dev:test": "bun run src/cli.ts dev api",

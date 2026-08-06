@@ -6,6 +6,8 @@
 
 🇺🇸 English · [🇨🇳 中文](./README.zh-CN.md)
 
+![tsdkbundle intro banner](./banner.jpg)
+
 A Bun-based ESM bundler and watcher for multi-entry projects.
 
 ## 🚀 Quick Start
