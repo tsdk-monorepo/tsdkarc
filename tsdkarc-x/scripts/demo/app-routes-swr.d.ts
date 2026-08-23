@@ -23,7 +23,7 @@ export interface AppRoutesSwr {
         useQuery(input?: null | undefined, opts?: SWRConfiguration<{ message: string; trace: string; user: string; }>): SWRResponse<{ message: string; trace: string; user: string; }>;
       };
       getProfile: {
-        useQuery(input: { includeHistory?: boolean }, opts?: SWRConfiguration<{ history: never[] | null; id: string; name: string; role: string; }>): SWRResponse<{ history: never[] | null; id: string; name: string; role: string; }>;
+        useQuery(input: { includeHistory?: boolean | undefined; }, opts?: SWRConfiguration<{ history: { a: { b: number; }; }[] | null; id: string; name: string; role: string; }>): SWRResponse<{ history: { a: { b: number; }; }[] | null; id: string; name: string; role: string; }>;
       };
       getProfile2: {
         useQuery(input: { includeHistory: number[]; } | undefined, opts?: SWRConfiguration<{ history: never[] | null; id: string; name: string; role: string; }>): SWRResponse<{ history: never[] | null; id: string; name: string; role: string; }>;

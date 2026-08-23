@@ -21,7 +21,7 @@ export interface AppRoutes {
         query(input?: null | undefined, opts?: RequestOptions): Promise<{ message: string; trace: string; user: string; }>;
       };
       getProfile: {
-        query(input: { includeHistory?: boolean }, opts?: RequestOptions): Promise<{ history: never[] | null; id: string; name: string; role: string; }>;
+        query(input: { includeHistory?: boolean | undefined; }, opts?: RequestOptions): Promise<{ history: { a: { b: number; }; }[] | null; id: string; name: string; role: string; }>;
       };
       getProfile2: {
         query(input: { includeHistory: number[]; } | undefined, opts?: RequestOptions): Promise<{ history: never[] | null; id: string; name: string; role: string; }>;

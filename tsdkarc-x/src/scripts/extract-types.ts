@@ -756,6 +756,15 @@ function walkObjectLiteral(
         walkObjectLiteral(inner, prefix, checker, out, options);
       }
       continue;
+    } // NEW: 4. Method Declaration: `async messages() {}`
+    else if (ts.isMethodDeclaration(prop)) {
+      key = ts.isIdentifier(prop.name)
+        ? prop.name.text
+        : ts.isStringLiteral(prop.name)
+        ? prop.name.text
+        : null;
+      val = prop; // The method declaration itself is the callable function node
+      propNameNode = prop.name;
     } else {
       continue;
     }
@@ -815,7 +824,11 @@ function walkObjectLiteral(
     }
 
     // Bare arrow/function (plain handler)
-    if (ts.isArrowFunction(val) || ts.isFunctionExpression(val)) {
+    if (
+      ts.isArrowFunction(val) ||
+      ts.isFunctionExpression(val) ||
+      ts.isMethodDeclaration(val)
+    ) {
       setOut(val);
       continue;
     }

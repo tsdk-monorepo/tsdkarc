@@ -1,5 +1,10 @@
 # TsdkArc Packages Changelog
 
+## tsdkarc-x@0.1.9
+
+- Fix extract opanapi script not work correctly
+- Fix npm install wrong peerDependencies warning
+
 ## tsdkarc-x@0.1.8
 
 - Update peerDependencies `tsdkarc` to 2.0.0

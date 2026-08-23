@@ -94,6 +94,11 @@ function zodSchemaToJson(schema: ZodType | undefined): object | null {
     unrepresentable: "any",
   }) as any;
 
+  // NEW: Intercept Zod object shapes to fix File/Blob definitions
+  if (rest.type === "object" && rest.properties && (schema as any).shape) {
+    patchZodOpenApiBinary((schema as any).shape, rest.properties);
+  }
+
   zodJsonCache.set(schema, rest);
   return rest;
 }
@@ -194,17 +199,11 @@ function extractOuterObjectBody(tsType: string): string | null {
 }
 
 /**
- * Best-effort converter from a raw TypeScript return type string
- * to a basic OpenAPI JSON Schema properties object.
- * Only handles top-level primitive shapes; nested objects produce `{ type: "object" }`.
- * Brace depth is tracked throughout, so a nested object's own members are
- * never mistaken for siblings of the property that contains them.
+ * Recursively parses an object type string `{ key: type; ... }` into a JSON Schema object.
  */
-function bestEffortTsToSchema(tsType: string | undefined): object {
-  if (!tsType) return {};
-
-  const body = extractOuterObjectBody(tsType);
-  if (body === null) return {};
+function parseTsObjectType(tsTypeStr: string): Record<string, any> {
+  const body = extractOuterObjectBody(tsTypeStr);
+  if (!body) return { type: "object" };
 
   const properties: Record<string, any> = {};
 
@@ -218,45 +217,101 @@ function bestEffortTsToSchema(tsType: string | undefined): object {
     const key = propMatch[1];
     const val = propMatch[2].trim();
 
-    if (val === "string") properties[key] = { type: "string" };
-    else if (val === "number") properties[key] = { type: "number" };
-    else if (val === "boolean") properties[key] = { type: "boolean" };
-    else if (val.includes("[]") || val.startsWith("Array"))
-      properties[key] = { type: "array", items: {} };
-    else if (val.startsWith("{")) properties[key] = { type: "object" };
-    else if (val.includes('"') || val.includes("'"))
-      properties[key] = { type: "string" }; // string literal / enum
-    else properties[key] = {}; // fallback for complex types
+    properties[key] = resolveTsTypeStr(val);
   }
 
-  return Object.keys(properties).length > 0 ? { properties } : {};
+  return Object.keys(properties).length > 0
+    ? { type: "object", properties }
+    : { type: "object" };
+}
+
+/**
+ * Resolves any TS type string into an OpenAPI schema field (supports primitives, unions, arrays, and nested objects).
+ */
+function resolveTsTypeStr(rawVal: string): any {
+  // 1. Strip optional / null unions
+  const types = rawVal.split("|").map((s) => s.trim());
+  const cleanVal =
+    types.find((t) => t !== "undefined" && t !== "null") || types[0];
+
+  // 2. Primitives
+  if (cleanVal === "string") return { type: "string" };
+  if (cleanVal === "number") return { type: "number" };
+  if (cleanVal === "boolean") return { type: "boolean" };
+
+  // 3. Array shorthand (e.g., "{ id: string }[]" or "number[]")
+  if (cleanVal.endsWith("[]")) {
+    const itemType = cleanVal.slice(0, -2).trim();
+    if (itemType === "never") return { type: "array", items: {} };
+    return { type: "array", items: resolveTsTypeStr(itemType) };
+  }
+
+  // 4. Generic Array (e.g., "Array<{ id: string }>")
+  if (cleanVal.startsWith("Array<") && cleanVal.endsWith(">")) {
+    const itemType = cleanVal.slice(6, -1).trim();
+    return { type: "array", items: resolveTsTypeStr(itemType) };
+  }
+
+  // 5. Nested Objects: Recurse if value starts with `{`
+  if (cleanVal.startsWith("{")) {
+    return parseTsObjectType(cleanVal);
+  }
+
+  // 6. String Literals / Enums
+  if (cleanVal.includes('"') || cleanVal.includes("'")) {
+    return { type: "string" };
+  }
+
+  return {};
+}
+
+/**
+ * Entry point: Best-effort converter from TS return/input type string to OpenAPI properties.
+ */
+function bestEffortTsToSchema(tsType: string | undefined): object {
+  if (!tsType) return {};
+  const body = extractOuterObjectBody(tsType);
+  if (body === null) return {};
+
+  const schema = parseTsObjectType(tsType);
+  // Return just the { properties: { ... } } block for top-level spreading
+  return schema.properties ? { properties: schema.properties } : {};
 }
 
 // ─── OpenAPI path item builder ────────────────────────────────────────────────
-
 function buildPathItem(route: RouteInfo, meta?: Partial<SourceMeta>): object {
   const { segments, kind, method, inputSchema } = route;
 
-  // Precomputed once — avoids split/join inside multiple expression sites.
+  // Precomputed once
   const dotPath = segments.join(".");
   const tag = segments[0];
   const operationId = segments.join("_");
 
-  const hasInput = inputSchema !== null;
+  // NEW: Try Zod first, fallback to TS AST extraction
+  let finalInputSchema = inputSchema;
+  if (!finalInputSchema && meta?.inputTs && meta.inputTs !== "unknown") {
+    finalInputSchema = {
+      title: "Inferred Request",
+      type: "object",
+      ...bestEffortTsToSchema(meta.inputTs),
+    };
+  }
+
+  const hasInput = finalInputSchema !== null && finalInputSchema !== undefined;
   const payloadArg = hasInput ? "data" : "";
   const clientCall = `api.${dotPath}.${kind}(${payloadArg})`;
 
   const inputBlock = !hasInput
     ? {}
     : method === "get"
-    ? { parameters: buildQueryParams(inputSchema!) }
+    ? { parameters: buildQueryParams(finalInputSchema!) }
     : {
         requestBody: {
           required: true,
           content:
             kind === "upload"
-              ? { "multipart/form-data": { schema: inputSchema! } }
-              : { "application/json": { schema: inputSchema! } },
+              ? { "multipart/form-data": { schema: finalInputSchema! } }
+              : { "application/json": { schema: finalInputSchema! } },
         },
       };
 
@@ -334,4 +389,33 @@ export function extractOpenApi(
     ...(options.tags?.length ? { tags: options.tags } : {}),
     paths,
   };
+}
+
+/** Unwraps ZodOption, ZodDefault, etc., to get the core type */
+function unwrapZodType(schema: any): any {
+  if (typeof schema.unwrap === "function")
+    return unwrapZodType(schema.unwrap());
+  if (typeof schema.removeDefault === "function")
+    return unwrapZodType(schema.removeDefault());
+  if (schema._def?.innerType) return unwrapZodType(schema._def.innerType);
+  return schema;
+}
+
+/** Patches empty objects into OpenAPI binary formats if they are Files/Blobs */
+function patchZodOpenApiBinary(
+  zodShape: Record<string, any>,
+  openApiProperties: Record<string, any>
+) {
+  for (const [key, propSchema] of Object.entries(zodShape)) {
+    const inner = unwrapZodType(propSchema);
+    // Support standard Zod `.class` and your custom `_zod.bag.Class`
+    const cls = inner._def?.class || inner._zod?.bag?.Class;
+
+    if (
+      typeof cls === "function" &&
+      (cls.name === "File" || cls.name === "Blob")
+    ) {
+      openApiProperties[key] = { type: "string", format: "binary" };
+    }
+  }
 }

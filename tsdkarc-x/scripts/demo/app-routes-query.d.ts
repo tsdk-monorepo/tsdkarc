@@ -22,7 +22,7 @@ export interface AppRoutesReactQuery {
         useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ message: string; trace: string; user: string; }, Error, { message: string; trace: string; user: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ message: string; trace: string; user: string; }, Error>;
       };
       getProfile: {
-        useQuery(input: { includeHistory?: boolean }, opts?: Omit<UseQueryOptions<{ history: never[] | null; id: string; name: string; role: string; }, Error, { history: never[] | null; id: string; name: string; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ history: never[] | null; id: string; name: string; role: string; }, Error>;
+        useQuery(input: { includeHistory?: boolean | undefined; }, opts?: Omit<UseQueryOptions<{ history: { a: { b: number; }; }[] | null; id: string; name: string; role: string; }, Error, { history: { a: { b: number; }; }[] | null; id: string; name: string; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ history: { a: { b: number; }; }[] | null; id: string; name: string; role: string; }, Error>;
       };
       getProfile2: {
         useQuery(input: { includeHistory: number[]; } | undefined, opts?: Omit<UseQueryOptions<{ history: never[] | null; id: string; name: string; role: string; }, Error, { history: never[] | null; id: string; name: string; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ history: never[] | null; id: string; name: string; role: string; }, Error>;

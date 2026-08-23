@@ -45,14 +45,13 @@ export const userRoutes = appRouter.init((r, ctx) => ({
 
   // ✅ Feature C: Query WITH Zod Schema & DI Injection
   getProfile: r.query(
-    z.object({
-      /** comment desc */
-      includeHistory: z.boolean().default(false),
-    }),
-    async (input, env) => {
+    async ({ includeHistory }: { includeHistory?: boolean }, env) => {
       // TS auto-completes env.ctx.db
       const user = env.ctx.db.findUser(env.meta.user.id);
-      return { ...user, history: input.includeHistory ? [] : null };
+      return {
+        ...user,
+        history: includeHistory ? ([] as { a: { b: number } }[]) : null,
+      };
     }
   ),
 

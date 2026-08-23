@@ -1,6 +1,6 @@
 {
   "name": "tsdkarc-x",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Fast, End-to-end type-safe RPC for full-stack TypeScript.",
   "repository": "tsdk-monorepo/tsdkarc",
   "bugs": "https://github.com/tsdk-monorepo/tsdkarc/issues",
@@ -135,7 +135,7 @@
     "@scalar/express-api-reference": "^0.10.11",
     "@hono/node-server": "^2.1.0",
     "hono": "^4.13.0",
-    "vue": "^3.5.40",
+    "vue": "^2.6.0 || ^3.3.0",
     "@tanstack/vue-query": "^5.101.4",
     "tsdkarc": "^2.0.0",
     "typescript": "^5"
