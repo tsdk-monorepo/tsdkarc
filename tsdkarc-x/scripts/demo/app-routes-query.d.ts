@@ -19,7 +19,16 @@ export interface AppRoutesReactQuery {
         useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<string, Error, string>, "queryKey" | "queryFn">): UseQueryResult<string, Error>;
       };
       ping: {
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ message: string; trace: string; user: string; }, Error, { message: string; trace: string; user: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ message: string; trace: string; user: string; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ message: string; trace: string; user: string; }, Error, { message: string; trace: string; user: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ message: string; trace: string; user: string; }, Error>;
+      };
+      testSubscribe2: {
+        useMutation(opts?: Omit<UseMutationOptions<WebPushSubscription2, Error, WebPushSubscription>, "mutationFn">): UseMutationResult<WebPushSubscription2, Error, WebPushSubscription>;
+      };
+      testSubscribe3: {
+        useMutation(opts?: Omit<UseMutationOptions<Response, Error, Request>, "mutationFn">): UseMutationResult<Response, Error, Request>;
+      };
+      testSubscribe: {
+        useQuery(input: WebPushSubscription, opts?: Omit<UseQueryOptions<WebPushSubscription2, Error, WebPushSubscription2>, "queryKey" | "queryFn">): UseQueryResult<WebPushSubscription2, Error>;
       };
       getProfile: {
         useQuery(input: { includeHistory?: boolean | undefined; }, opts?: Omit<UseQueryOptions<{ history: { a: { b: number; }; }[] | null; id: string; name: string; role: string; }, Error, { history: { a: { b: number; }; }[] | null; id: string; name: string; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ history: { a: { b: number; }; }[] | null; id: string; name: string; role: string; }, Error>;
@@ -57,13 +66,13 @@ export interface AppRoutesReactQuery {
   };
   a: {
     a: {
-      useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ a: number; }, Error, { a: number; }>, "queryKey" | "queryFn">): UseQueryResult<{ a: number; }, Error>;
+      useQuery(input: any, opts?: Omit<UseQueryOptions<{ a: number; }, Error, { a: number; }>, "queryKey" | "queryFn">): UseQueryResult<{ a: number; }, Error>;
     };
     health: {
       useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<string, Error, string>, "queryKey" | "queryFn">): UseQueryResult<string, Error>;
     };
     ping: {
-      useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ message: string; trace: string; user: string; }, Error, { message: string; trace: string; user: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ message: string; trace: string; user: string; }, Error>;
+      useQuery(input: any, opts?: Omit<UseQueryOptions<{ message: string; trace: string; user: string; }, Error, { message: string; trace: string; user: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ message: string; trace: string; user: string; }, Error>;
     };
   };
   mock: {
@@ -138,7 +147,7 @@ export interface AppRoutesReactQuery {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
       };
       /**
        * Confirm email address via verification code.
@@ -156,7 +165,7 @@ export interface AppRoutesReactQuery {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes0: {
@@ -692,7 +701,7 @@ export interface AppRoutesReactQuery {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, void>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, void>;
+        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, any>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, any>;
       };
       /**
        * Get notification preferences.
@@ -701,7 +710,7 @@ export interface AppRoutesReactQuery {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
       };
       /**
        * Update preferences.
@@ -728,7 +737,7 @@ export interface AppRoutesReactQuery {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes0: {
@@ -1844,7 +1853,7 @@ export interface AppRoutesReactQuery {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
       };
       /**
        * Confirm email address via verification code.
@@ -1862,7 +1871,7 @@ export interface AppRoutesReactQuery {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes1: {
@@ -2398,7 +2407,7 @@ export interface AppRoutesReactQuery {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, void>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, void>;
+        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, any>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, any>;
       };
       /**
        * Get notification preferences.
@@ -2407,7 +2416,7 @@ export interface AppRoutesReactQuery {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
       };
       /**
        * Update preferences.
@@ -2434,7 +2443,7 @@ export interface AppRoutesReactQuery {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes1: {
@@ -3550,7 +3559,7 @@ export interface AppRoutesReactQuery {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
       };
       /**
        * Confirm email address via verification code.
@@ -3568,7 +3577,7 @@ export interface AppRoutesReactQuery {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes2: {
@@ -4104,7 +4113,7 @@ export interface AppRoutesReactQuery {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, void>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, void>;
+        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, any>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, any>;
       };
       /**
        * Get notification preferences.
@@ -4113,7 +4122,7 @@ export interface AppRoutesReactQuery {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
       };
       /**
        * Update preferences.
@@ -4140,7 +4149,7 @@ export interface AppRoutesReactQuery {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes2: {
@@ -5256,7 +5265,7 @@ export interface AppRoutesReactQuery {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
       };
       /**
        * Confirm email address via verification code.
@@ -5274,7 +5283,7 @@ export interface AppRoutesReactQuery {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes3: {
@@ -5810,7 +5819,7 @@ export interface AppRoutesReactQuery {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, void>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, void>;
+        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, any>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, any>;
       };
       /**
        * Get notification preferences.
@@ -5819,7 +5828,7 @@ export interface AppRoutesReactQuery {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
       };
       /**
        * Update preferences.
@@ -5846,7 +5855,7 @@ export interface AppRoutesReactQuery {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes3: {
@@ -6962,7 +6971,7 @@ export interface AppRoutesReactQuery {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
       };
       /**
        * Confirm email address via verification code.
@@ -6980,7 +6989,7 @@ export interface AppRoutesReactQuery {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes4: {
@@ -7516,7 +7525,7 @@ export interface AppRoutesReactQuery {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, void>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, void>;
+        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, any>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, any>;
       };
       /**
        * Get notification preferences.
@@ -7525,7 +7534,7 @@ export interface AppRoutesReactQuery {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
       };
       /**
        * Update preferences.
@@ -7552,7 +7561,7 @@ export interface AppRoutesReactQuery {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes4: {
@@ -8668,7 +8677,7 @@ export interface AppRoutesReactQuery {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
       };
       /**
        * Confirm email address via verification code.
@@ -8686,7 +8695,7 @@ export interface AppRoutesReactQuery {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes5: {
@@ -9222,7 +9231,7 @@ export interface AppRoutesReactQuery {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, void>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, void>;
+        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, any>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, any>;
       };
       /**
        * Get notification preferences.
@@ -9231,7 +9240,7 @@ export interface AppRoutesReactQuery {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
       };
       /**
        * Update preferences.
@@ -9258,7 +9267,7 @@ export interface AppRoutesReactQuery {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes5: {
@@ -10374,7 +10383,7 @@ export interface AppRoutesReactQuery {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
       };
       /**
        * Confirm email address via verification code.
@@ -10392,7 +10401,7 @@ export interface AppRoutesReactQuery {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes6: {
@@ -10928,7 +10937,7 @@ export interface AppRoutesReactQuery {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, void>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, void>;
+        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, any>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, any>;
       };
       /**
        * Get notification preferences.
@@ -10937,7 +10946,7 @@ export interface AppRoutesReactQuery {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
       };
       /**
        * Update preferences.
@@ -10964,7 +10973,7 @@ export interface AppRoutesReactQuery {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes6: {
@@ -12080,7 +12089,7 @@ export interface AppRoutesReactQuery {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
       };
       /**
        * Confirm email address via verification code.
@@ -12098,7 +12107,7 @@ export interface AppRoutesReactQuery {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes7: {
@@ -12634,7 +12643,7 @@ export interface AppRoutesReactQuery {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, void>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, void>;
+        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, any>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, any>;
       };
       /**
        * Get notification preferences.
@@ -12643,7 +12652,7 @@ export interface AppRoutesReactQuery {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
       };
       /**
        * Update preferences.
@@ -12670,7 +12679,7 @@ export interface AppRoutesReactQuery {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes7: {
@@ -13786,7 +13795,7 @@ export interface AppRoutesReactQuery {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
       };
       /**
        * Confirm email address via verification code.
@@ -13804,7 +13813,7 @@ export interface AppRoutesReactQuery {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes8: {
@@ -14340,7 +14349,7 @@ export interface AppRoutesReactQuery {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, void>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, void>;
+        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, any>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, any>;
       };
       /**
        * Get notification preferences.
@@ -14349,7 +14358,7 @@ export interface AppRoutesReactQuery {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
       };
       /**
        * Update preferences.
@@ -14376,7 +14385,7 @@ export interface AppRoutesReactQuery {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes8: {
@@ -15492,7 +15501,7 @@ export interface AppRoutesReactQuery {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ id: UserId; role: string; }, Error, { id: UserId; role: string; }>, "queryKey" | "queryFn">): UseQueryResult<{ id: UserId; role: string; }, Error>;
       };
       /**
        * Confirm email address via verification code.
@@ -15510,7 +15519,7 @@ export interface AppRoutesReactQuery {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes9: {
@@ -16046,7 +16055,7 @@ export interface AppRoutesReactQuery {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, void>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, void>;
+        useMutation(opts?: Omit<UseMutationOptions<{ marked: boolean; }, Error, any>, "mutationFn">): UseMutationResult<{ marked: boolean; }, Error, any>;
       };
       /**
        * Get notification preferences.
@@ -16055,7 +16064,7 @@ export interface AppRoutesReactQuery {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
+        useQuery(input: any, opts?: Omit<UseQueryOptions<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error, { channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>, "queryKey" | "queryFn">): UseQueryResult<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }, Error>;
       };
       /**
        * Update preferences.
@@ -16082,7 +16091,7 @@ export interface AppRoutesReactQuery {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): RQStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes9: {

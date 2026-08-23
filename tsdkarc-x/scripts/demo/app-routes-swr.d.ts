@@ -20,7 +20,16 @@ export interface AppRoutesSwr {
         useQuery(input?: null | undefined, opts?: SWRConfiguration<string>): SWRResponse<string>;
       };
       ping: {
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ message: string; trace: string; user: string; }>): SWRResponse<{ message: string; trace: string; user: string; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ message: string; trace: string; user: string; }>): SWRResponse<{ message: string; trace: string; user: string; }>;
+      };
+      testSubscribe2: {
+        useMutation(opts?: SWRMutationConfiguration<WebPushSubscription2, Error, string, WebPushSubscription>): SWRMutationResponse<WebPushSubscription2, Error, string, WebPushSubscription>;
+      };
+      testSubscribe3: {
+        useMutation(opts?: SWRMutationConfiguration<Response, Error, string, Request>): SWRMutationResponse<Response, Error, string, Request>;
+      };
+      testSubscribe: {
+        useQuery(input: WebPushSubscription, opts?: SWRConfiguration<WebPushSubscription2>): SWRResponse<WebPushSubscription2>;
       };
       getProfile: {
         useQuery(input: { includeHistory?: boolean | undefined; }, opts?: SWRConfiguration<{ history: { a: { b: number; }; }[] | null; id: string; name: string; role: string; }>): SWRResponse<{ history: { a: { b: number; }; }[] | null; id: string; name: string; role: string; }>;
@@ -58,13 +67,13 @@ export interface AppRoutesSwr {
   };
   a: {
     a: {
-      useQuery(input?: null | undefined, opts?: SWRConfiguration<{ a: number; }>): SWRResponse<{ a: number; }>;
+      useQuery(input: any, opts?: SWRConfiguration<{ a: number; }>): SWRResponse<{ a: number; }>;
     };
     health: {
       useQuery(input?: null | undefined, opts?: SWRConfiguration<string>): SWRResponse<string>;
     };
     ping: {
-      useQuery(input?: null | undefined, opts?: SWRConfiguration<{ message: string; trace: string; user: string; }>): SWRResponse<{ message: string; trace: string; user: string; }>;
+      useQuery(input: any, opts?: SWRConfiguration<{ message: string; trace: string; user: string; }>): SWRResponse<{ message: string; trace: string; user: string; }>;
     };
   };
   mock: {
@@ -139,7 +148,7 @@ export interface AppRoutesSwr {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -157,7 +166,7 @@ export interface AppRoutesSwr {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes0: {
@@ -693,7 +702,7 @@ export interface AppRoutesSwr {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, void>): SWRMutationResponse<{ marked: boolean; }, Error, string, void>;
+        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, any>): SWRMutationResponse<{ marked: boolean; }, Error, string, any>;
       };
       /**
        * Get notification preferences.
@@ -702,7 +711,7 @@ export interface AppRoutesSwr {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -729,7 +738,7 @@ export interface AppRoutesSwr {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes0: {
@@ -1845,7 +1854,7 @@ export interface AppRoutesSwr {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -1863,7 +1872,7 @@ export interface AppRoutesSwr {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes1: {
@@ -2399,7 +2408,7 @@ export interface AppRoutesSwr {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, void>): SWRMutationResponse<{ marked: boolean; }, Error, string, void>;
+        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, any>): SWRMutationResponse<{ marked: boolean; }, Error, string, any>;
       };
       /**
        * Get notification preferences.
@@ -2408,7 +2417,7 @@ export interface AppRoutesSwr {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -2435,7 +2444,7 @@ export interface AppRoutesSwr {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes1: {
@@ -3551,7 +3560,7 @@ export interface AppRoutesSwr {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -3569,7 +3578,7 @@ export interface AppRoutesSwr {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes2: {
@@ -4105,7 +4114,7 @@ export interface AppRoutesSwr {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, void>): SWRMutationResponse<{ marked: boolean; }, Error, string, void>;
+        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, any>): SWRMutationResponse<{ marked: boolean; }, Error, string, any>;
       };
       /**
        * Get notification preferences.
@@ -4114,7 +4123,7 @@ export interface AppRoutesSwr {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -4141,7 +4150,7 @@ export interface AppRoutesSwr {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes2: {
@@ -5257,7 +5266,7 @@ export interface AppRoutesSwr {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -5275,7 +5284,7 @@ export interface AppRoutesSwr {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes3: {
@@ -5811,7 +5820,7 @@ export interface AppRoutesSwr {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, void>): SWRMutationResponse<{ marked: boolean; }, Error, string, void>;
+        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, any>): SWRMutationResponse<{ marked: boolean; }, Error, string, any>;
       };
       /**
        * Get notification preferences.
@@ -5820,7 +5829,7 @@ export interface AppRoutesSwr {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -5847,7 +5856,7 @@ export interface AppRoutesSwr {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes3: {
@@ -6963,7 +6972,7 @@ export interface AppRoutesSwr {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -6981,7 +6990,7 @@ export interface AppRoutesSwr {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes4: {
@@ -7517,7 +7526,7 @@ export interface AppRoutesSwr {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, void>): SWRMutationResponse<{ marked: boolean; }, Error, string, void>;
+        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, any>): SWRMutationResponse<{ marked: boolean; }, Error, string, any>;
       };
       /**
        * Get notification preferences.
@@ -7526,7 +7535,7 @@ export interface AppRoutesSwr {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -7553,7 +7562,7 @@ export interface AppRoutesSwr {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes4: {
@@ -8669,7 +8678,7 @@ export interface AppRoutesSwr {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -8687,7 +8696,7 @@ export interface AppRoutesSwr {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes5: {
@@ -9223,7 +9232,7 @@ export interface AppRoutesSwr {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, void>): SWRMutationResponse<{ marked: boolean; }, Error, string, void>;
+        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, any>): SWRMutationResponse<{ marked: boolean; }, Error, string, any>;
       };
       /**
        * Get notification preferences.
@@ -9232,7 +9241,7 @@ export interface AppRoutesSwr {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -9259,7 +9268,7 @@ export interface AppRoutesSwr {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes5: {
@@ -10375,7 +10384,7 @@ export interface AppRoutesSwr {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -10393,7 +10402,7 @@ export interface AppRoutesSwr {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes6: {
@@ -10929,7 +10938,7 @@ export interface AppRoutesSwr {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, void>): SWRMutationResponse<{ marked: boolean; }, Error, string, void>;
+        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, any>): SWRMutationResponse<{ marked: boolean; }, Error, string, any>;
       };
       /**
        * Get notification preferences.
@@ -10938,7 +10947,7 @@ export interface AppRoutesSwr {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -10965,7 +10974,7 @@ export interface AppRoutesSwr {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes6: {
@@ -12081,7 +12090,7 @@ export interface AppRoutesSwr {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -12099,7 +12108,7 @@ export interface AppRoutesSwr {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes7: {
@@ -12635,7 +12644,7 @@ export interface AppRoutesSwr {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, void>): SWRMutationResponse<{ marked: boolean; }, Error, string, void>;
+        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, any>): SWRMutationResponse<{ marked: boolean; }, Error, string, any>;
       };
       /**
        * Get notification preferences.
@@ -12644,7 +12653,7 @@ export interface AppRoutesSwr {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -12671,7 +12680,7 @@ export interface AppRoutesSwr {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes7: {
@@ -13787,7 +13796,7 @@ export interface AppRoutesSwr {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -13805,7 +13814,7 @@ export interface AppRoutesSwr {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes8: {
@@ -14341,7 +14350,7 @@ export interface AppRoutesSwr {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, void>): SWRMutationResponse<{ marked: boolean; }, Error, string, void>;
+        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, any>): SWRMutationResponse<{ marked: boolean; }, Error, string, any>;
       };
       /**
        * Get notification preferences.
@@ -14350,7 +14359,7 @@ export interface AppRoutesSwr {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -14377,7 +14386,7 @@ export interface AppRoutesSwr {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes8: {
@@ -15493,7 +15502,7 @@ export interface AppRoutesSwr {
         /**
          * Current authenticated user.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ id: UserId; role: string; }>): SWRResponse<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -15511,7 +15520,7 @@ export interface AppRoutesSwr {
         /**
          * Stream login activity events for the current user.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "session_created"; sessionId: SessionId; ts: string; }>;
       };
     };
     usersRoutes9: {
@@ -16047,7 +16056,7 @@ export interface AppRoutesSwr {
         /**
          * Mark all notifications read.
          */
-        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, void>): SWRMutationResponse<{ marked: boolean; }, Error, string, void>;
+        useMutation(opts?: SWRMutationConfiguration<{ marked: boolean; }, Error, string, any>): SWRMutationResponse<{ marked: boolean; }, Error, string, any>;
       };
       /**
        * Get notification preferences.
@@ -16056,7 +16065,7 @@ export interface AppRoutesSwr {
         /**
          * Get notification preferences.
          */
-        useQuery(input?: null | undefined, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        useQuery(input: any, opts?: SWRConfiguration<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>): SWRResponse<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -16083,7 +16092,7 @@ export interface AppRoutesSwr {
         /**
          * Real-time notification SSE.
          */
-        useStream(input?: null | undefined, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
+        useStream(input: any, opts?: { enabled?: boolean }): SWRStreamState<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }>;
       };
     };
     searchRoutes9: {

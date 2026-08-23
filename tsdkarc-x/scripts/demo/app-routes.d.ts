@@ -18,7 +18,16 @@ export interface AppRoutes {
         query(input?: null | undefined, opts?: RequestOptions): Promise<string>;
       };
       ping: {
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ message: string; trace: string; user: string; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ message: string; trace: string; user: string; }>;
+      };
+      testSubscribe2: {
+        mutate(input: WebPushSubscription, opts?: RequestOptions): Promise<WebPushSubscription2>;
+      };
+      testSubscribe3: {
+        mutate(input: Request, opts?: RequestOptions): Promise<Response>;
+      };
+      testSubscribe: {
+        query(input: WebPushSubscription, opts?: RequestOptions): Promise<WebPushSubscription2>;
       };
       getProfile: {
         query(input: { includeHistory?: boolean | undefined; }, opts?: RequestOptions): Promise<{ history: { a: { b: number; }; }[] | null; id: string; name: string; role: string; }>;
@@ -56,13 +65,13 @@ export interface AppRoutes {
   };
   a: {
     a: {
-      query(input?: null | undefined, opts?: RequestOptions): Promise<{ a: number; }>;
+      query(input: any, opts?: RequestOptions): Promise<{ a: number; }>;
     };
     health: {
       query(input?: null | undefined, opts?: RequestOptions): Promise<string>;
     };
     ping: {
-      query(input?: null | undefined, opts?: RequestOptions): Promise<{ message: string; trace: string; user: string; }>;
+      query(input: any, opts?: RequestOptions): Promise<{ message: string; trace: string; user: string; }>;
     };
   };
   mock: {
@@ -137,7 +146,7 @@ export interface AppRoutes {
         /**
          * Current authenticated user.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -155,7 +164,7 @@ export interface AppRoutes {
         /**
          * Stream login activity events for the current user.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
       };
     };
     usersRoutes0: {
@@ -691,7 +700,7 @@ export interface AppRoutes {
         /**
          * Mark all notifications read.
          */
-        mutate(input?: null | undefined, opts?: RequestOptions): Promise<{ marked: boolean; }>;
+        mutate(input: any, opts?: RequestOptions): Promise<{ marked: boolean; }>;
       };
       /**
        * Get notification preferences.
@@ -700,7 +709,7 @@ export interface AppRoutes {
         /**
          * Get notification preferences.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -727,7 +736,7 @@ export interface AppRoutes {
         /**
          * Real-time notification SSE.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
       };
     };
     searchRoutes0: {
@@ -1843,7 +1852,7 @@ export interface AppRoutes {
         /**
          * Current authenticated user.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -1861,7 +1870,7 @@ export interface AppRoutes {
         /**
          * Stream login activity events for the current user.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
       };
     };
     usersRoutes1: {
@@ -2397,7 +2406,7 @@ export interface AppRoutes {
         /**
          * Mark all notifications read.
          */
-        mutate(input?: null | undefined, opts?: RequestOptions): Promise<{ marked: boolean; }>;
+        mutate(input: any, opts?: RequestOptions): Promise<{ marked: boolean; }>;
       };
       /**
        * Get notification preferences.
@@ -2406,7 +2415,7 @@ export interface AppRoutes {
         /**
          * Get notification preferences.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -2433,7 +2442,7 @@ export interface AppRoutes {
         /**
          * Real-time notification SSE.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
       };
     };
     searchRoutes1: {
@@ -3549,7 +3558,7 @@ export interface AppRoutes {
         /**
          * Current authenticated user.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -3567,7 +3576,7 @@ export interface AppRoutes {
         /**
          * Stream login activity events for the current user.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
       };
     };
     usersRoutes2: {
@@ -4103,7 +4112,7 @@ export interface AppRoutes {
         /**
          * Mark all notifications read.
          */
-        mutate(input?: null | undefined, opts?: RequestOptions): Promise<{ marked: boolean; }>;
+        mutate(input: any, opts?: RequestOptions): Promise<{ marked: boolean; }>;
       };
       /**
        * Get notification preferences.
@@ -4112,7 +4121,7 @@ export interface AppRoutes {
         /**
          * Get notification preferences.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -4139,7 +4148,7 @@ export interface AppRoutes {
         /**
          * Real-time notification SSE.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
       };
     };
     searchRoutes2: {
@@ -5255,7 +5264,7 @@ export interface AppRoutes {
         /**
          * Current authenticated user.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -5273,7 +5282,7 @@ export interface AppRoutes {
         /**
          * Stream login activity events for the current user.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
       };
     };
     usersRoutes3: {
@@ -5809,7 +5818,7 @@ export interface AppRoutes {
         /**
          * Mark all notifications read.
          */
-        mutate(input?: null | undefined, opts?: RequestOptions): Promise<{ marked: boolean; }>;
+        mutate(input: any, opts?: RequestOptions): Promise<{ marked: boolean; }>;
       };
       /**
        * Get notification preferences.
@@ -5818,7 +5827,7 @@ export interface AppRoutes {
         /**
          * Get notification preferences.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -5845,7 +5854,7 @@ export interface AppRoutes {
         /**
          * Real-time notification SSE.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
       };
     };
     searchRoutes3: {
@@ -6961,7 +6970,7 @@ export interface AppRoutes {
         /**
          * Current authenticated user.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -6979,7 +6988,7 @@ export interface AppRoutes {
         /**
          * Stream login activity events for the current user.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
       };
     };
     usersRoutes4: {
@@ -7515,7 +7524,7 @@ export interface AppRoutes {
         /**
          * Mark all notifications read.
          */
-        mutate(input?: null | undefined, opts?: RequestOptions): Promise<{ marked: boolean; }>;
+        mutate(input: any, opts?: RequestOptions): Promise<{ marked: boolean; }>;
       };
       /**
        * Get notification preferences.
@@ -7524,7 +7533,7 @@ export interface AppRoutes {
         /**
          * Get notification preferences.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -7551,7 +7560,7 @@ export interface AppRoutes {
         /**
          * Real-time notification SSE.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
       };
     };
     searchRoutes4: {
@@ -8667,7 +8676,7 @@ export interface AppRoutes {
         /**
          * Current authenticated user.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -8685,7 +8694,7 @@ export interface AppRoutes {
         /**
          * Stream login activity events for the current user.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
       };
     };
     usersRoutes5: {
@@ -9221,7 +9230,7 @@ export interface AppRoutes {
         /**
          * Mark all notifications read.
          */
-        mutate(input?: null | undefined, opts?: RequestOptions): Promise<{ marked: boolean; }>;
+        mutate(input: any, opts?: RequestOptions): Promise<{ marked: boolean; }>;
       };
       /**
        * Get notification preferences.
@@ -9230,7 +9239,7 @@ export interface AppRoutes {
         /**
          * Get notification preferences.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -9257,7 +9266,7 @@ export interface AppRoutes {
         /**
          * Real-time notification SSE.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
       };
     };
     searchRoutes5: {
@@ -10373,7 +10382,7 @@ export interface AppRoutes {
         /**
          * Current authenticated user.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -10391,7 +10400,7 @@ export interface AppRoutes {
         /**
          * Stream login activity events for the current user.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
       };
     };
     usersRoutes6: {
@@ -10927,7 +10936,7 @@ export interface AppRoutes {
         /**
          * Mark all notifications read.
          */
-        mutate(input?: null | undefined, opts?: RequestOptions): Promise<{ marked: boolean; }>;
+        mutate(input: any, opts?: RequestOptions): Promise<{ marked: boolean; }>;
       };
       /**
        * Get notification preferences.
@@ -10936,7 +10945,7 @@ export interface AppRoutes {
         /**
          * Get notification preferences.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -10963,7 +10972,7 @@ export interface AppRoutes {
         /**
          * Real-time notification SSE.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
       };
     };
     searchRoutes6: {
@@ -12079,7 +12088,7 @@ export interface AppRoutes {
         /**
          * Current authenticated user.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -12097,7 +12106,7 @@ export interface AppRoutes {
         /**
          * Stream login activity events for the current user.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
       };
     };
     usersRoutes7: {
@@ -12633,7 +12642,7 @@ export interface AppRoutes {
         /**
          * Mark all notifications read.
          */
-        mutate(input?: null | undefined, opts?: RequestOptions): Promise<{ marked: boolean; }>;
+        mutate(input: any, opts?: RequestOptions): Promise<{ marked: boolean; }>;
       };
       /**
        * Get notification preferences.
@@ -12642,7 +12651,7 @@ export interface AppRoutes {
         /**
          * Get notification preferences.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -12669,7 +12678,7 @@ export interface AppRoutes {
         /**
          * Real-time notification SSE.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
       };
     };
     searchRoutes7: {
@@ -13785,7 +13794,7 @@ export interface AppRoutes {
         /**
          * Current authenticated user.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -13803,7 +13812,7 @@ export interface AppRoutes {
         /**
          * Stream login activity events for the current user.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
       };
     };
     usersRoutes8: {
@@ -14339,7 +14348,7 @@ export interface AppRoutes {
         /**
          * Mark all notifications read.
          */
-        mutate(input?: null | undefined, opts?: RequestOptions): Promise<{ marked: boolean; }>;
+        mutate(input: any, opts?: RequestOptions): Promise<{ marked: boolean; }>;
       };
       /**
        * Get notification preferences.
@@ -14348,7 +14357,7 @@ export interface AppRoutes {
         /**
          * Get notification preferences.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -14375,7 +14384,7 @@ export interface AppRoutes {
         /**
          * Real-time notification SSE.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
       };
     };
     searchRoutes8: {
@@ -15491,7 +15500,7 @@ export interface AppRoutes {
         /**
          * Current authenticated user.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ id: UserId; role: string; }>;
       };
       /**
        * Confirm email address via verification code.
@@ -15509,7 +15518,7 @@ export interface AppRoutes {
         /**
          * Stream login activity events for the current user.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "session_created"; sessionId: SessionId; ts: string; }, void, unknown>>;
       };
     };
     usersRoutes9: {
@@ -16045,7 +16054,7 @@ export interface AppRoutes {
         /**
          * Mark all notifications read.
          */
-        mutate(input?: null | undefined, opts?: RequestOptions): Promise<{ marked: boolean; }>;
+        mutate(input: any, opts?: RequestOptions): Promise<{ marked: boolean; }>;
       };
       /**
        * Get notification preferences.
@@ -16054,7 +16063,7 @@ export interface AppRoutes {
         /**
          * Get notification preferences.
          */
-        query(input?: null | undefined, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
+        query(input: any, opts?: RequestOptions): Promise<{ channels: Record<string, boolean>; types: Partial<Record<"billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync", boolean>>; }>;
       };
       /**
        * Update preferences.
@@ -16081,7 +16090,7 @@ export interface AppRoutes {
         /**
          * Real-time notification SSE.
          */
-        stream(input?: null | undefined, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
+        stream(input: any, opts?: RequestOptions): Promise<AsyncGenerator<{ type: "notification"; notification: { id: string; type: "billing" | "comment" | "mention" | "task_assigned" | "task_completed" | "security" | "system" | "workflow_run" | "integration_sync"; read: boolean; payload: { type: "mention"; commentId: string; resourceType: string; resourceId: string; } | { type: "task_assigned"; taskId: string; projectId: string; } | { type: "task_completed"; taskId: string; completedBy: string; } | { type: "comment"; commentId: string; taskId: string; } | { type: "billing"; invoiceId: string; amount: number; currency: string; } | { type: "security"; event: string; ip?: string | undefined; } | { type: "system"; message: string; } | { type: "workflow_run"; workflowId: string; status: "success" | "failed"; } | { type: "integration_sync"; integrationId: string; itemsSynced: number; }; createdAt: string; actorId: string | null; }; }, void, unknown>>;
       };
     };
     searchRoutes9: {

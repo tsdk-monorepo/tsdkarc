@@ -289,11 +289,15 @@ function buildPathItem(route: RouteInfo, meta?: Partial<SourceMeta>): object {
 
   // NEW: Try Zod first, fallback to TS AST extraction
   let finalInputSchema = inputSchema;
-  if (!finalInputSchema && meta?.inputTs && meta.inputTs !== "unknown") {
+  if (
+    !finalInputSchema &&
+    meta?.inputTsExpanded &&
+    meta.inputTsExpanded !== "unknown"
+  ) {
     finalInputSchema = {
       title: "Inferred Request",
       type: "object",
-      ...bestEffortTsToSchema(meta.inputTs),
+      ...bestEffortTsToSchema(meta.inputTsExpanded),
     };
   }
 
@@ -319,23 +323,18 @@ function buildPathItem(route: RouteInfo, meta?: Partial<SourceMeta>): object {
   const finalDescription = meta?.docs
     ? `${meta.docs}\n\n${clientSnippet}`
     : clientSnippet;
-
   const responseTsType =
-    meta?.outputTs && meta.outputTs !== "unknown" ? meta.outputTs : "any";
-
-  const trimmedType = responseTsType.trim();
-  let rootType = "object";
-  if (trimmedType === "string") rootType = "string";
-  else if (trimmedType === "number") rootType = "number";
-  else if (trimmedType === "boolean") rootType = "boolean";
-  else if (trimmedType.endsWith("[]") || trimmedType.startsWith("Array"))
-    rootType = "array";
+    meta?.outputTsExpanded && meta.outputTsExpanded !== "unknown"
+      ? meta.outputTsExpanded
+      : "any";
 
   const responseSchema = {
     title: "Inferred Response",
-    type: rootType,
-    description: `### TypeScript Return Type\n\`\`\`typescript\ntype Response = ${responseTsType};\n\`\`\``,
+    type: "object", // Root type fallback
     ...bestEffortTsToSchema(responseTsType),
+    description: `### TypeScript Return Type\n\`\`\`typescript\ntype Response = ${
+      meta?.outputTs || "any"
+    };\n\`\`\``,
   };
 
   return {

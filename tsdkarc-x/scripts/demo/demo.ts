@@ -18,6 +18,7 @@ import fs from "fs/promises";
 import path from "path";
 
 import type { Context } from "hono";
+import { WebPushSubscription, WebPushSubscription2 } from "./types";
 
 const createContext2 = async (c: Context) => ({
   get token() {
@@ -42,6 +43,18 @@ export const userRoutes = appRouter.init((r, ctx) => ({
       user: env.meta.user.id, // Typed user from authMw
     };
   }),
+
+  testSubscribe2: r.mutate((input: WebPushSubscription) => {
+    return {} as unknown as WebPushSubscription2;
+  }),
+
+  testSubscribe3: r.mutate((input: Request) => {
+    return {} as unknown as Response;
+  }),
+
+  testSubscribe(input: WebPushSubscription) {
+    return {} as unknown as WebPushSubscription2;
+  },
 
   // ✅ Feature C: Query WITH Zod Schema & DI Injection
   getProfile: r.query(

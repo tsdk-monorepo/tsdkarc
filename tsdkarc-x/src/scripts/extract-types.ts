@@ -711,11 +711,101 @@ export interface SourceMeta {
   inputTs?: string;
   docs: string;
   location: string;
+  outputTsExpanded?: string; // NEW
+  inputTsExpanded?: string; // NEW
 }
 
 interface SourceExtractionResult {
   leaves: Map<string, SourceMeta>;
   namespaces: Map<string, SourceMeta>;
+}
+
+/**
+ * Recursively expands named interfaces and type aliases into inline literal strings.
+ */
+function expandTypeToLiteral(
+  type: ts.Type,
+  checker: ts.TypeChecker,
+  depth = 0
+): string {
+  if (depth > 5) return typeToString(type, checker); // Prevent infinite loops
+
+  // 1. Unions
+  if (type.isUnion()) {
+    const types = type.types.map((t) =>
+      expandTypeToLiteral(t, checker, depth + 1)
+    );
+    return Array.from(new Set(types)).join(" | ");
+  }
+
+  // 2. Classes & Arrays
+  const symbol = type.getSymbol() || type.aliasSymbol;
+  if (symbol) {
+    const name = symbol.getName();
+
+    // Check if the type is a standard Array first (we DO want to expand what's inside arrays)
+    if (name === "Array" || name === "ReadonlyArray") {
+      const typeArgs = checker.getTypeArguments(type as ts.TypeReference);
+      if (typeArgs.length > 0) {
+        return `Array<${expandTypeToLiteral(typeArgs[0], checker, depth + 1)}>`;
+      }
+    }
+
+    // NEW: Dynamically check if the type comes from a built-in library
+    const declarations = symbol.getDeclarations();
+    if (declarations && declarations.length > 0) {
+      const sourceFile = declarations[0].getSourceFile().fileName;
+      // Normalizes path matching for Windows/Linux
+      const isBuiltIn =
+        sourceFile.includes("node_modules/typescript/lib/") ||
+        sourceFile.includes("node_modules/@types/node/");
+
+      if (isBuiltIn) {
+        return name; // Return "Request", "Response", "Map", "Buffer" as opaque strings
+      }
+    }
+  }
+
+  // 3. Primitives & Literals
+  if (type.flags & ts.TypeFlags.String || type.isStringLiteral())
+    return "string";
+  if (type.flags & ts.TypeFlags.Number || type.isNumberLiteral())
+    return "number";
+  if (type.flags & ts.TypeFlags.Boolean) return "boolean";
+  if (type.flags & ts.TypeFlags.Null) return "null";
+  if (type.flags & ts.TypeFlags.Undefined) return "undefined";
+  if (type.flags & ts.TypeFlags.Any) return "any";
+  if (type.flags & ts.TypeFlags.Unknown) return "unknown";
+
+  // 4. Objects (Interfaces, Type Aliases)
+  if (
+    type.flags & ts.TypeFlags.Object ||
+    type.flags & ts.TypeFlags.Intersection
+  ) {
+    const callSigs = type.getCallSignatures();
+    if (callSigs.length > 0) return "Function";
+
+    const props = type.getProperties();
+    if (props.length > 0) {
+      const fields = props.map((prop) => {
+        const propType = checker.getTypeOfSymbol(prop);
+        const isOptional = prop.flags & ts.SymbolFlags.Optional ? "?" : "";
+        const name = prop.getName();
+        const safeName = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name)
+          ? name
+          : `"${name}"`;
+
+        return `${safeName}${isOptional}: ${expandTypeToLiteral(
+          propType,
+          checker,
+          depth + 1
+        )}`;
+      });
+      return `{ ${fields.join("; ")} }`;
+    }
+  }
+
+  return typeToString(type, checker);
 }
 
 function walkObjectLiteral(
@@ -800,12 +890,41 @@ function walkObjectLiteral(
     }
 
     const setOut = (handlerNode: ts.Node, callNode?: ts.CallExpression) => {
-      const outputTs = resolveOutputType(handlerNode, callNode, checker);
-      const inputTs = extractFirstParamType(handlerNode, checker);
+      // 1. Get raw ts.Type instead of string
+      let outType: ts.Type | null = null;
+      const handlerType = checker.getTypeAtLocation(handlerNode);
+      const handlerSigs = handlerType.getCallSignatures();
+      if (handlerSigs.length) {
+        outType = checker.getReturnTypeOfSignature(handlerSigs[0]);
+      }
 
+      let inType: ts.Type | null = null;
+      if (handlerSigs.length && handlerSigs[0].getParameters().length) {
+        inType = checker.getTypeOfSymbol(handlerSigs[0].getParameters()[0]);
+      }
+
+      // 2. Unwrap Promises for the output type
+      if (outType) {
+        const typeArgs = checker.getTypeArguments(outType as ts.TypeReference);
+        const symName = outType.getSymbol()?.getName();
+        if (
+          typeArgs.length &&
+          ["Promise", "AsyncGenerator"].includes(symName || "")
+        ) {
+          outType = typeArgs[0];
+        }
+      }
+
+      // 3. Save BOTH raw strings (for fast d.ts) and expanded strings (for OpenAPI)
       out.leaves.set(path, {
-        outputTs,
-        inputTs: inputTs ?? undefined,
+        outputTs: outType ? typeToString(outType, checker) : "unknown",
+        outputTsExpanded: outType
+          ? expandTypeToLiteral(outType, checker)
+          : "unknown",
+        inputTs: inType ? typeToString(inType, checker) : undefined,
+        inputTsExpanded: inType
+          ? expandTypeToLiteral(inType, checker)
+          : undefined,
         docs: docs.trim(),
         location,
       });
