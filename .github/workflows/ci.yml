@@ -238,7 +238,7 @@ jobs:
         working-directory: tsdkarc-x
 
       - name: Install e2e-tests dependencies
-        run: bun install
+        run: npm install
         working-directory: e2e-tests
 
       - name: Relink local dependencies for e2e-tests
