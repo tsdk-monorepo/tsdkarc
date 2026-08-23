@@ -25,7 +25,7 @@ import {
 import { launchApp } from "tsdkarc-x";
 import { ExpressAdapter } from "tsdkarc-x/express";
 import { type Request } from "express";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import { type RoutesOf } from "tsdkarc-x";
 import { RpcError } from "tsdkarc-x/client";
