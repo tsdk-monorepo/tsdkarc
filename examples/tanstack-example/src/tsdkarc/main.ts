@@ -7,8 +7,6 @@ import {
   RpcError,
 } from "tsdkarc-x";
 import { FetchAdapter } from "tsdkarc-x/fetch";
-import { extractOpenApi } from "tsdkarc-x/openapi";
-import { extractAppRoutesTypesFull } from "tsdkarc-x/extract";
 
 export const transport = new FetchAdapter({
   log: true,
@@ -40,7 +38,7 @@ const userRoutes = appRouter.init((r) => ({
 }));
 export const routes = { users: userRoutes }; // routesExportName
 
-const app = await launchApp({
+export const app = await launchApp({
   basePath: "/api/arcx",
   transport,
   createContext,
@@ -49,24 +47,3 @@ const app = await launchApp({
 });
 
 export type AppRoutes = RoutesOf<typeof app>;
-
-//  Generate openapi JSON
-export const openapi = extractOpenApi(
-  app.routes,
-  {
-    info: { title: "Tanstack Router Example API", version: "0.0.5" },
-  },
-  { entryFile: "./src/tsdkarc/main.ts" }
-);
-
-// Generate static type of routes
-/*
-const result =
-  await extractAppRoutesTypesFull(app.routes, {
-    entryFile: "./src/tsdkarc/main.ts",
-  });
-fs.writeFile('./types/client.d.ts', result.clientDts, 'utf8');
-fs.writeFile('./types/swr-client.d.ts', result.swrDts, 'utf8');
-fs.writeFile('./types/react-query-client.d.ts', result.reactQueryDts, 'utf8');
-fs.writeFile('./types/vue-query-client.d.ts', result.vueQueryDts, 'utf8');
-*/
